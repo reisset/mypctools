@@ -3,8 +3,6 @@
 # Main TUI launcher for mypctools
 # v0.3.0
 
-set -e
-
 MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"

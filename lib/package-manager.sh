@@ -180,6 +180,19 @@ install_cursor_fallback() {
     print_info "Cursor installed to ~/.local/bin/cursor.AppImage"
 }
 
+# LM Studio - AppImage download (~1GB)
+install_lmstudio_fallback() {
+    local appimage_url="https://lmstudio.ai/download/latest/linux/x64"
+    mkdir -p "$HOME/.local/bin"
+    print_warning "LM Studio is ~1GB - this may take a while..."
+    if ! curl -L -o "$HOME/.local/bin/lmstudio.AppImage" "$appimage_url"; then
+        print_error "Failed to download LM Studio"
+        return 1
+    fi
+    chmod +x "$HOME/.local/bin/lmstudio.AppImage"
+    print_info "LM Studio installed to ~/.local/bin/lmstudio.AppImage"
+}
+
 # Ollama - official install script
 install_ollama_fallback() {
     curl -fsSL https://ollama.com/install.sh | sh
