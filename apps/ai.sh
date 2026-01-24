@@ -47,7 +47,7 @@ show_ai_menu() {
                     install_package "Ollama" "" "ollama" "" "install_ollama_fallback"
                     ;;
                 "LM Studio")
-                    install_package "LM Studio" "" "" "ai.lmstudio.LMStudio" ""
+                    install_package "LM Studio" "" "" "" "install_lmstudio_fallback"
                     ;;
             esac
         done <<< "$choices"
