@@ -1,0 +1,223 @@
+#!/usr/bin/env bash
+# mypctools/launcher.sh
+# Main TUI launcher for mypctools
+# v0.1.0
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+source "$SCRIPT_DIR/lib/helpers.sh"
+source "$SCRIPT_DIR/lib/distro-detect.sh"
+
+VERSION="0.1.0"
+
+# Check gum is installed
+if ! command_exists gum; then
+    print_error "gum is not installed. Run ./install.sh first."
+    exit 1
+fi
+
+# Submenus
+show_install_apps_menu() {
+    while true; do
+        local choice
+        choice=$(gum choose --header "Install Apps" \
+            "Browsers" \
+            "Gaming" \
+            "Media" \
+            "Dev Tools" \
+            "CLI Utilities" \
+            "Back")
+
+        case "$choice" in
+            "Browsers")
+                source "$SCRIPT_DIR/apps/browsers.sh"
+                show_browsers_menu
+                ;;
+            "Gaming")
+                source "$SCRIPT_DIR/apps/gaming.sh"
+                show_gaming_menu
+                ;;
+            "Media")
+                source "$SCRIPT_DIR/apps/media.sh"
+                show_media_menu
+                ;;
+            "Dev Tools")
+                source "$SCRIPT_DIR/apps/dev-tools.sh"
+                show_dev_tools_menu
+                ;;
+            "CLI Utilities")
+                source "$SCRIPT_DIR/apps/cli-utils.sh"
+                show_cli_utils_menu
+                ;;
+            "Back"|"")
+                break
+                ;;
+        esac
+    done
+}
+
+show_scripts_menu() {
+    while true; do
+        local choice
+        choice=$(gum choose --header "My Scripts" \
+            "Bash Setup" \
+            "Screensavers" \
+            "Claude Setup" \
+            "Back")
+
+        case "$choice" in
+            "Bash Setup")
+                if [[ -f "$SCRIPT_DIR/scripts/bash/install.sh" ]]; then
+                    print_info "Running Bash Setup installer..."
+                    bash "$SCRIPT_DIR/scripts/bash/install.sh"
+                else
+                    print_warning "Bash Setup scripts not yet added."
+                    print_info "Add your scripts to: $SCRIPT_DIR/scripts/bash/"
+                fi
+                read -rp "Press Enter to continue..."
+                ;;
+            "Screensavers")
+                if [[ -f "$SCRIPT_DIR/scripts/screensavers/install.sh" ]]; then
+                    print_info "Running Screensavers installer..."
+                    bash "$SCRIPT_DIR/scripts/screensavers/install.sh"
+                else
+                    print_warning "Screensaver scripts not yet added."
+                    print_info "Add your scripts to: $SCRIPT_DIR/scripts/screensavers/"
+                fi
+                read -rp "Press Enter to continue..."
+                ;;
+            "Claude Setup")
+                if [[ -f "$SCRIPT_DIR/scripts/claude/install.sh" ]]; then
+                    print_info "Running Claude Setup installer..."
+                    bash "$SCRIPT_DIR/scripts/claude/install.sh"
+                else
+                    print_warning "Claude Setup scripts not yet added (private)."
+                    print_info "Add your scripts to: $SCRIPT_DIR/scripts/claude/"
+                fi
+                read -rp "Press Enter to continue..."
+                ;;
+            "Back"|"")
+                break
+                ;;
+        esac
+    done
+}
+
+show_system_setup_menu() {
+    while true; do
+        local choice
+        choice=$(gum choose --header "System Setup" \
+            "System Info" \
+            "Coming Soon..." \
+            "Back")
+
+        case "$choice" in
+            "System Info")
+                echo ""
+                print_header "System Information"
+                print_info "Distro: $DISTRO_NAME"
+                print_info "Type: $DISTRO_TYPE"
+                print_info "Kernel: $(uname -r)"
+                print_info "Shell: $SHELL"
+                echo ""
+                read -rp "Press Enter to continue..."
+                ;;
+            "Coming Soon...")
+                print_info "More system setup options coming in future versions."
+                read -rp "Press Enter to continue..."
+                ;;
+            "Back"|"")
+                break
+                ;;
+        esac
+    done
+}
+
+show_settings_menu() {
+    while true; do
+        local choice
+        choice=$(gum choose --header "Settings" \
+            "About" \
+            "Check for Updates" \
+            "Back")
+
+        case "$choice" in
+            "About")
+                echo ""
+                show_header "mypctools v$VERSION"
+                echo ""
+                print_info "A personal TUI for managing scripts and apps"
+                print_info "Built with Gum by Charm"
+                print_info "https://github.com/reisset/mypctools"
+                echo ""
+                read -rp "Press Enter to continue..."
+                ;;
+            "Check for Updates")
+                print_info "[STUB] Would check for updates via git pull"
+                read -rp "Press Enter to continue..."
+                ;;
+            "Back"|"")
+                break
+                ;;
+        esac
+    done
+}
+
+show_windows_menu() {
+    echo ""
+    print_header "Windows PowerShell Scripts"
+    print_warning "These scripts are for Windows and cannot be run from here."
+    print_info "Location: $SCRIPT_DIR/windows/powershell/"
+    print_info "GitHub: https://github.com/reisset/mypowershell"
+    echo ""
+
+    gum confirm "Open folder in file manager?" && {
+        if command_exists xdg-open; then
+            xdg-open "$SCRIPT_DIR/windows/powershell/" 2>/dev/null || true
+        fi
+    }
+}
+
+# Main menu
+main_menu() {
+    while true; do
+        clear
+        show_header "mypctools v$VERSION"
+        echo ""
+
+        local choice
+        choice=$(gum choose \
+            "Install Apps" \
+            "My Scripts" \
+            "System Setup" \
+            "Windows Scripts (Reference)" \
+            "Settings" \
+            "Exit")
+
+        case "$choice" in
+            "Install Apps")
+                show_install_apps_menu
+                ;;
+            "My Scripts")
+                show_scripts_menu
+                ;;
+            "System Setup")
+                show_system_setup_menu
+                ;;
+            "Windows Scripts (Reference)")
+                show_windows_menu
+                ;;
+            "Settings")
+                show_settings_menu
+                ;;
+            "Exit"|"")
+                print_success "Goodbye!"
+                exit 0
+                ;;
+        esac
+    done
+}
+
+# Run
+main_menu
