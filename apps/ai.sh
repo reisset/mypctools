@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # mypctools/apps/ai.sh
 # AI tools installation menu
-# v0.2.0
+# v0.3.0
 
 _AI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_AI_DIR/../lib/helpers.sh"
+source "$_AI_DIR/../lib/theme.sh"
 source "$_AI_DIR/../lib/package-manager.sh"
 
 show_ai_menu() {
-    print_header "AI Tools"
+    clear
+    show_subheader "AI Tools"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select AI tools (Space=select, Enter=confirm):" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
         "OpenCode" \
         "Claude Code" \
         "Mistral Vibe CLI" \
@@ -24,13 +26,13 @@ show_ai_menu() {
     fi
 
     echo ""
-    print_header "Would install the following:"
+    show_subheader "Would install"
     while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
     done <<< "$choices"
     echo ""
 
-    gum confirm "Proceed with installation?" && {
+    if themed_confirm "Proceed with installation?"; then
         while read -r choice; do
             case "$choice" in
                 "OpenCode")
@@ -52,7 +54,7 @@ show_ai_menu() {
         done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
-    }
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

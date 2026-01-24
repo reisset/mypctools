@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # mypctools/apps/cli-utils.sh
 # CLI utilities installation menu
-# v0.1.0
+# v0.2.0
 
 _CLI_UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_CLI_UTILS_DIR/../lib/helpers.sh"
+source "$_CLI_UTILS_DIR/../lib/theme.sh"
 source "$_CLI_UTILS_DIR/../lib/package-manager.sh"
 
 show_cli_utils_menu() {
-    print_header "CLI Utilities"
+    clear
+    show_subheader "CLI Utilities"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select utilities (Space=select, Enter=confirm):" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
         "fzf - Fuzzy finder" \
         "bat - Better cat" \
         "eza - Better ls" \
@@ -29,13 +31,13 @@ show_cli_utils_menu() {
     fi
 
     echo ""
-    print_header "Would install the following:"
+    show_subheader "Would install"
     while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
     done <<< "$choices"
     echo ""
 
-    gum confirm "Proceed with installation?" && {
+    if themed_confirm "Proceed with installation?"; then
         while read -r choice; do
             case "$choice" in
                 "fzf - Fuzzy finder")
@@ -72,7 +74,7 @@ show_cli_utils_menu() {
         done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
-    }
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

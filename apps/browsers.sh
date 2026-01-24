@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # mypctools/apps/browsers.sh
 # Browser installation menu
-# v0.1.0
+# v0.2.0
 
 _BROWSERS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_BROWSERS_DIR/../lib/helpers.sh"
+source "$_BROWSERS_DIR/../lib/theme.sh"
 source "$_BROWSERS_DIR/../lib/package-manager.sh"
 
 show_browsers_menu() {
-    print_header "Browsers"
+    clear
+    show_subheader "Browsers"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select browsers (Space=select, Enter=confirm):" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
         "Brave Browser" \
         "Firefox" \
         "Back")
@@ -21,13 +23,13 @@ show_browsers_menu() {
     fi
 
     echo ""
-    print_header "Would install the following:"
+    show_subheader "Would install"
     while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
     done <<< "$choices"
     echo ""
 
-    gum confirm "Proceed with installation?" && {
+    if themed_confirm "Proceed with installation?"; then
         while read -r choice; do
             case "$choice" in
                 "Brave Browser")
@@ -40,7 +42,7 @@ show_browsers_menu() {
         done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
-    }
+    fi
 }
 
 # Run if executed directly

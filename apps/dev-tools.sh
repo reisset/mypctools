@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # mypctools/apps/dev-tools.sh
 # Developer tools installation menu
-# v0.2.0
+# v0.3.0
 
 _DEV_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_DEV_TOOLS_DIR/../lib/helpers.sh"
+source "$_DEV_TOOLS_DIR/../lib/theme.sh"
 source "$_DEV_TOOLS_DIR/../lib/package-manager.sh"
 
 show_dev_tools_menu() {
-    print_header "Developer Tools"
+    clear
+    show_subheader "Developer Tools"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select tools (Space=select, Enter=confirm):" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
         "Docker" \
         "LazyDocker" \
         "VSCode" \
@@ -25,13 +27,13 @@ show_dev_tools_menu() {
     fi
 
     echo ""
-    print_header "Would install the following:"
+    show_subheader "Would install"
     while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
     done <<< "$choices"
     echo ""
 
-    gum confirm "Proceed with installation?" && {
+    if themed_confirm "Proceed with installation?"; then
         while read -r choice; do
             case "$choice" in
                 "Docker")
@@ -56,7 +58,7 @@ show_dev_tools_menu() {
         done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
-    }
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

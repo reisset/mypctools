@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # mypctools/launcher.sh
 # Main TUI launcher for mypctools
-# v0.2.0
+# v0.3.0
 
 set -e
 
 MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
+source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.2.0"
+VERSION="0.3.0"
 
 # Cleanup on interrupt
 cleanup() {
@@ -35,8 +36,10 @@ fi
 # Submenus
 show_install_apps_menu() {
     while true; do
+        clear
+        show_subheader "Install Apps"
         local choice
-        choice=$(gum choose --header "Install Apps" \
+        choice=$(themed_choose "" \
             "AI" \
             "Browsers" \
             "Gaming" \
@@ -79,8 +82,10 @@ show_install_apps_menu() {
 
 show_scripts_menu() {
     while true; do
+        clear
+        show_subheader "My Scripts"
         local choice
-        choice=$(gum choose --header "My Scripts" \
+        choice=$(themed_choose "" \
             "Bash Setup" \
             "Screensavers" \
             "Claude Setup" \
@@ -89,8 +94,10 @@ show_scripts_menu() {
         case "$choice" in
             "Bash Setup")
                 while true; do
+                    clear
+                    show_subheader "Bash Setup"
                     local action
-                    action=$(gum choose --header "Bash Setup" \
+                    action=$(themed_choose "" \
                         "Install" \
                         "Uninstall" \
                         "Back")
@@ -120,8 +127,10 @@ show_scripts_menu() {
                 ;;
             "Screensavers")
                 while true; do
+                    clear
+                    show_subheader "Screensavers"
                     local action
-                    action=$(gum choose --header "Screensavers" \
+                    action=$(themed_choose "" \
                         "Install" \
                         "Uninstall" \
                         "Back")
@@ -151,8 +160,10 @@ show_scripts_menu() {
                 ;;
             "Claude Setup")
                 while true; do
+                    clear
+                    show_subheader "Claude Setup"
                     local action
-                    action=$(gum choose --header "Claude Setup" \
+                    action=$(themed_choose "" \
                         "Install" \
                         "Uninstall" \
                         "Back")
@@ -189,16 +200,18 @@ show_scripts_menu() {
 
 show_system_setup_menu() {
     while true; do
+        clear
+        show_subheader "System Setup"
         local choice
-        choice=$(gum choose --header "System Setup" \
+        choice=$(themed_choose "" \
             "System Info" \
             "Coming Soon..." \
             "Back")
 
         case "$choice" in
             "System Info")
-                echo ""
-                print_header "System Information"
+                clear
+                show_subheader "System Information"
 
                 # User@Host
                 print_info "User: $USER@$(hostname)"
@@ -280,17 +293,18 @@ show_system_setup_menu() {
 
 show_settings_menu() {
     while true; do
+        clear
+        show_subheader "Settings"
         local choice
-        choice=$(gum choose --header "Settings" \
+        choice=$(themed_choose "" \
             "About" \
             "Check for Updates" \
             "Back")
 
         case "$choice" in
             "About")
-                echo ""
-                show_header "mypctools v$VERSION"
-                echo ""
+                clear
+                show_title "mypctools v$VERSION"
                 print_info "A personal TUI for managing scripts and apps"
                 print_info "Built with Gum by Charm"
                 print_info "https://github.com/reisset/mypctools"
@@ -298,17 +312,18 @@ show_settings_menu() {
                 read -rp "Press Enter to continue..."
                 ;;
             "Check for Updates")
-                echo ""
+                clear
+                show_subheader "Check for Updates"
                 print_info "Checking for updates..."
                 if git -C "$MYPCTOOLS_ROOT" fetch origin main &>/dev/null; then
                     local behind
                     behind=$(git -C "$MYPCTOOLS_ROOT" rev-list HEAD..origin/main --count 2>/dev/null)
                     if [[ "$behind" -gt 0 ]]; then
                         print_warning "$behind new commit(s) available"
-                        gum confirm "Pull updates now?" && {
+                        if themed_confirm "Pull updates now?"; then
                             git -C "$MYPCTOOLS_ROOT" pull origin main
                             print_success "Updated! Restart mypctools to use new version."
-                        }
+                        fi
                     else
                         print_success "Already up to date!"
                     fi
@@ -325,29 +340,28 @@ show_settings_menu() {
 }
 
 show_windows_menu() {
-    echo ""
-    print_header "Windows PowerShell Scripts"
+    clear
+    show_subheader "Windows PowerShell Scripts"
     print_warning "These scripts are for Windows and cannot be run from here."
     print_info "Location: $MYPCTOOLS_ROOT/windows/powershell/"
     print_info "GitHub: https://github.com/reisset/mypowershell"
     echo ""
 
-    gum confirm "Open folder in file manager?" && {
+    if themed_confirm "Open folder in file manager?"; then
         if command_exists xdg-open; then
             xdg-open "$MYPCTOOLS_ROOT/windows/powershell/" 2>/dev/null || true
         fi
-    }
+    fi
 }
 
 # Main menu
 main_menu() {
     while true; do
         clear
-        show_header "mypctools v$VERSION"
-        echo ""
+        show_title "mypctools v$VERSION"
 
         local choice
-        choice=$(gum choose \
+        choice=$(themed_choose "" \
             "Install Apps" \
             "My Scripts" \
             "System Setup" \
