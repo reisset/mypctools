@@ -1,0 +1,71 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Overview
+
+mypctools is a personal TUI (Terminal User Interface) for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum) by Charm.
+
+## Running the TUI
+
+```bash
+./install.sh     # First-time setup (installs gum, sets up PATH)
+mypctools        # Run from anywhere after install
+./launcher.sh    # Run directly from this directory
+```
+
+## Architecture
+
+```
+mypctools/
+├── launcher.sh          # Main TUI entry point (gum-based menus)
+├── install.sh           # Bootstrap: installs gum, creates ~/.local/bin/mypctools symlink
+├── uninstall.sh         # Removes symlink and cleans up
+├── lib/
+│   ├── helpers.sh       # Print functions, gum wrappers, logging
+│   ├── distro-detect.sh # Sets DISTRO_TYPE (arch/debian/fedora) and DISTRO_NAME
+│   └── package-manager.sh # install_package() with apt/pacman/flatpak fallback chain
+└── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
+└── scripts/             # Personal script bundles with install/uninstall.sh each
+```
+
+## Key Patterns
+
+**Package installation** uses `install_package` from `lib/package-manager.sh`:
+```bash
+install_package "Display Name" "apt_pkg" "pacman_pkg" "flatpak_id" "fallback_fn"
+```
+Order: native package manager → flatpak → custom fallback function.
+
+**Adding a new app category**: Create `apps/<category>.sh` with a `show_<category>_menu()` function, source helpers and package-manager, then add to `launcher.sh` menu.
+
+**Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Add menu entry in `launcher.sh:show_scripts_menu()`.
+
+## Included Script Bundles
+
+- `scripts/bash/` - Bash shell setup (Kitty, Starship, modern CLI tools). Has `--server` flag for headless installs.
+- `scripts/screensavers/` - Terminal screensaver scripts
+- `scripts/claude/` - Claude Code preferences and skills (copies to `~/.claude/`)
+- `windows/powershell/` - Windows PowerShell configs (reference only, not runnable from Linux)
+
+## Distro Support
+
+Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial.
+`DISTRO_TYPE` is exported by `lib/distro-detect.sh` and used throughout.
+
+## Code Style
+
+- Simple bash over clever one-liners
+- Comments only where code isn't self-explanatory
+- On failure, return to menu — don't exit the entire app
+- Use `lib/helpers.sh` print functions for consistent output
+
+## Gum Quick Reference
+
+```bash
+gum choose "Option 1" "Option 2"              # Single select
+gum choose --no-limit "A" "B" "C"             # Multi-select
+gum confirm "Proceed?" && do_thing            # Yes/no
+gum spin --spinner dot --title "Working..." -- cmd   # Spinner
+gum style --border normal --padding "1 2" "Title"    # Styled box
+```

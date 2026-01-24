@@ -88,7 +88,16 @@ is_installed() {
 
 # Brave Browser - official installer works on any distro
 install_brave_fallback() {
-    curl -fsS https://dl.brave.com/install.sh | sh
+    local installer="/tmp/brave_install.sh"
+    if ! curl -fsS --retry 3 --connect-timeout 10 https://dl.brave.com/install.sh -o "$installer"; then
+        print_error "Failed to download Brave installer"
+        return 1
+    fi
+    chmod +x "$installer"
+    "$installer"
+    local ret=$?
+    rm -f "$installer"
+    return $ret
 }
 
 # VSCode - Debian repo setup (Arch uses AUR 'code' package)
@@ -98,13 +107,17 @@ install_vscode_fallback() {
         return 1
     fi
 
-    sudo apt-get install -y wget gpg
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg
+    sudo apt-get install -y wget gpg || return 1
+    local gpg_key="/tmp/microsoft.asc"
+    if ! wget --timeout=10 --tries=3 -qO "$gpg_key" https://packages.microsoft.com/keys/microsoft.asc; then
+        print_error "Failed to download Microsoft GPG key"
+        return 1
+    fi
+    gpg --dearmor < "$gpg_key" > /tmp/microsoft.gpg
     sudo install -D -o root -g root -m 644 /tmp/microsoft.gpg /usr/share/keyrings/microsoft.gpg
-    rm -f /tmp/microsoft.gpg
+    rm -f "$gpg_key" /tmp/microsoft.gpg
     echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list
-    sudo apt-get update
-    sudo apt-get install -y code
+    sudo apt-get update && sudo apt-get install -y code
 }
 
 # Spotify - Debian repo setup (Arch uses AUR, flatpak works everywhere)
@@ -114,10 +127,15 @@ install_spotify_fallback() {
         return 1
     fi
 
-    curl -sS https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.asc | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+    local gpg_key="/tmp/spotify_pubkey.asc"
+    if ! curl -sS --retry 3 --connect-timeout 10 https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.asc -o "$gpg_key"; then
+        print_error "Failed to download Spotify GPG key"
+        return 1
+    fi
+    sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg < "$gpg_key"
+    rm -f "$gpg_key"
     echo "deb https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
-    sudo apt-get update
-    sudo apt-get install -y spotify-client
+    sudo apt-get update && sudo apt-get install -y spotify-client
 }
 
 # =============================================================================
@@ -141,13 +159,11 @@ install_package() {
         return 0
     fi
 
-    print_info "Installing $display_name..."
-
     # Try native package manager first
     case "$pkg_manager" in
         apt)
             if [[ -n "$apt_pkg" ]]; then
-                if run_with_spinner "Installing $display_name..." sudo apt install -y $apt_pkg; then
+                if run_with_spinner "Installing $display_name..." sudo apt install -y "$apt_pkg"; then
                     print_success "$display_name installed successfully"
                     return 0
                 fi
@@ -156,7 +172,7 @@ install_package() {
             ;;
         pacman)
             if [[ -n "$pacman_pkg" ]]; then
-                if run_with_spinner "Installing $display_name..." sudo pacman -S --noconfirm $pacman_pkg; then
+                if run_with_spinner "Installing $display_name..." sudo pacman -S --noconfirm "$pacman_pkg"; then
                     print_success "$display_name installed successfully"
                     return 0
                 fi
@@ -167,7 +183,7 @@ install_package() {
 
     # Flatpak fallback
     if [[ -n "$flatpak_id" ]] && has_flatpak; then
-        if run_with_spinner "Installing $display_name (Flatpak)..." flatpak install -y flathub $flatpak_id; then
+        if run_with_spinner "Installing $display_name (Flatpak)..." flatpak install -y flathub "$flatpak_id"; then
             print_success "$display_name installed via Flatpak"
             return 0
         fi
@@ -176,8 +192,7 @@ install_package() {
 
     # Manual fallback function
     if [[ -n "$fallback_fn" ]] && declare -f "$fallback_fn" &>/dev/null; then
-        print_info "Running custom install for $display_name..."
-        if $fallback_fn; then
+        if run_with_spinner "Installing $display_name (custom)..." $fallback_fn; then
             print_success "$display_name installed via fallback"
             return 0
         fi

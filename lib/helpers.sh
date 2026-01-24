@@ -51,12 +51,6 @@ choose_multi() {
     gum choose --no-limit --header "$header" "$@"
 }
 
-show_spinner() {
-    local title="$1"
-    shift
-    gum spin --spinner dot --title "$title" -- "$@"
-}
-
 show_header() {
     gum style \
         --border normal \

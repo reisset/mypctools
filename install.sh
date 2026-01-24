@@ -36,7 +36,13 @@ install_gum() {
         debian)
             # Add Charm repo
             sudo mkdir -p /etc/apt/keyrings
-            curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+            local gpg_key="/tmp/charm_gpg.key"
+            if ! curl -fsSL --retry 3 --connect-timeout 10 https://repo.charm.sh/apt/gpg.key -o "$gpg_key"; then
+                print_fail "Failed to download Charm GPG key"
+                exit 1
+            fi
+            sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg < "$gpg_key"
+            rm -f "$gpg_key"
             echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
             sudo apt update && sudo apt install -y gum
             ;;

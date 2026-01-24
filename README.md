@@ -13,26 +13,31 @@ cd mypctools
 mypctools
 ```
 
+To uninstall: `./uninstall.sh`
+
 ## Features
 
 - **Install Apps** - Browsers, gaming, media, dev tools, CLI utilities
-- **My Scripts** - Personal bash configs, screensavers, and more (with install/uninstall options)
+- **My Scripts** - Personal bash configs, screensavers, Claude Code setup (all with install/uninstall)
 - **System Setup** - System info and tweaks
 - Cross-distro support (Debian/Ubuntu and Arch-based)
 - Smart package detection (skips already-installed apps)
-- Clean spinner UI during package installations
-- Fallback installers for packages needing repos/keys (Brave, VSCode, Spotify)
+- Spinner UI during installations with graceful Ctrl+C handling
+- Fallback installers with retry/timeout for packages needing repos (Brave, VSCode, Spotify)
 
 ## Included Scripts
 
 This repo consolidates content from:
 
-- **[mybash](https://github.com/reisset/mybash)** → `scripts/bash/` - Bash shell setup and configs
-- **[myscreensavers](https://github.com/reisset/myscreensavers)** → `scripts/screensavers/` - Terminal screensaver scripts
-- **[claudesetup](https://github.com/reisset/claudesetup)** → `scripts/claude/` - Claude Code preferences and skills
-- **[mypowershell](https://github.com/reisset/mypowershell)** → `windows/powershell/` - Windows PowerShell configs (reference)
+| Script | Source | Description |
+|--------|--------|-------------|
+| `scripts/bash/` | [mybash](https://github.com/reisset/mybash) | Bash shell setup, Kitty, Starship, modern CLI tools |
+| `scripts/screensavers/` | [myscreensavers](https://github.com/reisset/myscreensavers) | Terminal screensavers (cmatrix, pipes, etc.) |
+| `scripts/claude/` | [claudesetup](https://github.com/reisset/claudesetup) | Claude Code preferences and skills |
+| `windows/powershell/` | [mypowershell](https://github.com/reisset/mypowershell) | Windows PowerShell configs (reference only) |
 
 ## Requirements
 
 - Bash
-- [Gum](https://github.com/charmbracelet/gum) (installed automatically by `install.sh`)
+- Linux (Debian/Ubuntu or Arch-based)
+- [Gum](https://github.com/charmbracelet/gum) (installed automatically)
