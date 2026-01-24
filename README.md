@@ -19,6 +19,8 @@ mypctools
 - **My Scripts** - Personal bash configs, screensavers, and more
 - **System Setup** - System info and tweaks
 - Cross-distro support (Debian/Ubuntu and Arch-based)
+- Smart package detection (skips already-installed apps)
+- Fallback installers for packages needing repos/keys (Brave, VSCode, Spotify)
 
 ## Requirements
 

@@ -47,7 +47,7 @@ show_dev_tools_menu() {
                     install_package "LazyDocker" "" "lazydocker" "" ""
                     ;;
                 "VSCode")
-                    install_package "VSCode" "code" "code" "com.visualstudio.code" ""
+                    install_package "VSCode" "code" "code" "com.visualstudio.code" "install_vscode_fallback"
                     ;;
                 "Cursor")
                     install_package "Cursor" "" "cursor-bin" "" ""

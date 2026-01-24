@@ -32,7 +32,7 @@ show_media_menu() {
         echo "$choices" | while read -r choice; do
             case "$choice" in
                 "Spotify")
-                    install_package "Spotify" "spotify-client" "spotify" "com.spotify.Client" ""
+                    install_package "Spotify" "spotify-client" "spotify" "com.spotify.Client" "install_spotify_fallback"
                     ;;
                 "VLC")
                     install_package "VLC" "vlc" "vlc" "org.videolan.VLC" ""
