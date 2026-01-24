@@ -3,15 +3,15 @@
 # Media apps installation menu
 # v0.1.0
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../lib/helpers.sh"
-source "$SCRIPT_DIR/../lib/package-manager.sh"
+_MEDIA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_MEDIA_DIR/../lib/helpers.sh"
+source "$_MEDIA_DIR/../lib/package-manager.sh"
 
 show_media_menu() {
     print_header "Media"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select media apps to install:" \
+    choices=$(gum choose --no-limit --header "Select apps (Space=select, Enter=confirm):" \
         "Spotify" \
         "VLC" \
         "MPV" \

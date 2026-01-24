@@ -4,9 +4,9 @@
 # v0.1.0
 
 # Source distro detection
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/distro-detect.sh"
-source "$SCRIPT_DIR/helpers.sh"
+_PKG_MGR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_PKG_MGR_DIR/distro-detect.sh"
+source "$_PKG_MGR_DIR/helpers.sh"
 
 # Get the appropriate package manager
 get_package_manager() {
@@ -46,32 +46,44 @@ install_package() {
 
     print_info "Installing $display_name..."
 
-    # STUB: Just print what we would do
+    # Try native package manager first
     case "$pkg_manager" in
         apt)
             if [[ -n "$apt_pkg" ]]; then
-                print_info "[STUB] Would run: sudo apt install -y $apt_pkg"
-                return 0
+                if sudo apt install -y $apt_pkg; then
+                    print_success "$display_name installed successfully"
+                    return 0
+                fi
+                print_warning "apt install failed, trying fallback..."
             fi
             ;;
         pacman)
             if [[ -n "$pacman_pkg" ]]; then
-                print_info "[STUB] Would run: sudo pacman -S --noconfirm $pacman_pkg"
-                return 0
+                if sudo pacman -S --noconfirm $pacman_pkg; then
+                    print_success "$display_name installed successfully"
+                    return 0
+                fi
+                print_warning "pacman install failed, trying fallback..."
             fi
             ;;
     esac
 
     # Flatpak fallback
     if [[ -n "$flatpak_id" ]] && has_flatpak; then
-        print_info "[STUB] Would run: flatpak install -y $flatpak_id"
-        return 0
+        if flatpak install -y flathub $flatpak_id; then
+            print_success "$display_name installed via Flatpak"
+            return 0
+        fi
+        print_warning "Flatpak install failed..."
     fi
 
-    # Manual fallback
+    # Manual fallback function
     if [[ -n "$fallback_fn" ]] && declare -f "$fallback_fn" &>/dev/null; then
-        print_info "[STUB] Would run fallback function: $fallback_fn"
-        return 0
+        print_info "Running custom install for $display_name..."
+        if $fallback_fn; then
+            print_success "$display_name installed via fallback"
+            return 0
+        fi
     fi
 
     print_error "No installation method available for $display_name"

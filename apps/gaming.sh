@@ -3,15 +3,15 @@
 # Gaming apps installation menu
 # v0.1.0
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../lib/helpers.sh"
-source "$SCRIPT_DIR/../lib/package-manager.sh"
+_GAMING_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_GAMING_DIR/../lib/helpers.sh"
+source "$_GAMING_DIR/../lib/package-manager.sh"
 
 show_gaming_menu() {
     print_header "Gaming"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select gaming apps to install:" \
+    choices=$(gum choose --no-limit --header "Select apps (Space=select, Enter=confirm):" \
         "Steam" \
         "Lutris" \
         "ProtonUp-Qt" \
