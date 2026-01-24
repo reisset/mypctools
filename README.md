@@ -16,10 +16,11 @@ mypctools
 ## Features
 
 - **Install Apps** - Browsers, gaming, media, dev tools, CLI utilities
-- **My Scripts** - Personal bash configs, screensavers, and more
+- **My Scripts** - Personal bash configs, screensavers, and more (with install/uninstall options)
 - **System Setup** - System info and tweaks
 - Cross-distro support (Debian/Ubuntu and Arch-based)
 - Smart package detection (skips already-installed apps)
+- Clean spinner UI during package installations
 - Fallback installers for packages needing repos/keys (Brave, VSCode, Spotify)
 
 ## Included Scripts

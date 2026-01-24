@@ -31,6 +31,13 @@ has_flatpak() {
     command_exists flatpak
 }
 
+# Run command with spinner, show output only on failure
+run_with_spinner() {
+    local title="$1"
+    shift
+    gum spin --spinner dot --show-error --title "$title" -- "$@"
+}
+
 # Check if a package is already installed
 # Usage: is_installed "pacman_pkg" "apt_pkg" "flatpak_id"
 is_installed() {
@@ -140,7 +147,7 @@ install_package() {
     case "$pkg_manager" in
         apt)
             if [[ -n "$apt_pkg" ]]; then
-                if sudo apt install -y $apt_pkg; then
+                if run_with_spinner "Installing $display_name..." sudo apt install -y $apt_pkg; then
                     print_success "$display_name installed successfully"
                     return 0
                 fi
@@ -149,7 +156,7 @@ install_package() {
             ;;
         pacman)
             if [[ -n "$pacman_pkg" ]]; then
-                if sudo pacman -S --noconfirm $pacman_pkg; then
+                if run_with_spinner "Installing $display_name..." sudo pacman -S --noconfirm $pacman_pkg; then
                     print_success "$display_name installed successfully"
                     return 0
                 fi
@@ -160,7 +167,7 @@ install_package() {
 
     # Flatpak fallback
     if [[ -n "$flatpak_id" ]] && has_flatpak; then
-        if flatpak install -y flathub $flatpak_id; then
+        if run_with_spinner "Installing $display_name (Flatpak)..." flatpak install -y flathub $flatpak_id; then
             print_success "$display_name installed via Flatpak"
             return 0
         fi
