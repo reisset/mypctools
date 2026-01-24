@@ -26,8 +26,9 @@ One menu to install apps across distros. Uses native package managers first, fal
 | Browsers | Brave, Firefox, Chrome, Zen |
 | Gaming | Steam, Lutris, Heroic, ProtonUp-Qt |
 | Media | Spotify, VLC, OBS, Discord |
-| Dev Tools | Docker, LazyDocker, VSCode, Cursor, Ollama, LM Studio |
+| Dev Tools | Docker, LazyDocker, VSCode, Cursor, .NET SDK, Python |
 | CLI Utils | btop, neofetch, bat, eza, zoxide, fzf, Caligula |
+| AI Tools | OpenCode, Claude Code, Mistral Vibe, Ollama, LM Studio |
 
 ### My Scripts
 
@@ -62,6 +63,9 @@ The installer tries each method in order and stops at the first success. Custom 
 | Caligula | cargo install |
 | LazyDocker | GitHub binary release |
 | Cursor | AppImage download |
+| OpenCode | Official install script |
+| Claude Code | Official install script |
+| Mistral Vibe | Official install script |
 | Ollama | Official install script |
 
 ## Project Structure
@@ -75,11 +79,12 @@ mypctools/
 │   ├── distro-detect.sh     # Sets DISTRO_TYPE and DISTRO_NAME
 │   └── package-manager.sh   # install_package() with fallback chain
 ├── apps/                    # App category menus
+│   ├── ai.sh
 │   ├── browsers.sh
-│   ├── gaming.sh
-│   ├── media.sh
+│   ├── cli-utils.sh
 │   ├── dev-tools.sh
-│   └── cli-utils.sh
+│   ├── gaming.sh
+│   └── media.sh
 └── scripts/                 # Bundled script collections
     ├── bash/
     ├── screensavers/

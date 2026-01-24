@@ -24,13 +24,13 @@ show_gaming_menu() {
 
     echo ""
     print_header "Would install the following:"
-    echo "$choices" | while read -r choice; do
+    while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
-    done
+    done <<< "$choices"
     echo ""
 
     gum confirm "Proceed with installation?" && {
-        echo "$choices" | while read -r choice; do
+        while read -r choice; do
             case "$choice" in
                 "Steam")
                     install_package "Steam" "steam" "steam" "com.valvesoftware.Steam" ""
@@ -45,7 +45,7 @@ show_gaming_menu() {
                     install_package "Heroic Games Launcher" "" "heroic-games-launcher-bin" "com.heroicgameslauncher.hgl" ""
                     ;;
             esac
-        done
+        done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
     }

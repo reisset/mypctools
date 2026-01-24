@@ -245,9 +245,10 @@ install_package() {
         print_warning "Flatpak install failed..."
     fi
 
-    # Manual fallback function
+    # Manual fallback function (called directly, not through gum spin)
     if [[ -n "$fallback_fn" ]] && declare -f "$fallback_fn" &>/dev/null; then
-        if run_with_spinner "Installing $display_name (custom)..." "$fallback_fn"; then
+        print_info "Installing $display_name (custom)..."
+        if "$fallback_fn"; then
             print_success "$display_name installed via fallback"
             return 0
         fi
