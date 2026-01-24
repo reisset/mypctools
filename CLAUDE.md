@@ -39,6 +39,14 @@ Order: native package manager → flatpak → custom fallback function.
 
 **Adding a new app category**: Create `apps/<category>.sh` with a `show_<category>_menu()` function, source helpers and package-manager, then add to `launcher.sh` menu.
 
+**Adding a curl-based installer**: Add a fallback function to `lib/package-manager.sh`:
+```bash
+install_toolname_fallback() {
+    curl -fsSL https://example.com/install.sh | bash
+}
+```
+Then reference it in `install_package` calls: `install_package "Tool" "" "" "" "install_toolname_fallback"`
+
 **Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Add menu entry in `launcher.sh:show_scripts_menu()`.
 
 ## Included Script Bundles
