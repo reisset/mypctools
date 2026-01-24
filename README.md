@@ -22,6 +22,14 @@ mypctools
 - Smart package detection (skips already-installed apps)
 - Fallback installers for packages needing repos/keys (Brave, VSCode, Spotify)
 
+## Included Scripts
+
+This repo consolidates content from:
+
+- **[mybash](https://github.com/reisset/mybash)** → `scripts/bash/` - Bash shell setup and configs
+- **[myscreensavers](https://github.com/reisset/myscreensavers)** → `scripts/screensavers/` - Terminal screensaver scripts
+- **[mypowershell](https://github.com/reisset/mypowershell)** → `windows/powershell/` - Windows PowerShell configs (reference)
+
 ## Requirements
 
 - Bash
