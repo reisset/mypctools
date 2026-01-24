@@ -68,34 +68,97 @@ show_scripts_menu() {
 
         case "$choice" in
             "Bash Setup")
-                if [[ -f "$MYPCTOOLS_ROOT/scripts/bash/install.sh" ]]; then
-                    print_info "Running Bash Setup installer..."
-                    bash "$MYPCTOOLS_ROOT/scripts/bash/install.sh"
-                else
-                    print_warning "Bash Setup scripts not yet added."
-                    print_info "Add your scripts to: $MYPCTOOLS_ROOT/scripts/bash/"
-                fi
-                read -rp "Press Enter to continue..."
+                while true; do
+                    local action
+                    action=$(gum choose --header "Bash Setup" \
+                        "Install" \
+                        "Uninstall" \
+                        "Back")
+
+                    case "$action" in
+                        "Install")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/bash/install.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/bash/install.sh"
+                            else
+                                print_warning "Install script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Uninstall")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/bash/uninstall.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/bash/uninstall.sh"
+                            else
+                                print_warning "No uninstall script found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Back"|"")
+                            break
+                            ;;
+                    esac
+                done
                 ;;
             "Screensavers")
-                if [[ -f "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh" ]]; then
-                    print_info "Running Screensavers installer..."
-                    bash "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh"
-                else
-                    print_warning "Screensaver scripts not yet added."
-                    print_info "Add your scripts to: $MYPCTOOLS_ROOT/scripts/screensavers/"
-                fi
-                read -rp "Press Enter to continue..."
+                while true; do
+                    local action
+                    action=$(gum choose --header "Screensavers" \
+                        "Install" \
+                        "Uninstall" \
+                        "Back")
+
+                    case "$action" in
+                        "Install")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh"
+                            else
+                                print_warning "Install script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Uninstall")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensavers/uninstall.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/screensavers/uninstall.sh"
+                            else
+                                print_warning "No uninstall script found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Back"|"")
+                            break
+                            ;;
+                    esac
+                done
                 ;;
             "Claude Setup")
-                if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/install.sh" ]]; then
-                    print_info "Running Claude Setup installer..."
-                    bash "$MYPCTOOLS_ROOT/scripts/claude/install.sh"
-                else
-                    print_warning "Claude Setup scripts not yet added (private)."
-                    print_info "Add your scripts to: $MYPCTOOLS_ROOT/scripts/claude/"
-                fi
-                read -rp "Press Enter to continue..."
+                while true; do
+                    local action
+                    action=$(gum choose --header "Claude Setup" \
+                        "Install" \
+                        "Uninstall" \
+                        "Back")
+
+                    case "$action" in
+                        "Install")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/install.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/claude/install.sh"
+                            else
+                                print_warning "Install script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Uninstall")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh"
+                            else
+                                print_warning "No uninstall script found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Back"|"")
+                            break
+                            ;;
+                    esac
+                done
                 ;;
             "Back"|"")
                 break
