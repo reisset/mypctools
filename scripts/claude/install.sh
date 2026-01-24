@@ -1,46 +1,46 @@
 #!/bin/bash
-# Claude Code dotfiles installer
-# v1.4 - Added fish shell support, fixed alias detection to use $SHELL
+# Claude Code config installer
+# v1.5 - Changed from symlinks to copies for portability
 
 set -e
 
-REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "Installing Claude Code config from $REPO_DIR"
+echo "Installing Claude Code config..."
 
 # Create directories
 mkdir -p ~/.claude/skills ~/.claude/commands
 
-# Symlink CLAUDE.md
-ln -sf "$REPO_DIR/CLAUDE.md" ~/.claude/CLAUDE.md
-echo "  Linked CLAUDE.md"
+# Copy CLAUDE.md
+cp "$SCRIPT_DIR/CLAUDE.md" ~/.claude/CLAUDE.md
+echo "  Installed CLAUDE.md"
 
-# Symlink skills (directories containing SKILL.md)
-if [ -d "$REPO_DIR/skills" ]; then
-    for skill in "$REPO_DIR/skills"/*/; do
+# Copy skills (directories containing SKILL.md)
+if [ -d "$SCRIPT_DIR/skills" ]; then
+    for skill in "$SCRIPT_DIR/skills"/*/; do
         [ -d "$skill" ] || continue
         skill_name=$(basename "$skill")
-        ln -sfn "$skill" ~/.claude/skills/"$skill_name"
-        echo "  Linked skill: $skill_name"
+        cp -r "$skill" ~/.claude/skills/
+        echo "  Installed skill: $skill_name"
     done
 fi
 
-# Symlink commands (skip hidden files like .gitkeep)
-if [ -d "$REPO_DIR/commands" ]; then
-    for cmd in "$REPO_DIR/commands"/*; do
+# Copy commands (skip hidden files like .gitkeep)
+if [ -d "$SCRIPT_DIR/commands" ]; then
+    for cmd in "$SCRIPT_DIR/commands"/*; do
         [ -e "$cmd" ] || continue
         cmd_name=$(basename "$cmd")
         [[ "$cmd_name" == .* ]] && continue
-        ln -sf "$cmd" ~/.claude/commands/"$cmd_name"
-        echo "  Linked command: $cmd_name"
+        cp "$cmd" ~/.claude/commands/"$cmd_name"
+        echo "  Installed command: $cmd_name"
     done
 fi
 
-# Symlink statusline script
-if [ -f "$REPO_DIR/statusline.sh" ]; then
-    ln -sf "$REPO_DIR/statusline.sh" ~/.claude/statusline.sh
+# Copy statusline script
+if [ -f "$SCRIPT_DIR/statusline.sh" ]; then
+    cp "$SCRIPT_DIR/statusline.sh" ~/.claude/statusline.sh
     chmod +x ~/.claude/statusline.sh
-    echo "  Linked statusline.sh"
+    echo "  Installed statusline.sh"
 
     # Update settings.json with statusLine config
     SETTINGS_FILE=~/.claude/settings.json
