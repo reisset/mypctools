@@ -13,7 +13,7 @@ show_cli_utils_menu() {
     show_subheader "CLI Utilities"
 
     local choices
-    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
         "fzf - Fuzzy finder" \
         "bat - Better cat" \
         "eza - Better ls" \
@@ -23,17 +23,16 @@ show_cli_utils_menu() {
         "tldr - Simplified man pages" \
         "zoxide - Smarter cd" \
         "caligula - ISO burner" \
-        "gum - TUI toolkit" \
-        "Back")
+        "gum - TUI toolkit")
 
-    if [[ -z "$choices" ]] || [[ "$choices" == "Back" ]]; then
+    if [[ -z "$choices" ]]; then
         return
     fi
 
     echo ""
     show_subheader "Would install"
     while read -r choice; do
-        [[ "$choice" != "Back" ]] && print_info "$choice"
+        print_info "$choice"
     done <<< "$choices"
     echo ""
 

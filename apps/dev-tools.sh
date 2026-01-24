@@ -13,23 +13,22 @@ show_dev_tools_menu() {
     show_subheader "Developer Tools"
 
     local choices
-    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
         "Docker" \
         "LazyDocker" \
         "VSCode" \
         "Cursor" \
         ".NET SDK" \
-        "Python (latest)" \
-        "Back")
+        "Python (latest)")
 
-    if [[ -z "$choices" ]] || [[ "$choices" == "Back" ]]; then
+    if [[ -z "$choices" ]]; then
         return
     fi
 
     echo ""
     show_subheader "Would install"
     while read -r choice; do
-        [[ "$choice" != "Back" ]] && print_info "$choice"
+        print_info "$choice"
     done <<< "$choices"
     echo ""
 

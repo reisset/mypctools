@@ -13,20 +13,19 @@ show_media_menu() {
     show_subheader "Media"
 
     local choices
-    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
         "Spotify" \
         "VLC" \
-        "MPV" \
-        "Back")
+        "MPV")
 
-    if [[ -z "$choices" ]] || [[ "$choices" == "Back" ]]; then
+    if [[ -z "$choices" ]]; then
         return
     fi
 
     echo ""
     show_subheader "Would install"
     while read -r choice; do
-        [[ "$choice" != "Back" ]] && print_info "$choice"
+        print_info "$choice"
     done <<< "$choices"
     echo ""
 
