@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/lib/package-manager.sh
 # Package installation logic (apt/pacman primary, flatpak fallback)
-# v0.1.0
+# v0.2.0
 
 # Source distro detection
 _PKG_MGR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -55,6 +55,9 @@ is_installed() {
             ;;
         apt)
             [[ -n "$apt_pkg" ]] && dpkg -s "$apt_pkg" &>/dev/null && return 0
+            ;;
+        dnf)
+            [[ -n "$apt_pkg" ]] && rpm -q "$apt_pkg" &>/dev/null && return 0
             ;;
     esac
 
@@ -147,6 +150,34 @@ install_spotify_fallback() {
     sudo apt-get update && sudo apt-get install -y spotify-client
 }
 
+# LazyDocker - binary download from GitHub releases
+install_lazydocker_fallback() {
+    local version
+    version=$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+    if [[ -z "$version" ]]; then
+        print_error "Failed to fetch LazyDocker version"
+        return 1
+    fi
+    curl -Lo /tmp/lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/download/v${version}/lazydocker_${version}_Linux_x86_64.tar.gz" || return 1
+    tar -xzf /tmp/lazydocker.tar.gz -C /tmp lazydocker || return 1
+    sudo mv /tmp/lazydocker /usr/local/bin/
+    rm -f /tmp/lazydocker.tar.gz
+}
+
+# Cursor - AppImage download
+install_cursor_fallback() {
+    local appimage_url="https://downloader.cursor.sh/linux/appImage/x64"
+    mkdir -p "$HOME/.local/bin"
+    curl -Lo "$HOME/.local/bin/cursor.AppImage" "$appimage_url" || return 1
+    chmod +x "$HOME/.local/bin/cursor.AppImage"
+    print_info "Cursor installed to ~/.local/bin/cursor.AppImage"
+}
+
+# Ollama - official install script
+install_ollama_fallback() {
+    curl -fsSL https://ollama.com/install.sh | sh
+}
+
 # =============================================================================
 
 # Install a package
@@ -201,7 +232,7 @@ install_package() {
 
     # Manual fallback function
     if [[ -n "$fallback_fn" ]] && declare -f "$fallback_fn" &>/dev/null; then
-        if run_with_spinner "Installing $display_name (custom)..." $fallback_fn; then
+        if run_with_spinner "Installing $display_name (custom)..." "$fallback_fn"; then
             print_success "$display_name installed via fallback"
             return 0
         fi
@@ -211,14 +242,3 @@ install_package() {
     return 1
 }
 
-# Batch install packages from a list
-# Usage: install_packages "pkg1" "pkg2" "pkg3"
-install_packages() {
-    local failed=0
-    for pkg in "$@"; do
-        if ! install_package "$pkg" "$pkg" "$pkg" "" ""; then
-            ((failed++))
-        fi
-    done
-    return $failed
-}
