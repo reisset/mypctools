@@ -22,13 +22,13 @@ show_browsers_menu() {
 
     echo ""
     print_header "Would install the following:"
-    echo "$choices" | while read -r choice; do
+    while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
-    done
+    done <<< "$choices"
     echo ""
 
     gum confirm "Proceed with installation?" && {
-        echo "$choices" | while read -r choice; do
+        while read -r choice; do
             case "$choice" in
                 "Brave Browser")
                     install_package "Brave Browser" "brave-browser" "brave-bin" "" "install_brave_fallback"
@@ -37,7 +37,7 @@ show_browsers_menu() {
                     install_package "Firefox" "firefox" "firefox" "org.mozilla.firefox" ""
                     ;;
             esac
-        done
+        done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
     }

@@ -25,13 +25,13 @@ show_ai_menu() {
 
     echo ""
     print_header "Would install the following:"
-    echo "$choices" | while read -r choice; do
+    while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
-    done
+    done <<< "$choices"
     echo ""
 
     gum confirm "Proceed with installation?" && {
-        echo "$choices" | while read -r choice; do
+        while read -r choice; do
             case "$choice" in
                 "OpenCode")
                     install_package "OpenCode" "" "opencode-bin" "" "install_opencode_fallback"
@@ -49,7 +49,7 @@ show_ai_menu() {
                     install_package "LM Studio" "" "" "ai.lmstudio.LMStudio" ""
                     ;;
             esac
-        done
+        done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
     }

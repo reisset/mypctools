@@ -26,13 +26,13 @@ show_dev_tools_menu() {
 
     echo ""
     print_header "Would install the following:"
-    echo "$choices" | while read -r choice; do
+    while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
-    done
+    done <<< "$choices"
     echo ""
 
     gum confirm "Proceed with installation?" && {
-        echo "$choices" | while read -r choice; do
+        while read -r choice; do
             case "$choice" in
                 "Docker")
                     install_package "Docker" "docker.io" "docker" "" ""
@@ -53,7 +53,7 @@ show_dev_tools_menu() {
                     install_package "Python" "python3" "python" "" ""
                     ;;
             esac
-        done
+        done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
     }

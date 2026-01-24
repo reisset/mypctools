@@ -23,13 +23,13 @@ show_media_menu() {
 
     echo ""
     print_header "Would install the following:"
-    echo "$choices" | while read -r choice; do
+    while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
-    done
+    done <<< "$choices"
     echo ""
 
     gum confirm "Proceed with installation?" && {
-        echo "$choices" | while read -r choice; do
+        while read -r choice; do
             case "$choice" in
                 "Spotify")
                     install_package "Spotify" "spotify-client" "spotify" "com.spotify.Client" "install_spotify_fallback"
@@ -41,7 +41,7 @@ show_media_menu() {
                     install_package "MPV" "mpv" "mpv" "io.mpv.Mpv" ""
                     ;;
             esac
-        done
+        done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
     }

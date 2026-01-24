@@ -30,13 +30,13 @@ show_cli_utils_menu() {
 
     echo ""
     print_header "Would install the following:"
-    echo "$choices" | while read -r choice; do
+    while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
-    done
+    done <<< "$choices"
     echo ""
 
     gum confirm "Proceed with installation?" && {
-        echo "$choices" | while read -r choice; do
+        while read -r choice; do
             case "$choice" in
                 "fzf - Fuzzy finder")
                     install_package "fzf" "fzf" "fzf" "" ""
@@ -69,7 +69,7 @@ show_cli_utils_menu() {
                     install_package "gum" "gum" "gum" "" ""
                     ;;
             esac
-        done
+        done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
     }
