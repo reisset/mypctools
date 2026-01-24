@@ -28,6 +28,7 @@ This repo consolidates content from:
 
 - **[mybash](https://github.com/reisset/mybash)** → `scripts/bash/` - Bash shell setup and configs
 - **[myscreensavers](https://github.com/reisset/myscreensavers)** → `scripts/screensavers/` - Terminal screensaver scripts
+- **[claudesetup](https://github.com/reisset/claudesetup)** → `scripts/claude/` - Claude Code preferences and skills
 - **[mypowershell](https://github.com/reisset/mypowershell)** → `windows/powershell/` - Windows PowerShell configs (reference)
 
 ## Requirements
