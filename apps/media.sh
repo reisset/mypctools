@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # mypctools/apps/media.sh
 # Media apps installation menu
-# v0.1.0
+# v0.2.0
 
 _MEDIA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_MEDIA_DIR/../lib/helpers.sh"
+source "$_MEDIA_DIR/../lib/theme.sh"
 source "$_MEDIA_DIR/../lib/package-manager.sh"
 
 show_media_menu() {
-    print_header "Media"
+    clear
+    show_subheader "Media"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select apps (Space=select, Enter=confirm):" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
         "Spotify" \
         "VLC" \
         "MPV" \
@@ -22,13 +24,13 @@ show_media_menu() {
     fi
 
     echo ""
-    print_header "Would install the following:"
+    show_subheader "Would install"
     while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
     done <<< "$choices"
     echo ""
 
-    gum confirm "Proceed with installation?" && {
+    if themed_confirm "Proceed with installation?"; then
         while read -r choice; do
             case "$choice" in
                 "Spotify")
@@ -44,7 +46,7 @@ show_media_menu() {
         done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
-    }
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

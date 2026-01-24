@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # mypctools/lib/helpers.sh
 # Shared helper functions for mypctools
-# v0.1.0
+# v0.2.0
+
+# Source theme
+_HELPERS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_HELPERS_DIR/theme.sh"
 
 # Colors
 RED='\033[0;31m'
@@ -55,7 +59,8 @@ show_header() {
     gum style \
         --border normal \
         --padding "1 2" \
-        --border-foreground 212 \
+        --border-foreground "$THEME_PRIMARY" \
+        --foreground "$THEME_PRIMARY" \
         --bold \
         "$1"
 }

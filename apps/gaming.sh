@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # mypctools/apps/gaming.sh
 # Gaming apps installation menu
-# v0.1.0
+# v0.2.0
 
 _GAMING_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_GAMING_DIR/../lib/helpers.sh"
+source "$_GAMING_DIR/../lib/theme.sh"
 source "$_GAMING_DIR/../lib/package-manager.sh"
 
 show_gaming_menu() {
-    print_header "Gaming"
+    clear
+    show_subheader "Gaming"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select apps (Space=select, Enter=confirm):" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
         "Steam" \
         "Lutris" \
         "ProtonUp-Qt" \
@@ -23,13 +25,13 @@ show_gaming_menu() {
     fi
 
     echo ""
-    print_header "Would install the following:"
+    show_subheader "Would install"
     while read -r choice; do
         [[ "$choice" != "Back" ]] && print_info "$choice"
     done <<< "$choices"
     echo ""
 
-    gum confirm "Proceed with installation?" && {
+    if themed_confirm "Proceed with installation?"; then
         while read -r choice; do
             case "$choice" in
                 "Steam")
@@ -48,7 +50,7 @@ show_gaming_menu() {
         done <<< "$choices"
         print_success "Done!"
         read -rp "Press Enter to continue..."
-    }
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
