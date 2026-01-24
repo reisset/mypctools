@@ -14,7 +14,6 @@ show_browsers_menu() {
     choices=$(gum choose --no-limit --header "Select browsers (Space=select, Enter=confirm):" \
         "Brave Browser" \
         "Firefox" \
-        "Zen Browser" \
         "Back")
 
     if [[ -z "$choices" ]] || [[ "$choices" == "Back" ]]; then
@@ -32,13 +31,10 @@ show_browsers_menu() {
         echo "$choices" | while read -r choice; do
             case "$choice" in
                 "Brave Browser")
-                    install_package "Brave Browser" "brave-browser" "brave-bin" "com.brave.Browser" ""
+                    install_package "Brave Browser" "brave-browser" "brave-bin" "" "install_brave_fallback"
                     ;;
                 "Firefox")
                     install_package "Firefox" "firefox" "firefox" "org.mozilla.firefox" ""
-                    ;;
-                "Zen Browser")
-                    install_package "Zen Browser" "" "zen-browser-bin" "io.github.nickvergessen.zenbrowser" ""
                     ;;
             esac
         done
