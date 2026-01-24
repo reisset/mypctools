@@ -123,13 +123,20 @@ install_vscode_fallback() {
     sudo apt-get update && sudo apt-get install -y code
 }
 
-# Caligula - Rust-based ISO burner (cargo install for non-Arch)
+# Caligula - ISO burner (download prebuilt binary for non-Arch)
 install_caligula_fallback() {
-    if ! command_exists cargo; then
-        print_error "Rust/cargo required. Install with: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+    local version="0.4.10"
+    local url="https://github.com/ifd3f/caligula/releases/download/v${version}/caligula-x86_64-linux"
+    local tmp_file="/tmp/caligula"
+
+    if ! curl -fsSL "$url" -o "$tmp_file"; then
+        print_error "Failed to download caligula binary"
         return 1
     fi
-    cargo install caligula
+
+    chmod +x "$tmp_file"
+    sudo mv "$tmp_file" /usr/local/bin/caligula
+    print_success "caligula installed to /usr/local/bin/"
 }
 
 # Spotify - Debian repo setup (Arch uses AUR, flatpak works everywhere)
