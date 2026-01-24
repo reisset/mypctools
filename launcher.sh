@@ -11,6 +11,21 @@ source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
 VERSION="0.1.0"
 
+# Cleanup on interrupt
+cleanup() {
+    tput cnorm 2>/dev/null  # Show cursor
+    stty echo 2>/dev/null   # Re-enable echo
+    echo ""
+    exit 130
+}
+trap cleanup SIGINT SIGTERM
+
+# Don't run as root
+if check_root; then
+    print_error "Do not run as root. Use your normal user."
+    exit 1
+fi
+
 # Check gum is installed
 if ! command_exists gum; then
     print_error "gum is not installed. Run ./install.sh first."
@@ -88,7 +103,7 @@ show_scripts_menu() {
                             if [[ -f "$MYPCTOOLS_ROOT/scripts/bash/uninstall.sh" ]]; then
                                 bash "$MYPCTOOLS_ROOT/scripts/bash/uninstall.sh"
                             else
-                                print_warning "No uninstall script found."
+                                print_warning "Uninstall script not found."
                             fi
                             read -rp "Press Enter to continue..."
                             ;;
@@ -119,7 +134,7 @@ show_scripts_menu() {
                             if [[ -f "$MYPCTOOLS_ROOT/scripts/screensavers/uninstall.sh" ]]; then
                                 bash "$MYPCTOOLS_ROOT/scripts/screensavers/uninstall.sh"
                             else
-                                print_warning "No uninstall script found."
+                                print_warning "Uninstall script not found."
                             fi
                             read -rp "Press Enter to continue..."
                             ;;
@@ -150,7 +165,7 @@ show_scripts_menu() {
                             if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh" ]]; then
                                 bash "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh"
                             else
-                                print_warning "No uninstall script found."
+                                print_warning "Uninstall script not found."
                             fi
                             read -rp "Press Enter to continue..."
                             ;;
