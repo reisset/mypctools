@@ -3,15 +3,15 @@
 # CLI utilities installation menu
 # v0.1.0
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../lib/helpers.sh"
-source "$SCRIPT_DIR/../lib/package-manager.sh"
+_CLI_UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_CLI_UTILS_DIR/../lib/helpers.sh"
+source "$_CLI_UTILS_DIR/../lib/package-manager.sh"
 
 show_cli_utils_menu() {
     print_header "CLI Utilities"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select CLI utilities to install:" \
+    choices=$(gum choose --no-limit --header "Select utilities (Space=select, Enter=confirm):" \
         "fzf - Fuzzy finder" \
         "bat - Better cat" \
         "eza - Better ls" \

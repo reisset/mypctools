@@ -3,15 +3,15 @@
 # Developer tools installation menu
 # v0.1.0
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../lib/helpers.sh"
-source "$SCRIPT_DIR/../lib/package-manager.sh"
+_DEV_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_DEV_TOOLS_DIR/../lib/helpers.sh"
+source "$_DEV_TOOLS_DIR/../lib/package-manager.sh"
 
 show_dev_tools_menu() {
     print_header "Developer Tools"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select dev tools to install:" \
+    choices=$(gum choose --no-limit --header "Select tools (Space=select, Enter=confirm):" \
         "Docker" \
         "Docker Compose" \
         "LazyDocker" \

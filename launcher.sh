@@ -5,9 +5,9 @@
 
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-source "$SCRIPT_DIR/lib/helpers.sh"
-source "$SCRIPT_DIR/lib/distro-detect.sh"
+MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+source "$MYPCTOOLS_ROOT/lib/helpers.sh"
+source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
 VERSION="0.1.0"
 
@@ -31,23 +31,23 @@ show_install_apps_menu() {
 
         case "$choice" in
             "Browsers")
-                source "$SCRIPT_DIR/apps/browsers.sh"
+                source "$MYPCTOOLS_ROOT/apps/browsers.sh"
                 show_browsers_menu
                 ;;
             "Gaming")
-                source "$SCRIPT_DIR/apps/gaming.sh"
+                source "$MYPCTOOLS_ROOT/apps/gaming.sh"
                 show_gaming_menu
                 ;;
             "Media")
-                source "$SCRIPT_DIR/apps/media.sh"
+                source "$MYPCTOOLS_ROOT/apps/media.sh"
                 show_media_menu
                 ;;
             "Dev Tools")
-                source "$SCRIPT_DIR/apps/dev-tools.sh"
+                source "$MYPCTOOLS_ROOT/apps/dev-tools.sh"
                 show_dev_tools_menu
                 ;;
             "CLI Utilities")
-                source "$SCRIPT_DIR/apps/cli-utils.sh"
+                source "$MYPCTOOLS_ROOT/apps/cli-utils.sh"
                 show_cli_utils_menu
                 ;;
             "Back"|"")
@@ -68,32 +68,32 @@ show_scripts_menu() {
 
         case "$choice" in
             "Bash Setup")
-                if [[ -f "$SCRIPT_DIR/scripts/bash/install.sh" ]]; then
+                if [[ -f "$MYPCTOOLS_ROOT/scripts/bash/install.sh" ]]; then
                     print_info "Running Bash Setup installer..."
-                    bash "$SCRIPT_DIR/scripts/bash/install.sh"
+                    bash "$MYPCTOOLS_ROOT/scripts/bash/install.sh"
                 else
                     print_warning "Bash Setup scripts not yet added."
-                    print_info "Add your scripts to: $SCRIPT_DIR/scripts/bash/"
+                    print_info "Add your scripts to: $MYPCTOOLS_ROOT/scripts/bash/"
                 fi
                 read -rp "Press Enter to continue..."
                 ;;
             "Screensavers")
-                if [[ -f "$SCRIPT_DIR/scripts/screensavers/install.sh" ]]; then
+                if [[ -f "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh" ]]; then
                     print_info "Running Screensavers installer..."
-                    bash "$SCRIPT_DIR/scripts/screensavers/install.sh"
+                    bash "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh"
                 else
                     print_warning "Screensaver scripts not yet added."
-                    print_info "Add your scripts to: $SCRIPT_DIR/scripts/screensavers/"
+                    print_info "Add your scripts to: $MYPCTOOLS_ROOT/scripts/screensavers/"
                 fi
                 read -rp "Press Enter to continue..."
                 ;;
             "Claude Setup")
-                if [[ -f "$SCRIPT_DIR/scripts/claude/install.sh" ]]; then
+                if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/install.sh" ]]; then
                     print_info "Running Claude Setup installer..."
-                    bash "$SCRIPT_DIR/scripts/claude/install.sh"
+                    bash "$MYPCTOOLS_ROOT/scripts/claude/install.sh"
                 else
                     print_warning "Claude Setup scripts not yet added (private)."
-                    print_info "Add your scripts to: $SCRIPT_DIR/scripts/claude/"
+                    print_info "Add your scripts to: $MYPCTOOLS_ROOT/scripts/claude/"
                 fi
                 read -rp "Press Enter to continue..."
                 ;;
@@ -168,13 +168,13 @@ show_windows_menu() {
     echo ""
     print_header "Windows PowerShell Scripts"
     print_warning "These scripts are for Windows and cannot be run from here."
-    print_info "Location: $SCRIPT_DIR/windows/powershell/"
+    print_info "Location: $MYPCTOOLS_ROOT/windows/powershell/"
     print_info "GitHub: https://github.com/reisset/mypowershell"
     echo ""
 
     gum confirm "Open folder in file manager?" && {
         if command_exists xdg-open; then
-            xdg-open "$SCRIPT_DIR/windows/powershell/" 2>/dev/null || true
+            xdg-open "$MYPCTOOLS_ROOT/windows/powershell/" 2>/dev/null || true
         fi
     }
 }

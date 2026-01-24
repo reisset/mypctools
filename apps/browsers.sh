@@ -3,15 +3,15 @@
 # Browser installation menu
 # v0.1.0
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../lib/helpers.sh"
-source "$SCRIPT_DIR/../lib/package-manager.sh"
+_BROWSERS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_BROWSERS_DIR/../lib/helpers.sh"
+source "$_BROWSERS_DIR/../lib/package-manager.sh"
 
 show_browsers_menu() {
     print_header "Browsers"
 
     local choices
-    choices=$(gum choose --no-limit --header "Select browsers to install:" \
+    choices=$(gum choose --no-limit --header "Select browsers (Space=select, Enter=confirm):" \
         "Brave Browser" \
         "Firefox" \
         "Zen Browser" \
