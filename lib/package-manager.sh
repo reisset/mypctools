@@ -178,6 +178,21 @@ install_ollama_fallback() {
     curl -fsSL https://ollama.com/install.sh | sh
 }
 
+# OpenCode - official install script
+install_opencode_fallback() {
+    curl -fsSL https://opencode.ai/install | bash
+}
+
+# Claude Code - official install script
+install_claude_code_fallback() {
+    curl -fsSL https://claude.ai/install.sh | bash
+}
+
+# Mistral Vibe CLI - official install script
+install_mistral_vibe_fallback() {
+    curl -LsSf https://mistral.ai/vibe/install.sh | bash
+}
+
 # =============================================================================
 
 # Install a package
