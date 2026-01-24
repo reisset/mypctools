@@ -16,8 +16,6 @@ show_dev_tools_menu() {
         "LazyDocker" \
         "VSCode" \
         "Cursor" \
-        "LM Studio" \
-        "Ollama" \
         ".NET SDK" \
         "Python (latest)" \
         "Back")
@@ -47,12 +45,6 @@ show_dev_tools_menu() {
                     ;;
                 "Cursor")
                     install_package "Cursor" "" "cursor-bin" "" "install_cursor_fallback"
-                    ;;
-                "LM Studio")
-                    install_package "LM Studio" "" "" "ai.lmstudio.LMStudio" ""
-                    ;;
-                "Ollama")
-                    install_package "Ollama" "" "ollama" "" "install_ollama_fallback"
                     ;;
                 ".NET SDK")
                     install_package ".NET SDK" "dotnet-sdk-8.0" "dotnet-sdk" "" ""
