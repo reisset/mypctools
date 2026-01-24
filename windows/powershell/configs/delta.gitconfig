@@ -1,0 +1,29 @@
+[core]
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true    # use n and p to move between diff sections
+    light = false      # set to true if you're in a terminal with a light background color
+    side-by-side = false
+    line-numbers = true
+    syntax-theme = TwoDark
+    
+    # Tokyo Night inspired colors
+    minus-style                   = bold red
+    minus-non-emph-style          = red
+    minus-emph-style              = bold red 52
+    minus-line-num-style          = red
+    plus-style                    = bold green
+    plus-non-emph-style           = green
+    plus-emph-style               = bold green 22
+    plus-line-num-style           = green
+    commit-decoration-style       = bold yellow box
+    file-style                    = bold 232 209
+    file-decoration-style         = 209 ul
+    hunk-header-decoration-style  = 209 box
+    
+[merge]
+    conflictstyle = zdiff3

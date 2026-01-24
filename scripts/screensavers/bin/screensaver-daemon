@@ -1,0 +1,391 @@
+#!/bin/bash
+# screensaver-daemon - Monitor idle time and launch screensaver
+#
+# Supports multiple desktop environments:
+# - GNOME: DBus IdleMonitor (polling)
+# - Hyprland/Sway: swayidle (event-based)
+# - X11/KDE: xprintidle (polling)
+#
+# Launches a fullscreen terminal with the screensaver when idle.
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SCREENSAVER="$SCRIPT_DIR/bin/screensaver"
+
+# Load config file if it exists
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/myscreensavers/config"
+if [[ -f "$CONFIG_FILE" ]]; then
+    # shellcheck source=/dev/null
+    source "$CONFIG_FILE"
+fi
+
+# Configuration (can be overridden via config file or environment)
+IDLE_TIMEOUT_MS=${IDLE_TIMEOUT_MS:-300000}  # 5 minutes in milliseconds
+CHECK_INTERVAL=${CHECK_INTERVAL:-5}          # Check every 5 seconds
+PREFERRED_TERMINAL=${PREFERRED_TERMINAL:-}   # Auto-detect if empty
+LOCK_ON_IDLE=${LOCK_ON_IDLE:-false}          # Lock screen before screensaver
+
+# State
+SCREENSAVER_PID=""
+TERMINAL_PID=""
+SWAYIDLE_PID=""
+IDLE_MARKER=""
+
+log() {
+    echo "[$(date '+%H:%M:%S')] $1"
+}
+
+# Detect desktop environment
+detect_de() {
+    if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then
+        echo "hyprland"
+    elif [[ -n "$SWAYSOCK" ]]; then
+        echo "sway"
+    elif [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]] || [[ -n "$GNOME_DESKTOP_SESSION_ID" ]]; then
+        echo "gnome"
+    elif [[ "$XDG_CURRENT_DESKTOP" == *"KDE"* ]] || [[ -n "$KDE_SESSION_VERSION" ]]; then
+        echo "kde"
+    elif [[ "$XDG_SESSION_TYPE" == "x11" ]]; then
+        echo "x11"
+    elif [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+        echo "wayland"
+    else
+        echo "unknown"
+    fi
+}
+
+# Cache detected DE
+DETECTED_DE=""
+get_de() {
+    if [[ -z "$DETECTED_DE" ]]; then
+        DETECTED_DE=$(detect_de)
+    fi
+    echo "$DETECTED_DE"
+}
+
+# Idle detection: GNOME (uses Mutter IdleMonitor DBus)
+get_idle_time_gnome() {
+    dbus-send --print-reply --dest=org.gnome.Mutter.IdleMonitor \
+        /org/gnome/Mutter/IdleMonitor/Core \
+        org.gnome.Mutter.IdleMonitor.GetIdletime 2>/dev/null | \
+        grep -oP 'uint64 \K[0-9]+' || echo "0"
+}
+
+# Idle detection: X11 (uses xprintidle)
+get_idle_time_x11() {
+    if command -v xprintidle &>/dev/null; then
+        xprintidle 2>/dev/null || echo "0"
+    else
+        echo "0"
+    fi
+}
+
+# Unified idle time getter (for polling-based DEs)
+get_idle_time() {
+    local de
+    de=$(get_de)
+
+    case "$de" in
+        gnome)
+            get_idle_time_gnome
+            ;;
+        x11|kde|unknown)
+            get_idle_time_x11
+            ;;
+        hyprland|sway|wayland)
+            # These use event-based mode; return special marker
+            echo "event_mode"
+            ;;
+        *)
+            get_idle_time_x11
+            ;;
+    esac
+}
+
+check_battery() {
+    # Returns 0 (true) if on battery and discharging, 1 (false) otherwise.
+    # Checks /sys/class/power_supply first, then falls back to upower.
+    
+    # Method 1: /sys/class/power_supply
+    if [[ -d /sys/class/power_supply ]]; then
+        # Check all power supplies starting with BAT
+        for bat in /sys/class/power_supply/BAT*; do
+            if [[ -f "$bat/status" ]]; then
+                status=$(cat "$bat/status")
+                if [[ "$status" == "Discharging" ]]; then
+                    return 0 # True, we are draining battery
+                fi
+            fi
+        done
+    fi
+
+    # Method 2: upower (fallback)
+    if command -v upower &>/dev/null; then
+        if upower -i $(upower -e | grep 'BAT') 2>/dev/null | grep -q "state:.*discharging"; then
+            return 0
+        fi
+    fi
+
+    return 1 # Not discharging (AC power or full)
+}
+
+find_terminal() {
+    # Use preferred terminal if set and available
+    if [[ -n "$PREFERRED_TERMINAL" ]] && command -v "$PREFERRED_TERMINAL" &>/dev/null; then
+        echo "$PREFERRED_TERMINAL"
+        return
+    fi
+
+    # Auto-detect available terminal emulator
+    # Prefer kitty > ghostty > foot (Wayland) > alacritty > gnome-terminal
+    if command -v kitty &>/dev/null; then
+        echo "kitty"
+    elif command -v ghostty &>/dev/null; then
+        echo "ghostty"
+    elif command -v foot &>/dev/null; then
+        echo "foot"
+    elif command -v alacritty &>/dev/null; then
+        echo "alacritty"
+    elif command -v gnome-terminal &>/dev/null; then
+        echo "gnome-terminal"
+    else
+        echo ""
+    fi
+}
+
+launch_screensaver() {
+    local terminal
+    terminal=$(find_terminal)
+
+    if [[ -z "$terminal" ]]; then
+        log "Error: No supported terminal found"
+        return 1
+    fi
+
+    # Lock screen first if enabled
+    if [[ "$LOCK_ON_IDLE" == "true" ]]; then
+        log "Locking screen"
+        loginctl lock-session 2>/dev/null || true
+    fi
+
+    log "Launching screensaver in $terminal"
+
+    # Launch in own process group (setsid) for clean kill
+    case "$terminal" in
+        kitty)
+            setsid kitty --start-as=fullscreen --title="Screensaver" -e "$SCREENSAVER" &
+            ;;
+        ghostty)
+            setsid ghostty --fullscreen -e "$SCREENSAVER" &
+            ;;
+        foot)
+            setsid foot --fullscreen --title="Screensaver" "$SCREENSAVER" &
+            ;;
+        alacritty)
+            setsid alacritty --option window.startup_mode=Fullscreen --title "Screensaver" -e "$SCREENSAVER" &
+            ;;
+        gnome-terminal)
+            setsid gnome-terminal --full-screen --title="Screensaver" -- "$SCREENSAVER" &
+            ;;
+    esac
+
+    TERMINAL_PID=$!
+    SCREENSAVER_PID=$TERMINAL_PID
+}
+
+kill_screensaver() {
+    if [[ -n "$SCREENSAVER_PID" ]]; then
+        log "Killing screensaver"
+
+        # Force kill the entire process group (SIGKILL)
+        # setsid makes TERMINAL_PID the process group leader, so -$PID kills the group
+        # We don't want to wait for graceful shutdown when user wakes device
+        kill -9 -"$TERMINAL_PID" 2>/dev/null || true
+
+        SCREENSAVER_PID=""
+        TERMINAL_PID=""
+    fi
+}
+
+is_screensaver_running() {
+    [[ -n "$SCREENSAVER_PID" ]] && kill -0 "$SCREENSAVER_PID" 2>/dev/null
+}
+
+cleanup() {
+    log "Shutting down daemon"
+    # Kill swayidle if running (for Wayland DEs)
+    if [[ -n "$SWAYIDLE_PID" ]]; then
+        kill "$SWAYIDLE_PID" 2>/dev/null || true
+    fi
+    # Clean up marker file
+    if [[ -n "$IDLE_MARKER" ]]; then
+        rm -f "$IDLE_MARKER" 2>/dev/null || true
+    fi
+    kill_screensaver
+    exit 0
+}
+
+trap cleanup SIGTERM SIGINT
+
+# Polling-based idle loop (GNOME, X11, KDE)
+run_polling_loop() {
+    log "Using polling-based idle detection"
+
+    while true; do
+        IDLE_MS=$(get_idle_time)
+
+        if [[ "$IDLE_MS" -ge "$IDLE_TIMEOUT_MS" ]]; then
+            # Only launch if not running AND not on battery power
+            if ! is_screensaver_running; then
+                if check_battery; then
+                    # On battery - skip silently to save power
+                    :
+                else
+                    launch_screensaver
+                fi
+            fi
+        else
+            if is_screensaver_running; then
+                kill_screensaver
+            fi
+        fi
+
+        sleep "$CHECK_INTERVAL"
+    done
+}
+
+# Event-based idle loop (Hyprland, Sway, Wayland)
+# Uses swayidle which blocks until idle timeout is reached
+run_event_loop() {
+    local timeout_sec=$((IDLE_TIMEOUT_MS / 1000))
+    log "Using event-based idle detection (swayidle, timeout: ${timeout_sec}s)"
+
+    # Set up marker file path (global for cleanup)
+    IDLE_MARKER="/tmp/screensaver-idle-marker-$$"
+
+    while true; do
+        # Skip entirely if on battery
+        if check_battery; then
+            sleep "$CHECK_INTERVAL"
+            continue
+        fi
+
+        # Clean up any previous marker
+        rm -f "$IDLE_MARKER"
+
+        # Start swayidle in background
+        # When idle timeout reached, it touches the marker file
+        # When user resumes activity, swayidle sends resume event
+        swayidle -w \
+            timeout "$timeout_sec" "touch $IDLE_MARKER" \
+            resume "rm -f $IDLE_MARKER" &
+        SWAYIDLE_PID=$!
+
+        # Monitor for idle state
+        while kill -0 "$SWAYIDLE_PID" 2>/dev/null; do
+            if [[ -f "$IDLE_MARKER" ]]; then
+                # System is idle
+                if ! is_screensaver_running && ! check_battery; then
+                    launch_screensaver
+                fi
+            else
+                # User resumed activity
+                if is_screensaver_running; then
+                    kill_screensaver
+                fi
+            fi
+            sleep 1
+        done
+
+        # swayidle exited unexpectedly, restart it
+        log "swayidle exited, restarting..."
+        SWAYIDLE_PID=""
+        rm -f "$IDLE_MARKER"
+        sleep 1
+    done
+}
+
+# Check dependencies based on DE
+check_dependencies() {
+    local de
+    de=$(get_de)
+
+    if [[ ! -x "$SCREENSAVER" ]]; then
+        echo "Error: Screensaver script not found or not executable: $SCREENSAVER"
+        exit 1
+    fi
+
+    case "$de" in
+        gnome)
+            if ! command -v dbus-send &>/dev/null; then
+                echo "Error: dbus-send not found. Install dbus package."
+                exit 1
+            fi
+            if ! get_idle_time_gnome &>/dev/null || [[ "$(get_idle_time_gnome)" == "0" ]]; then
+                # Only fail if we can't connect at all (not just 0 idle time)
+                if ! dbus-send --print-reply --dest=org.gnome.Mutter.IdleMonitor \
+                    /org/gnome/Mutter/IdleMonitor/Core \
+                    org.gnome.Mutter.IdleMonitor.GetIdletime &>/dev/null; then
+                    echo "Error: Cannot query GNOME IdleMonitor. Is GNOME running?"
+                    exit 1
+                fi
+            fi
+            ;;
+        hyprland|sway|wayland)
+            if ! command -v swayidle &>/dev/null; then
+                echo "Error: swayidle is required for $de but not found."
+                echo ""
+                echo "Install it:"
+                echo "  Arch: sudo pacman -S swayidle"
+                echo "  Ubuntu: sudo apt install swayidle"
+                exit 1
+            fi
+            ;;
+        x11|kde)
+            if ! command -v xprintidle &>/dev/null; then
+                echo "Warning: xprintidle not found. Idle detection may not work."
+                echo ""
+                echo "Install it:"
+                echo "  Arch: sudo pacman -S xprintidle"
+                echo "  Ubuntu: sudo apt install xprintidle"
+                echo ""
+                echo "Continuing anyway..."
+            fi
+            ;;
+    esac
+
+    # Validate terminal emulator exists
+    local terminal
+    terminal=$(find_terminal)
+    if [[ -z "$terminal" ]]; then
+        echo "Error: No supported terminal found."
+        echo "Install one of: kitty, ghostty, foot, alacritty, gnome-terminal"
+        echo "Or set PREFERRED_TERMINAL in ~/.config/myscreensavers/config"
+        exit 1
+    fi
+}
+
+# Main entry point
+main() {
+    local de
+    de=$(get_de)
+
+    check_dependencies
+
+    log "Daemon started (DE: $de, timeout: ${IDLE_TIMEOUT_MS}ms, interval: ${CHECK_INTERVAL}s)"
+    log "Screensaver: $SCREENSAVER"
+    log "Terminal: $(find_terminal)"
+
+    case "$de" in
+        hyprland|sway|wayland)
+            run_event_loop
+            ;;
+        *)
+            run_polling_loop
+            ;;
+    esac
+}
+
+# Run
+main
