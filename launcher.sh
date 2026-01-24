@@ -37,6 +37,7 @@ show_install_apps_menu() {
     while true; do
         local choice
         choice=$(gum choose --header "Install Apps" \
+            "AI" \
             "Browsers" \
             "Gaming" \
             "Media" \
@@ -45,6 +46,10 @@ show_install_apps_menu() {
             "Back")
 
         case "$choice" in
+            "AI")
+                source "$MYPCTOOLS_ROOT/apps/ai.sh"
+                show_ai_menu
+                ;;
             "Browsers")
                 source "$MYPCTOOLS_ROOT/apps/browsers.sh"
                 show_browsers_menu
