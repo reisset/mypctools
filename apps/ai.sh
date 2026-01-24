@@ -13,22 +13,21 @@ show_ai_menu() {
     show_subheader "AI Tools"
 
     local choices
-    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
         "OpenCode" \
         "Claude Code" \
         "Mistral Vibe CLI" \
         "Ollama" \
-        "LM Studio" \
-        "Back")
+        "LM Studio")
 
-    if [[ -z "$choices" ]] || [[ "$choices" == "Back" ]]; then
+    if [[ -z "$choices" ]]; then
         return
     fi
 
     echo ""
     show_subheader "Would install"
     while read -r choice; do
-        [[ "$choice" != "Back" ]] && print_info "$choice"
+        print_info "$choice"
     done <<< "$choices"
     echo ""
 

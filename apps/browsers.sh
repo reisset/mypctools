@@ -13,19 +13,18 @@ show_browsers_menu() {
     show_subheader "Browsers"
 
     local choices
-    choices=$(themed_choose_multi "Space=select, Enter=confirm" \
+    choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
         "Brave Browser" \
-        "Firefox" \
-        "Back")
+        "Firefox")
 
-    if [[ -z "$choices" ]] || [[ "$choices" == "Back" ]]; then
+    if [[ -z "$choices" ]]; then
         return
     fi
 
     echo ""
     show_subheader "Would install"
     while read -r choice; do
-        [[ "$choice" != "Back" ]] && print_info "$choice"
+        print_info "$choice"
     done <<< "$choices"
     echo ""
 
