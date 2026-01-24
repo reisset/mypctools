@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/apps/dev-tools.sh
 # Developer tools installation menu
-# v0.1.0
+# v0.2.0
 
 _DEV_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_DEV_TOOLS_DIR/../lib/helpers.sh"
@@ -40,19 +40,19 @@ show_dev_tools_menu() {
                     install_package "Docker" "docker.io" "docker" "" ""
                     ;;
                 "LazyDocker")
-                    install_package "LazyDocker" "" "lazydocker" "" ""
+                    install_package "LazyDocker" "" "lazydocker" "" "install_lazydocker_fallback"
                     ;;
                 "VSCode")
                     install_package "VSCode" "code" "code" "com.visualstudio.code" "install_vscode_fallback"
                     ;;
                 "Cursor")
-                    install_package "Cursor" "" "cursor-bin" "" ""
+                    install_package "Cursor" "" "cursor-bin" "" "install_cursor_fallback"
                     ;;
                 "LM Studio")
                     install_package "LM Studio" "" "" "ai.lmstudio.LMStudio" ""
                     ;;
                 "Ollama")
-                    install_package "Ollama" "" "ollama" "" ""
+                    install_package "Ollama" "" "ollama" "" "install_ollama_fallback"
                     ;;
                 ".NET SDK")
                     install_package ".NET SDK" "dotnet-sdk-8.0" "dotnet-sdk" "" ""

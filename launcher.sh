@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/launcher.sh
 # Main TUI launcher for mypctools
-# v0.1.0
+# v0.2.0
 
 set -e
 
@@ -9,7 +9,7 @@ MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.1.0"
+VERSION="0.2.0"
 
 # Cleanup on interrupt
 cleanup() {
@@ -293,7 +293,23 @@ show_settings_menu() {
                 read -rp "Press Enter to continue..."
                 ;;
             "Check for Updates")
-                print_info "[STUB] Would check for updates via git pull"
+                echo ""
+                print_info "Checking for updates..."
+                if git -C "$MYPCTOOLS_ROOT" fetch origin main &>/dev/null; then
+                    local behind
+                    behind=$(git -C "$MYPCTOOLS_ROOT" rev-list HEAD..origin/main --count 2>/dev/null)
+                    if [[ "$behind" -gt 0 ]]; then
+                        print_warning "$behind new commit(s) available"
+                        gum confirm "Pull updates now?" && {
+                            git -C "$MYPCTOOLS_ROOT" pull origin main
+                            print_success "Updated! Restart mypctools to use new version."
+                        }
+                    else
+                        print_success "Already up to date!"
+                    fi
+                else
+                    print_error "Failed to check for updates"
+                fi
                 read -rp "Press Enter to continue..."
                 ;;
             "Back"|"")
