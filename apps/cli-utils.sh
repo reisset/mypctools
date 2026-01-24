@@ -63,7 +63,7 @@ show_cli_utils_menu() {
                     install_package "zoxide" "zoxide" "zoxide" "" ""
                     ;;
                 "caligula - ISO burner")
-                    install_package "caligula" "" "caligula" "" ""
+                    install_package "caligula" "" "caligula" "" "install_caligula_fallback"
                     ;;
                 "gum - TUI toolkit")
                     install_package "gum" "gum" "gum" "" ""

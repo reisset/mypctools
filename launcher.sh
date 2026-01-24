@@ -194,10 +194,71 @@ show_system_setup_menu() {
             "System Info")
                 echo ""
                 print_header "System Information"
-                print_info "Distro: $DISTRO_NAME"
-                print_info "Type: $DISTRO_TYPE"
+
+                # User@Host
+                print_info "User: $USER@$(hostname)"
+
+                # OS
+                print_info "OS: $DISTRO_NAME"
+
+                # Host (hardware model)
+                local host_model=""
+                [[ -f /sys/devices/virtual/dmi/id/product_name ]] && host_model=$(cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null)
+                [[ -n "$host_model" ]] && print_info "Host: $host_model"
+
+                # Kernel
                 print_info "Kernel: $(uname -r)"
-                print_info "Shell: $SHELL"
+
+                # Uptime
+                local uptime_str
+                uptime_str=$(uptime -p 2>/dev/null | sed 's/up //')
+                print_info "Uptime: $uptime_str"
+
+                # Packages
+                local pkg_count=""
+                if command_exists dpkg; then
+                    pkg_count="$(dpkg --get-selections 2>/dev/null | wc -l) (dpkg)"
+                elif command_exists pacman; then
+                    pkg_count="$(pacman -Q 2>/dev/null | wc -l) (pacman)"
+                fi
+                if command_exists flatpak; then
+                    local flatpak_count
+                    flatpak_count=$(flatpak list --app 2>/dev/null | wc -l)
+                    [[ -n "$pkg_count" ]] && pkg_count="$pkg_count, $flatpak_count (flatpak)" || pkg_count="$flatpak_count (flatpak)"
+                fi
+                [[ -n "$pkg_count" ]] && print_info "Packages: $pkg_count"
+
+                # Shell
+                print_info "Shell: $(basename "$SHELL")"
+
+                # DE / WM
+                [[ -n "$XDG_CURRENT_DESKTOP" ]] && print_info "DE: $XDG_CURRENT_DESKTOP"
+                [[ -n "$XDG_SESSION_TYPE" ]] && print_info "Session: $XDG_SESSION_TYPE"
+
+                # Terminal
+                [[ -n "$TERM" ]] && print_info "Terminal: $TERM"
+
+                # CPU
+                local cpu_model
+                cpu_model=$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2 | sed 's/^ //')
+                [[ -n "$cpu_model" ]] && print_info "CPU: $cpu_model"
+
+                # GPU
+                local gpu_info
+                gpu_info=$(lspci 2>/dev/null | grep -i 'vga\|3d\|display' | head -1 | sed 's/.*: //')
+                [[ -n "$gpu_info" ]] && print_info "GPU: $gpu_info"
+
+                # Memory
+                local mem_total mem_used
+                mem_total=$(grep MemTotal /proc/meminfo 2>/dev/null | awk '{printf "%.1f", $2/1024/1024}')
+                mem_used=$(free -m 2>/dev/null | awk '/Mem:/ {printf "%.1f", $3/1024}')
+                [[ -n "$mem_total" ]] && print_info "Memory: ${mem_used}GB / ${mem_total}GB"
+
+                # Disk
+                local disk_info
+                disk_info=$(df -h / 2>/dev/null | awk 'NR==2 {print $3 " / " $2 " (" $5 " used)"}')
+                [[ -n "$disk_info" ]] && print_info "Disk (/): $disk_info"
+
                 echo ""
                 read -rp "Press Enter to continue..."
                 ;;

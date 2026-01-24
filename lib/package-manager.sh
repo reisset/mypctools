@@ -120,6 +120,15 @@ install_vscode_fallback() {
     sudo apt-get update && sudo apt-get install -y code
 }
 
+# Caligula - Rust-based ISO burner (cargo install for non-Arch)
+install_caligula_fallback() {
+    if ! command_exists cargo; then
+        print_error "Rust/cargo required. Install with: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+        return 1
+    fi
+    cargo install caligula
+}
+
 # Spotify - Debian repo setup (Arch uses AUR, flatpak works everywhere)
 install_spotify_fallback() {
     if [[ "$DISTRO_TYPE" != "debian" ]]; then
