@@ -13,7 +13,6 @@ show_dev_tools_menu() {
     local choices
     choices=$(gum choose --no-limit --header "Select tools (Space=select, Enter=confirm):" \
         "Docker" \
-        "Docker Compose" \
         "LazyDocker" \
         "VSCode" \
         "Cursor" \
@@ -39,9 +38,6 @@ show_dev_tools_menu() {
             case "$choice" in
                 "Docker")
                     install_package "Docker" "docker.io" "docker" "" ""
-                    ;;
-                "Docker Compose")
-                    install_package "Docker Compose" "docker-compose" "docker-compose" "" ""
                     ;;
                 "LazyDocker")
                     install_package "LazyDocker" "" "lazydocker" "" ""

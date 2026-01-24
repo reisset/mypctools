@@ -19,11 +19,11 @@ To uninstall: `./uninstall.sh`
 
 - **Install Apps** - Browsers, gaming, media, dev tools, CLI utilities
 - **My Scripts** - Personal bash configs, screensavers, Claude Code setup (all with install/uninstall)
-- **System Setup** - System info and tweaks
+- **System Setup** - Detailed system info (fastfetch-style: CPU, GPU, memory, packages, etc.)
 - Cross-distro support (Debian/Ubuntu and Arch-based)
 - Smart package detection (skips already-installed apps)
 - Spinner UI during installations with graceful Ctrl+C handling
-- Fallback installers with retry/timeout for packages needing repos (Brave, VSCode, Spotify)
+- Fallback installers for packages needing special handling (Brave, VSCode, Spotify, Caligula)
 
 ## Included Scripts
 
