@@ -76,13 +76,6 @@ if [ -L "$HOME/.config/kitty/kitty.conf" ]; then
     fi
 fi
 
-if [ -L "$HOME/.config/zellij/config.kdl" ]; then
-    if confirm "Remove Zellij config symlink?"; then
-        rm "$HOME/.config/zellij/config.kdl"
-        log_info "Removed ~/.config/zellij/config.kdl"
-    fi
-fi
-
 # Step 3: Remove git delta configuration
 if git config --global --get include.path 2>/dev/null | grep -q "delta.gitconfig"; then
     if confirm "Remove git delta configuration?"; then
@@ -145,7 +138,7 @@ BINARIES_TO_REMOVE=()
 if [ "$MANUAL_MODE" = true ]; then
     # Manual detection
     for binary in eza bat rg fzf zoxide yazi starship btop dust fd delta \
-                  lazygit procs bandwhich hyperfine tokei glow tldr micro mybash zellij; do
+                  lazygit procs glow tldr micro mybash; do
         if [ -x "$HOME/.local/bin/$binary" ]; then
             echo "  - $binary"
             BINARIES_TO_REMOVE+=("$HOME/.local/bin/$binary")

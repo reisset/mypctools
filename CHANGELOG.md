@@ -2,6 +2,24 @@
 
 ## [Unreleased]
 
+### Added
+- Fedora/dnf support in `install_package()` - Fedora users now get native package manager instead of falling through to flatpak
+- Design decisions section in CLAUDE.md documenting curl|bash fallback approach
+
+### Removed
+- Caligula ISO burner from CLI Utilities menu (niche, rarely used)
+- Stale tool references from bash/uninstall.sh: zellij, bandwhich, hyperfine, tokei (removed from installer but still in uninstaller)
+
+### Fixed
+- Fedora support was broken: `get_package_manager()` returned "dnf" but `install_package()` didn't handle it
+
+### Changed
+- scripts/claude/README.md now references mypctools as canonical source instead of external repo
+
+---
+
+## [Previous Unreleased]
+
 ### Removed
 - Deleted unused gum wrapper functions from lib/helpers.sh: `confirm_action()`, `choose_option()`, `choose_multi()`, `show_header()` (superseded by theme.sh functions)
 - Deleted unused `log_warning()` from lib/helpers.sh

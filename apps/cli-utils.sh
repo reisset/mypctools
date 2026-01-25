@@ -22,7 +22,6 @@ show_cli_utils_menu() {
         "btop - Better htop" \
         "tldr - Simplified man pages" \
         "zoxide - Smarter cd" \
-        "caligula - ISO burner" \
         "gum - TUI toolkit")
 
     if [[ -z "$choices" ]]; then
@@ -62,9 +61,6 @@ show_cli_utils_menu() {
                     ;;
                 "zoxide - Smarter cd")
                     install_package "zoxide" "zoxide" "zoxide" "" ""
-                    ;;
-                "caligula - ISO burner")
-                    install_package "caligula" "" "caligula" "" "install_caligula_fallback"
                     ;;
                 "gum - TUI toolkit")
                     install_package "gum" "gum" "gum" "" ""
