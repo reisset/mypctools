@@ -1,11 +1,11 @@
-# claudesetup
+# Claude Code Setup
 
 Personal Claude Code config: preferences, custom statusline, and document skills.
 
-## Quick Start
+Part of [mypctools](https://github.com/reisset/mypctools) - run from the main TUI or directly:
 
 ```bash
-git clone git@github.com:reisset/claudesetup.git ~/claudesetup && ~/claudesetup/install.sh
+./scripts/claude/install.sh
 ```
 
 Then restart your shell to get the `cdsp` alias.

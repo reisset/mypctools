@@ -81,3 +81,10 @@ gum style --border normal --padding "1 2" "Title"    # Styled box
 **Important**: Always redirect stdin from `/dev/null` when using `gum spin`. Without this, the spinner hangs indefinitely after the command completes because gum keeps waiting for stdin to close.
 
 **Sudo commands**: Call `ensure_sudo` from `lib/helpers.sh` before running sudo commands inside `gum spin`. This prompts for the password beforehand, avoiding hangs from password prompts that can't receive input.
+
+## Design Decisions
+
+**curl|bash fallback installers**: The fallback functions for Ollama, OpenCode, Claude Code, and Mistral Vibe pipe directly from official vendor URLs (`curl ... | bash`). This is intentional:
+- These are official installers from trusted vendors
+- Simplifies code vs download-then-execute pattern
+- Acceptable tradeoff for a personal tool

@@ -150,23 +150,6 @@ install_dotnet_fallback() {
     sudo apt-get update && sudo apt-get install -y dotnet-sdk-10.0
 }
 
-# Caligula - ISO burner (download prebuilt binary for non-Arch)
-install_caligula_fallback() {
-    local version="0.4.10"
-    local url="https://github.com/ifd3f/caligula/releases/download/v${version}/caligula-x86_64-linux"
-    local tmp_file="/tmp/caligula"
-
-    if ! curl -fsSL "$url" -o "$tmp_file"; then
-        print_error "Failed to download caligula binary"
-        return 1
-    fi
-
-    chmod +x "$tmp_file"
-    ensure_sudo || return 1
-    sudo mv "$tmp_file" /usr/local/bin/caligula
-    print_success "caligula installed to /usr/local/bin/"
-}
-
 # Discord - direct .deb download (Arch has official package, flatpak works everywhere)
 install_discord_fallback() {
     if [[ "$DISTRO_TYPE" != "debian" ]]; then
@@ -302,6 +285,16 @@ install_package() {
                     return 0
                 fi
                 print_warning "pacman install failed, trying fallback..."
+            fi
+            ;;
+        dnf)
+            if [[ -n "$apt_pkg" ]]; then  # Fedora package names usually match Debian
+                ensure_sudo || return 1
+                if run_with_spinner "Installing $display_name..." sudo dnf install -y "$apt_pkg"; then
+                    print_success "$display_name installed successfully"
+                    return 0
+                fi
+                print_warning "dnf install failed, trying fallback..."
             fi
             ;;
     esac
