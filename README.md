@@ -60,7 +60,7 @@ The installer tries each method in order and stops at the first success. Custom 
 | Brave | Official install script |
 | VSCode | Microsoft apt repo |
 | Spotify | Spotify apt repo |
-| Caligula | cargo install |
+| Caligula | GitHub binary release |
 | LazyDocker | GitHub binary release |
 | Cursor | AppImage download |
 | OpenCode | Official install script |
