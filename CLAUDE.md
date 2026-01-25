@@ -66,6 +66,7 @@ All sudo operations use `ensure_sudo` to pre-authenticate before running.
 - `scripts/bash/` - Bash shell setup (Kitty, Starship, modern CLI tools). Has `--server` flag for headless installs.
 - `scripts/screensavers/` - Terminal screensaver scripts
 - `scripts/claude/` - Claude Code preferences and skills (copies to `~/.claude/`)
+- `scripts/spicetify/` - Spicetify + StarryNight theme for native Spotify installs
 - `windows/powershell/` - Windows PowerShell configs (reference only, not runnable from Linux)
 
 ## Distro Support
