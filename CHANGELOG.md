@@ -9,9 +9,13 @@
 - Deleted unused `themed_spin()` from lib/theme.sh (project uses `run_with_spinner` instead)
 - Removed empty `configs/` directory
 
+### Added
+- `ensure_sudo()` helper function to pre-authenticate sudo before gum spin commands
+
 ### Fixed
 - README.md: Corrected Caligula fallback method from "cargo install" to "GitHub binary release"
 - gum spin hanging indefinitely after package installations complete (stdin not redirected)
+- sudo password prompts hanging inside gum spin (now pre-authenticates with `ensure_sudo`)
 - .NET SDK installation: case statement mismatch prevented menu selection from executing
 - .NET SDK detection: `is_installed` now correctly checks for `dotnet` command
 

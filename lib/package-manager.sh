@@ -112,6 +112,7 @@ install_vscode_fallback() {
         return 1
     fi
 
+    ensure_sudo || return 1
     sudo apt-get install -y wget gpg || return 1
     local gpg_key="/tmp/microsoft.asc"
     if ! wget --timeout=10 --tries=3 -qO "$gpg_key" https://packages.microsoft.com/keys/microsoft.asc; then
@@ -131,6 +132,8 @@ install_dotnet_fallback() {
         print_error ".NET SDK fallback only supports Debian-based distros"
         return 1
     fi
+
+    ensure_sudo || return 1
 
     # Ubuntu 24.04+ includes .NET in default repos - just need apt update
     print_info "Updating package lists..."
@@ -159,6 +162,7 @@ install_caligula_fallback() {
     fi
 
     chmod +x "$tmp_file"
+    ensure_sudo || return 1
     sudo mv "$tmp_file" /usr/local/bin/caligula
     print_success "caligula installed to /usr/local/bin/"
 }
@@ -175,6 +179,7 @@ install_spotify_fallback() {
         print_error "Failed to download Spotify GPG key"
         return 1
     fi
+    ensure_sudo || return 1
     sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg < "$gpg_key"
     rm -f "$gpg_key"
     echo "deb https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
@@ -191,6 +196,7 @@ install_lazydocker_fallback() {
     fi
     curl -Lo /tmp/lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/download/v${version}/lazydocker_${version}_Linux_x86_64.tar.gz" || return 1
     tar -xzf /tmp/lazydocker.tar.gz -C /tmp lazydocker || return 1
+    ensure_sudo || return 1
     sudo mv /tmp/lazydocker /usr/local/bin/
     rm -f /tmp/lazydocker.tar.gz
 }
@@ -262,6 +268,7 @@ install_package() {
     case "$pkg_manager" in
         apt)
             if [[ -n "$apt_pkg" ]]; then
+                ensure_sudo || return 1
                 if run_with_spinner "Installing $display_name..." sudo apt install -y "$apt_pkg"; then
                     print_success "$display_name installed successfully"
                     return 0
@@ -271,6 +278,7 @@ install_package() {
             ;;
         pacman)
             if [[ -n "$pacman_pkg" ]]; then
+                ensure_sudo || return 1
                 if run_with_spinner "Installing $display_name..." sudo pacman -S --noconfirm "$pacman_pkg"; then
                     print_success "$display_name installed successfully"
                     return 0
