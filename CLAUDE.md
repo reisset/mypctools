@@ -74,6 +74,8 @@ Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial.
 gum choose "Option 1" "Option 2"              # Single select
 gum choose --no-limit "A" "B" "C"             # Multi-select
 gum confirm "Proceed?" && do_thing            # Yes/no
-gum spin --spinner dot --title "Working..." -- cmd   # Spinner
+gum spin --spinner dot --title "Working..." -- cmd < /dev/null  # Spinner (stdin must be closed!)
 gum style --border normal --padding "1 2" "Title"    # Styled box
 ```
+
+**Important**: Always redirect stdin from `/dev/null` when using `gum spin`. Without this, the spinner hangs indefinitely after the command completes because gum keeps waiting for stdin to close.

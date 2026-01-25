@@ -11,3 +11,10 @@
 
 ### Fixed
 - README.md: Corrected Caligula fallback method from "cargo install" to "GitHub binary release"
+- gum spin hanging indefinitely after package installations complete (stdin not redirected)
+- .NET SDK installation: case statement mismatch prevented menu selection from executing
+- .NET SDK detection: `is_installed` now correctly checks for `dotnet` command
+
+### Changed
+- .NET SDK updated from version 8 to version 10 (current LTS)
+- .NET SDK fallback simplified for Ubuntu 24.04+ (uses default repos, no Microsoft repo needed)
