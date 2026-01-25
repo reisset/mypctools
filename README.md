@@ -2,7 +2,7 @@
 
 A personal TUI for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum).
 
-**v0.2.0**
+**v0.4.0**
 
 ## Quick Start
 
@@ -40,12 +40,15 @@ Bundled script collections with install/uninstall options:
 
 ### System Setup
 
-- Detailed system info (fastfetch-style): OS, kernel, CPU, GPU, memory, disk, packages, uptime
+- Full System Update - one-click apt/pacman/dnf upgrade
+- System Cleanup - remove orphans, clear caches, empty trash
+- Service Manager - TUI for systemctl services
+- System Info - fastfetch-style details (OS, kernel, CPU, GPU, memory, disk, packages)
 
 ### Settings
 
-- Check for updates via git pull
 - About info
+- Updates checked automatically on launch
 
 ## How Package Installation Works
 

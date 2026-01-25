@@ -1,6 +1,21 @@
 # Changelog
 
-## [Unreleased]
+## [0.4.0] - 2026-01-25
+
+### Added
+- ASCII art logo in main menu
+- Silent version check with "Pull Updates" option when available
+- Full System Update command (apt/pacman/dnf upgrade)
+- System Cleanup command (remove orphans, clear caches, empty trash)
+- Service Manager TUI for systemctl services
+
+### Removed
+- "Check for Updates" submenu (replaced by automatic check)
+- "Coming Soon..." placeholder in System Setup
+
+---
+
+## [0.3.1] - Unreleased
 
 ### Added
 - Fedora/dnf support in `install_package()` - Fedora users now get native package manager instead of falling through to flatpak
@@ -18,7 +33,7 @@
 
 ---
 
-## [Previous Unreleased]
+## [0.3.0]
 
 ### Removed
 - Deleted unused gum wrapper functions from lib/helpers.sh: `confirm_action()`, `choose_option()`, `choose_multi()`, `show_header()` (superseded by theme.sh functions)

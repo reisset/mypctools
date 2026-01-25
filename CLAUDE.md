@@ -25,7 +25,8 @@ mypctools/
 │   ├── helpers.sh       # Print functions, gum wrappers, logging
 │   ├── distro-detect.sh # Sets DISTRO_TYPE (arch/debian/fedora) and DISTRO_NAME
 │   └── package-manager.sh # install_package() with apt/pacman/flatpak fallback chain
-└── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
+├── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
+│   └── service-manager.sh # TUI for systemctl services
 └── scripts/             # Personal script bundles with install/uninstall.sh each
 ```
 
@@ -48,6 +49,17 @@ install_toolname_fallback() {
 Then reference it in `install_package` calls: `install_package "Tool" "" "" "" "install_toolname_fallback"`
 
 **Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Add menu entry in `launcher.sh:show_scripts_menu()`.
+
+## System Setup Features
+
+The System Setup menu (`show_system_setup_menu()` in `launcher.sh`) provides:
+
+- **Full System Update** - Runs `apt update && apt upgrade`, `pacman -Syu`, or `dnf upgrade` based on distro
+- **System Cleanup** - Removes orphan packages, clears package cache, empties user trash/thumbnails
+- **Service Manager** - TUI for managing systemd services (start/stop/restart/enable/disable)
+- **System Info** - Displays OS, kernel, CPU, GPU, memory, disk, packages, uptime
+
+All sudo operations use `ensure_sudo` to pre-authenticate before running.
 
 ## Included Script Bundles
 
