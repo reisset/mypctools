@@ -121,6 +121,7 @@ show_scripts_menu() {
             "Bash Setup" \
             "Screensavers" \
             "Claude Setup" \
+            "Spicetify Theme" \
             "Back")
 
         case "$choice" in
@@ -212,6 +213,39 @@ show_scripts_menu() {
                         "Uninstall")
                             if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh" ]]; then
                                 bash "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh"
+                            else
+                                print_warning "Uninstall script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Back"|"")
+                            break
+                            ;;
+                    esac
+                done
+                ;;
+            "Spicetify Theme")
+                while true; do
+                    clear
+                    show_subheader "Spicetify Theme"
+                    local action
+                    action=$(themed_choose "" \
+                        "Install" \
+                        "Uninstall" \
+                        "Back")
+
+                    case "$action" in
+                        "Install")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/spicetify/install.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/spicetify/install.sh"
+                            else
+                                print_warning "Install script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Uninstall")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/spicetify/uninstall.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/spicetify/uninstall.sh"
                             else
                                 print_warning "Uninstall script not found."
                             fi
