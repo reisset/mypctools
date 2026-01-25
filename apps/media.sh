@@ -14,6 +14,7 @@ show_media_menu() {
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
+        "Discord" \
         "Spotify" \
         "VLC" \
         "MPV")
@@ -32,6 +33,9 @@ show_media_menu() {
     if themed_confirm "Proceed with installation?"; then
         while read -r choice; do
             case "$choice" in
+                "Discord")
+                    install_package "Discord" "" "discord" "com.discordapp.Discord" "install_discord_fallback"
+                    ;;
                 "Spotify")
                     install_package "Spotify" "spotify-client" "spotify" "com.spotify.Client" "install_spotify_fallback"
                     ;;
