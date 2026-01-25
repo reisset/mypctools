@@ -35,7 +35,7 @@ has_flatpak() {
 run_with_spinner() {
     local title="$1"
     shift
-    gum spin --spinner dot --show-error --title "$title" -- "$@"
+    gum spin --spinner dot --show-error --title "$title" -- "$@" < /dev/null
 }
 
 # Check if a package is already installed
@@ -80,6 +80,8 @@ is_installed() {
         command -v "$cmd" &>/dev/null && return 0
         # Also check original name
         command -v "$apt_pkg" &>/dev/null && return 0
+        # Special case: dotnet SDK uses 'dotnet' command
+        [[ "$apt_pkg" == dotnet-sdk-* ]] && command -v dotnet &>/dev/null && return 0
     fi
 
     return 1
@@ -121,6 +123,28 @@ install_vscode_fallback() {
     rm -f "$gpg_key" /tmp/microsoft.gpg
     echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list
     sudo apt-get update && sudo apt-get install -y code
+}
+
+# .NET SDK - Ubuntu 24.04+ has .NET in default repos, fallback uses backports PPA
+install_dotnet_fallback() {
+    if [[ "$DISTRO_TYPE" != "debian" ]]; then
+        print_error ".NET SDK fallback only supports Debian-based distros"
+        return 1
+    fi
+
+    # Ubuntu 24.04+ includes .NET in default repos - just need apt update
+    print_info "Updating package lists..."
+    sudo apt-get update || return 1
+
+    # Try installing from default repos first
+    if sudo apt-get install -y dotnet-sdk-10.0; then
+        return 0
+    fi
+
+    # Fallback: Ubuntu .NET backports PPA (maintained by Canonical)
+    print_warning "Default repos failed, trying backports PPA..."
+    sudo add-apt-repository -y ppa:dotnet/backports || return 1
+    sudo apt-get update && sudo apt-get install -y dotnet-sdk-10.0
 }
 
 # Caligula - ISO burner (download prebuilt binary for non-Arch)

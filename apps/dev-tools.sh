@@ -18,7 +18,7 @@ show_dev_tools_menu() {
         "LazyDocker" \
         "VSCode" \
         "Cursor" \
-        ".NET SDK" \
+        ".NET SDK 10" \
         "Python (latest)")
 
     if [[ -z "$choices" ]]; then
@@ -47,8 +47,8 @@ show_dev_tools_menu() {
                 "Cursor")
                     install_package "Cursor" "" "cursor-bin" "" "install_cursor_fallback"
                     ;;
-                ".NET SDK")
-                    install_package ".NET SDK" "dotnet-sdk-8.0" "dotnet-sdk" "" ""
+                ".NET SDK 10")
+                    install_package ".NET SDK 10" "dotnet-sdk-10.0" "dotnet-sdk" "" "install_dotnet_fallback"
                     ;;
                 "Python (latest)")
                     install_package "Python" "python3" "python" "" ""
