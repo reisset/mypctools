@@ -37,34 +37,6 @@ print_info() {
     echo -e "${BLUE}→${NC} $1"
 }
 
-# Gum wrappers
-confirm_action() {
-    local prompt="${1:-Are you sure?}"
-    gum confirm "$prompt"
-}
-
-choose_option() {
-    local header="$1"
-    shift
-    gum choose --header "$header" "$@"
-}
-
-choose_multi() {
-    local header="$1"
-    shift
-    gum choose --no-limit --header "$header" "$@"
-}
-
-show_header() {
-    gum style \
-        --border normal \
-        --padding "1 2" \
-        --border-foreground "$THEME_PRIMARY" \
-        --foreground "$THEME_PRIMARY" \
-        --bold \
-        "$1"
-}
-
 # Logging
 log_info() {
     echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - $1"
@@ -72,10 +44,6 @@ log_info() {
 
 log_error() {
     echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1" >&2
-}
-
-log_warning() {
-    echo "[WARN] $(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
 # Check if running as root

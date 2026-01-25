@@ -65,15 +65,3 @@ themed_confirm() {
         --selected.background "$THEME_PRIMARY" \
         "$1"
 }
-
-# Themed spinner
-# Usage: themed_spin "Title text" command args...
-themed_spin() {
-    local title="$1"
-    shift
-    gum spin \
-        --spinner dot \
-        --title.foreground "$THEME_PRIMARY" \
-        --title "$title" \
-        -- "$@"
-}

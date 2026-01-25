@@ -45,8 +45,3 @@ detect_distro() {
 
 # Run detection on source
 detect_distro
-
-print_distro_info() {
-    echo "Distribution: $DISTRO_NAME"
-    echo "Type: $DISTRO_TYPE"
-}
