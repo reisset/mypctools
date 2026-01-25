@@ -59,3 +59,12 @@ check_root() {
 command_exists() {
     command -v "$1" &>/dev/null
 }
+
+# Ensure sudo credentials are cached (prompts user if needed)
+# Call this BEFORE running sudo commands inside gum spin
+ensure_sudo() {
+    if ! sudo -v; then
+        print_error "sudo authentication failed"
+        return 1
+    fi
+}
