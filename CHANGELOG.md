@@ -10,6 +10,7 @@
 - Removed empty `configs/` directory
 
 ### Added
+- Discord to Media apps menu (pacman/flatpak/deb fallback)
 - `ensure_sudo()` helper function to pre-authenticate sudo before gum spin commands
 
 ### Fixed

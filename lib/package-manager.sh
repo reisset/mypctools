@@ -167,6 +167,24 @@ install_caligula_fallback() {
     print_success "caligula installed to /usr/local/bin/"
 }
 
+# Discord - direct .deb download (Arch has official package, flatpak works everywhere)
+install_discord_fallback() {
+    if [[ "$DISTRO_TYPE" != "debian" ]]; then
+        print_error "Discord deb fallback only supports Debian-based distros. Try flatpak."
+        return 1
+    fi
+
+    local tmp_deb="/tmp/discord.deb"
+    if ! curl -fsSL "https://discord.com/api/download?platform=linux&format=deb" -o "$tmp_deb"; then
+        print_error "Failed to download Discord .deb"
+        return 1
+    fi
+    ensure_sudo || return 1
+    sudo dpkg -i "$tmp_deb"
+    sudo apt-get install -f -y  # Fix any dependency issues
+    rm -f "$tmp_deb"
+}
+
 # Spotify - Debian repo setup (Arch uses AUR, flatpak works everywhere)
 install_spotify_fallback() {
     if [[ "$DISTRO_TYPE" != "debian" ]]; then
