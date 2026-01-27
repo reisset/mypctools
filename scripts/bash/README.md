@@ -36,15 +36,6 @@ Don't just run random scripts from the internet. Read the code first.
 3. **Finish Up:**
     Open your terminal settings and select **JetBrainsMono Nerd Font** (the script installs this for you) to ensure icons render correctly.
 
-### Security
-
-I don't like piping curl straight to bash. This installer:
-- Validates download URLs.
-- Checks GPG keys for packages.
-- Only asks for sudo when absolutely necessary.
-
-For detailed security information, see [SECURITY.md](SECURITY.md).
-
 ## Tweaking configs
 
 - **Aliases:** `scripts/aliases.sh`.
@@ -68,4 +59,4 @@ mybash version   # Show version
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT - see root LICENSE file.
