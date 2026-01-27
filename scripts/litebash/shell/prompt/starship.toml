@@ -1,0 +1,42 @@
+# LiteBash Starship Config - Speed Optimized
+# git_status is DISABLED for performance
+# Uses ANSI colors so terminal theme controls appearance
+
+format = """$directory$git_branch$python$character"""
+
+add_newline = false
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold blue"
+read_only = " 󰌾"
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = " "
+style = "bold purple"
+
+[git_status]
+disabled = true
+
+[python]
+format = '[( $virtualenv)]($style) '
+style = "yellow"
+detect_extensions = []
+detect_files = []
+
+[nodejs]
+disabled = true
+
+[package]
+disabled = true
+
+[cmd_duration]
+min_time = 2000
+format = "[$duration]($style) "
+style = "bold yellow"
