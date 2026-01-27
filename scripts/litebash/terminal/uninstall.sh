@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Uninstaller
-# v1.0.0
+# v1.1.0 - Added restore of original default terminal
 
 set -e
 
@@ -43,6 +43,32 @@ if [ -f "$FOOT_CONFIG" ]; then
 else
     print_warning "No foot config found at $FOOT_CONFIG"
 fi
+
+# Restore original default terminal
+restore_default_terminal() {
+    local xdg_terminals="$HOME/.config/xdg-terminals.list"
+    local backup_file="$HOME/.config/xdg-terminals.list.litebash-backup"
+
+    if [ -f "$backup_file" ]; then
+        print_status "Restoring original default terminal..."
+        mv "$backup_file" "$xdg_terminals"
+        print_success "Restored original terminal config"
+    elif [ -f "$xdg_terminals" ]; then
+        # No backup but foot is set - remove foot entry
+        if grep -q "^foot.desktop$" "$xdg_terminals"; then
+            grep -v "^foot.desktop$" "$xdg_terminals" > "$xdg_terminals.tmp" 2>/dev/null || true
+            if [ -s "$xdg_terminals.tmp" ]; then
+                mv "$xdg_terminals.tmp" "$xdg_terminals"
+                print_success "Removed foot from default terminals"
+            else
+                rm -f "$xdg_terminals.tmp" "$xdg_terminals"
+                print_status "Removed xdg-terminals.list (was foot only)"
+            fi
+        fi
+    fi
+}
+
+restore_default_terminal
 
 # Note about fonts
 print_status "Fonts left in place (~/.local/share/fonts)"

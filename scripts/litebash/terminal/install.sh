@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Installer
-# v1.0.0
+# v1.1.0 - Added option to set foot as default terminal
 
 set -e
 
@@ -191,6 +191,38 @@ EOF
     print_success "Created foot.ini with $THEME theme"
 }
 
+# Set foot as default terminal (for xdg-terminal-exec)
+set_default_terminal() {
+    local xdg_terminals="$HOME/.config/xdg-terminals.list"
+    local backup_file="$HOME/.config/xdg-terminals.list.litebash-backup"
+
+    echo ""
+    read -rp "Set foot as default terminal? (Super+Enter will launch foot) [y/N]: " set_default
+
+    if [[ ! "$set_default" =~ ^[Yy]$ ]]; then
+        print_status "Skipping default terminal setup"
+        return 0
+    fi
+
+    # Backup original config (only if we haven't already)
+    if [ -f "$xdg_terminals" ] && [ ! -f "$backup_file" ]; then
+        cp "$xdg_terminals" "$backup_file"
+        print_status "Backed up original terminal config"
+    fi
+
+    # Create xdg-terminals.list with foot first
+    if [ -f "$xdg_terminals" ]; then
+        grep -v "^foot.desktop$" "$xdg_terminals" > "$xdg_terminals.tmp" 2>/dev/null || true
+        echo "foot.desktop" > "$xdg_terminals"
+        cat "$xdg_terminals.tmp" >> "$xdg_terminals" 2>/dev/null || true
+        rm -f "$xdg_terminals.tmp"
+    else
+        echo "foot.desktop" > "$xdg_terminals"
+    fi
+
+    print_success "Set foot as default terminal"
+}
+
 # Main
 main() {
     detect_distro
@@ -199,6 +231,7 @@ main() {
     install_foot
     install_font
     create_config
+    set_default_terminal
 
     echo ""
     print_success "Installation complete!"
