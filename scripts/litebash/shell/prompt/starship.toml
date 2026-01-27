@@ -1,5 +1,7 @@
 # LiteBash Starship Config
-# Default starship with git_status disabled for performance
+# Default colors, minimal scanning for speed
+
+format = """$directory$git_branch$python$nodejs$rust$golang$docker_context$character"""
 
 [git_status]
 disabled = true
