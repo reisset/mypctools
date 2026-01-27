@@ -26,7 +26,8 @@ Speed-focused bash environment for Linux power users.
 | starship | — | Fast, minimal prompt |
 | tealdeer | man | tldr pages |
 | glow | — | Markdown renderer |
-| dysk | df | Disk usage |
+| dysk | — | Disk usage (filesystem info) |
+| dust | — | Disk usage (directory sizes) |
 | gh | — | GitHub CLI |
 
 ### Terminal Themes (foot only)
@@ -36,22 +37,32 @@ Speed-focused bash environment for Linux power users.
 
 ## Installation
 
+LiteBash is part of the **mypctools** TUI.
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/litebash.git
-cd litebash
+# Via mypctools (recommended)
+mypctools
+# Navigate to: Scripts → LiteBash Shell
+# Optionally: Scripts → LiteBash Terminal (Wayland only)
+```
 
+### Manual Installation
+
+If running standalone outside mypctools:
+
+```bash
 # Shell config (works everywhere)
-cd shell && ./install.sh
+./shell/install.sh
 
-# Terminal config (Wayland desktops only)
-cd ../terminal && ./install.sh
+# Terminal config (Wayland only)
+./terminal/install.sh
 ```
 
 Both components are independent — install one or both.
 
 ## Theme Switching
 
-Re-run `terminal/install.sh` and select a different theme, or manually edit `~/.config/foot/foot.ini` and replace the `[colors]` section with one from `terminal/themes/`.
+Re-run the terminal installer via mypctools and select a different theme, or manually edit `~/.config/foot/foot.ini` and replace the `[colors]` section with one from `terminal/themes/`.
 
 ## Customization
 
@@ -69,8 +80,14 @@ Edit `~/.config/starship.toml`. See [Starship docs](https://starship.rs/config/)
 ## Uninstallation
 
 ```bash
-cd litebash/shell && ./uninstall.sh
-cd ../terminal && ./uninstall.sh
+# Via mypctools
+mypctools
+# Navigate to: Scripts → LiteBash Shell → Uninstall
+# Navigate to: Scripts → LiteBash Terminal → Uninstall
+
+# Or manually
+./shell/uninstall.sh
+./terminal/uninstall.sh
 ```
 
 ## Quick Reference

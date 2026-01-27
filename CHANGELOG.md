@@ -50,6 +50,36 @@ All notable changes to mypctools and its bundled scripts.
 
 ---
 
+## scripts/litebash
+
+### [1.1.0] - 2026-01-27
+
+#### Shell (v1.1.0)
+- Added `dust` disk usage analyzer (bootandy/dust)
+- Reset starship.toml to defaults (only git_status disabled for performance)
+- Removed `df='dysk'` alias (dysk/dust are standalone commands now)
+- Created TOOLS.md quick reference
+- Fixed TOOLS.md path reference in installer
+
+#### Terminal (v1.2.0)
+- Improved default terminal detection for multiple desktop environments
+- GNOME (Ubuntu): uses `update-alternatives` for x-terminal-emulator
+- COSMIC (Pop!_OS 24.04+): uses `xdg-terminals.list` (xdg-terminal-exec spec)
+- Hyprland/Sway: uses `xdg-terminals.list`
+- Case-insensitive desktop detection
+
+#### Documentation
+- Updated README for mypctools TUI integration
+- Fixed install/uninstall instructions
+
+### [1.0.0] - 2026-01-25
+- Initial release
+- Shell: eza, bat, ripgrep, fd, fzf, zoxide, btop, lazygit, micro, yazi, starship, tealdeer, glow, dysk, gh
+- Terminal: foot with Catppuccin Mocha, Tokyo Night, HackTheBox themes
+- Speed-optimized starship prompt (git_status disabled)
+
+---
+
 ## scripts/bash (MyBash)
 
 ### [2.8.8] - 2026-01-22

@@ -35,6 +35,7 @@ One menu to install apps across distros. Uses native package managers first, fal
 Bundled script collections with install/uninstall options:
 
 - **Bash Setup** - Kitty terminal, Starship prompt, modern CLI tools (bat, eza, fzf, zoxide). Has `--server` flag for headless installs.
+- **LiteBash** - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi). Optional foot terminal setup for Wayland.
 - **Screensavers** - Terminal eye candy (cmatrix, pipes, asciiquarium, etc.)
 - **Claude Setup** - Claude Code preferences, CLAUDE.md templates, custom skills
 
