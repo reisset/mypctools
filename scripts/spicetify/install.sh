@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # mypctools/scripts/spicetify/install.sh
-# Spicetify + StarryNight theme installer
-# v1.0.1
+# Spicetify theme installer (StarryNight or text)
+# v1.1.0
 #
 # Changelog:
+#   1.1.0 - Add "text" theme option with popular color schemes
+#         - Theme selection menu (StarryNight vs text)
 #   1.0.1 - Fix first-run failure by fixing permissions before spicetify install
 #         - Spicetify installer runs auto-backup which needs write access to Spotify dir
 #   1.0.0 - Initial release
 #         - Installs spicetify CLI
 #         - Configures StarryNight theme with gum-based color scheme selection
-#         - Works with native Spotify installs (apt/pacman) - NOT Flatpak/Snap
+#         - Works with native Spotify installs (apt/pacman/dnf) - NOT Flatpak/Snap
 
 set -e
 
@@ -66,7 +68,7 @@ has_native_spotify() {
 # Main install logic
 # -----------------------------------------------------------------------------
 
-print_header "Spicetify + StarryNight Installer"
+print_header "Spicetify Theme Installer"
 echo ""
 
 # Preflight: Check for native Spotify
@@ -126,36 +128,57 @@ else
     print_success "Backup created"
 fi
 
-# Download and install StarryNight theme
-print_info "Downloading StarryNight theme..."
+# Theme selection
+echo ""
+print_header "Select a theme"
+THEME=$(gum choose --header "Available themes:" "StarryNight" "text")
+
+if [[ -z "$THEME" ]]; then
+    print_warning "No selection - using StarryNight"
+    THEME="StarryNight"
+fi
+
+print_info "Selected theme: $THEME"
+
+# Download and install selected theme
+print_info "Downloading $THEME theme..."
 TEMP_DIR=$(mktemp -d)
 git clone --depth=1 --quiet https://github.com/spicetify/spicetify-themes.git "$TEMP_DIR/themes"
 mkdir -p "$SPICETIFY_CONFIG/Themes"
-cp -r "$TEMP_DIR/themes/StarryNight" "$SPICETIFY_CONFIG/Themes/"
-print_success "StarryNight theme installed"
+cp -r "$TEMP_DIR/themes/$THEME" "$SPICETIFY_CONFIG/Themes/"
+print_success "$THEME theme installed"
 
-# Color scheme selection with gum
+# Color scheme selection based on theme
 echo ""
 print_header "Select a color scheme"
-selected=$(gum choose --header "StarryNight color schemes:" \
-    "Base" \
-    "Cotton Candy" \
-    "Forest" \
-    "Galaxy" \
-    "Orange" \
-    "Sky" \
-    "Sunrise")
 
-if [[ -z "$selected" ]]; then
-    print_warning "No selection - using Base"
-    selected="Base"
+if [[ "$THEME" == "StarryNight" ]]; then
+    selected=$(gum choose --header "StarryNight color schemes:" \
+        "Base" \
+        "Cotton Candy" \
+        "Forest" \
+        "Galaxy" \
+        "Orange" \
+        "Sky" \
+        "Sunrise")
+    [[ -z "$selected" ]] && selected="Base"
+else
+    selected=$(gum choose --header "text color schemes:" \
+        "Spotify" \
+        "Spicetify" \
+        "CatppuccinMocha" \
+        "Dracula" \
+        "Gruvbox" \
+        "Nord" \
+        "TokyoNight")
+    [[ -z "$selected" ]] && selected="Spotify"
 fi
 
 print_info "Selected: $selected"
 
 # Apply theme
 print_info "Configuring spicetify..."
-spicetify config current_theme StarryNight
+spicetify config current_theme "$THEME"
 spicetify config color_scheme "$selected"
 
 print_info "Applying theme..."
@@ -164,7 +187,7 @@ print_success "Theme applied!"
 
 # Done
 echo ""
-print_success "Spicetify + StarryNight setup complete!"
+print_success "Spicetify + $THEME setup complete!"
 echo ""
 print_info "Restart Spotify to see your new theme."
 echo ""
