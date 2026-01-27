@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Installer
-# v1.1.0 - Added option to set foot as default terminal
+# v1.2.0 - Improved default terminal handling for GNOME/COSMIC/Hyprland
 
 set -e
 
@@ -191,18 +191,49 @@ EOF
     print_success "Created foot.ini with $THEME theme"
 }
 
-# Set foot as default terminal (for xdg-terminal-exec)
+# Set foot as default terminal
 set_default_terminal() {
     local xdg_terminals="$HOME/.config/xdg-terminals.list"
     local backup_file="$HOME/.config/xdg-terminals.list.litebash-backup"
 
     echo ""
-    read -rp "Set foot as default terminal? (Super+Enter will launch foot) [y/N]: " set_default
+    read -rp "Set foot as default terminal? [y/N]: " set_default
 
     if [[ ! "$set_default" =~ ^[Yy]$ ]]; then
         print_status "Skipping default terminal setup"
         return 0
     fi
+
+    # Detect desktop environment (case-insensitive)
+    local desktop="${XDG_CURRENT_DESKTOP:-unknown}"
+    local desktop_lower="${desktop,,}"  # lowercase for comparison
+    print_status "Detected desktop: $desktop"
+
+    # GNOME (Ubuntu) - uses update-alternatives, no xdg-terminal-exec support
+    # Skip if COSMIC is detected (Pop!_OS 24.04+ uses cosmic, not GNOME)
+    if [[ "$desktop_lower" == *"gnome"* ]] && [[ "$desktop_lower" != *"cosmic"* ]]; then
+        print_status "GNOME detected - using update-alternatives"
+        if command -v update-alternatives &>/dev/null; then
+            # Check if foot is registered as an alternative
+            if update-alternatives --list x-terminal-emulator 2>/dev/null | grep -q foot; then
+                sudo update-alternatives --set x-terminal-emulator /usr/bin/foot
+                print_success "Set foot as default via update-alternatives"
+            else
+                # Register foot as an alternative first
+                sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/foot 50
+                sudo update-alternatives --set x-terminal-emulator /usr/bin/foot
+                print_success "Registered and set foot as default terminal"
+            fi
+        else
+            print_warning "update-alternatives not found - cannot set default on GNOME"
+            print_warning "You may need to set foot as default manually in Settings"
+        fi
+        return 0
+    fi
+
+    # COSMIC (Pop!_OS) and Hyprland/wlroots - use xdg-terminal-exec spec
+    # This covers: COSMIC, Hyprland, Sway, and other wlroots compositors
+    print_status "Using xdg-terminals.list (xdg-terminal-exec spec)"
 
     # Backup original config (only if we haven't already)
     if [ -f "$xdg_terminals" ] && [ ! -f "$backup_file" ]; then

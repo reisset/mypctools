@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Shell Installer
-# v1.0.0
+# v1.1.0 - Added dust utility
 
 set -e
 
@@ -191,6 +191,55 @@ install_dysk() {
     rm -rf "$tmp_dir"
 }
 
+# Install dust (disk usage analyzer)
+install_dust() {
+    if command -v dust &>/dev/null; then
+        print_success "dust already installed"
+        return 0
+    fi
+
+    print_status "Installing dust from GitHub..."
+    local api_url="https://api.github.com/repos/bootandy/dust/releases/latest"
+    local download_url
+    local pattern
+
+    case "$ARCH" in
+        x86_64) pattern="x86_64-unknown-linux-musl.tar.gz" ;;
+        aarch64) pattern="aarch64-unknown-linux-musl.tar.gz" ;;
+        *) print_warning "Unsupported architecture for dust: $ARCH"; return 1 ;;
+    esac
+
+    download_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP '"browser_download_url":\s*"\K[^"]*'"$pattern"'[^"]*' | head -1)
+
+    if [ -z "$download_url" ]; then
+        print_warning "Could not find dust release"
+        return 1
+    fi
+
+    local tmp_dir=$(mktemp -d)
+    cd "$tmp_dir"
+
+    curl -fsSL -o "dust.tar.gz" "$download_url" || { print_warning "Failed to download dust"; rm -rf "$tmp_dir"; return 1; }
+    tar xzf "dust.tar.gz"
+
+    # Find the dust binary (it's in dust-*/dust)
+    local binary_path
+    binary_path=$(find . -name "dust" -type f -executable 2>/dev/null | head -1)
+    [ -z "$binary_path" ] && binary_path=$(find . -name "dust" -type f 2>/dev/null | head -1)
+
+    if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
+        chmod +x "$binary_path"
+        mv "$binary_path" "$LOCAL_BIN/dust"
+        print_success "Installed dust"
+    else
+        print_warning "Could not find dust binary in archive"
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+
+    rm -rf "$tmp_dir"
+}
+
 # Install starship via official script
 install_starship() {
     if command -v starship &>/dev/null; then
@@ -245,6 +294,7 @@ main() {
     install_from_github "tealdeer-rs/tealdeer" "tldr" "linux-${ARCH}-musl$"
     install_from_github "charmbracelet/glow" "glow" "Linux_${ARCH}\.tar\.gz$"
     install_dysk
+    install_dust
     install_from_github "sxyazi/yazi" "yazi" "${ARCH}-unknown-linux-musl\.zip"
 
     install_starship
@@ -254,7 +304,7 @@ main() {
     cp "$SCRIPT_DIR/litebash.sh" "$LITEBASH_DIR/"
     cp "$SCRIPT_DIR/aliases.sh" "$LITEBASH_DIR/"
     cp "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/"
-    cp "$SCRIPT_DIR/../docs/TOOLS.md" "$LITEBASH_DIR/"
+    cp "$SCRIPT_DIR/TOOLS.md" "$LITEBASH_DIR/"
 
     # Install starship config
     cp "$SCRIPT_DIR/prompt/starship.toml" "$HOME/.config/starship.toml"
