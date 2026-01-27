@@ -6,13 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 mypctools is a personal TUI (Terminal User Interface) for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum) by Charm.
 
-## Running the TUI
-
-```bash
-./install.sh     # First-time setup (installs gum, sets up PATH)
-mypctools        # Run from anywhere after install
-./launcher.sh    # Run directly from this directory
-```
+See README.md for user documentation and quick start.
 
 ## Architecture
 
@@ -64,10 +58,10 @@ All sudo operations use `ensure_sudo` to pre-authenticate before running.
 ## Included Script Bundles
 
 - `scripts/bash/` - Bash shell setup (Kitty, Starship, modern CLI tools). Has `--server` flag for headless installs.
+- `scripts/litebash/` - Speed-focused bash environment (foot terminal, minimal prompt)
 - `scripts/screensavers/` - Terminal screensaver scripts
 - `scripts/claude/` - Claude Code preferences and skills (copies to `~/.claude/`)
 - `scripts/spicetify/` - Spicetify + StarryNight theme for native Spotify installs
-- `windows/powershell/` - Windows PowerShell configs (reference only, not runnable from Linux)
 
 ## Distro Support
 

@@ -75,8 +75,8 @@ cd ../terminal && ./uninstall.sh
 
 ## Quick Reference
 
-After install, type `tools` to see the command reference, or view `docs/TOOLS.md`.
+After install, type `tools` to see the command reference.
 
 ## License
 
-MIT
+MIT - see root LICENSE file.

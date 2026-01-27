@@ -71,29 +71,6 @@ The installer tries each method in order and stops at the first success. Custom 
 | Mistral Vibe | Official install script |
 | Ollama | Official install script |
 
-## Project Structure
-
-```
-mypctools/
-├── launcher.sh              # Main TUI
-├── install.sh / uninstall.sh
-├── lib/
-│   ├── helpers.sh           # Print functions, gum wrappers
-│   ├── distro-detect.sh     # Sets DISTRO_TYPE and DISTRO_NAME
-│   └── package-manager.sh   # install_package() with fallback chain
-├── apps/                    # App category menus
-│   ├── ai.sh
-│   ├── browsers.sh
-│   ├── cli-utils.sh
-│   ├── dev-tools.sh
-│   ├── gaming.sh
-│   └── media.sh
-└── scripts/                 # Bundled script collections
-    ├── bash/
-    ├── screensavers/
-    └── claude/
-```
-
 ## Requirements
 
 - Linux (Debian/Ubuntu, Arch, or Fedora-based)
@@ -102,11 +79,6 @@ mypctools/
 
 Gum is installed automatically by `./install.sh`.
 
-## Related Repos
+## License
 
-The scripts in this repo were consolidated from:
-
-- [mybash](https://github.com/reisset/mybash) - Bash shell setup
-- [myscreensavers](https://github.com/reisset/myscreensavers) - Terminal screensavers
-- [claudesetup](https://github.com/reisset/claudesetup) - Claude Code config
-- [mypowershell](https://github.com/reisset/mypowershell) - Windows PowerShell (reference only)
+MIT - see [LICENSE](LICENSE).
