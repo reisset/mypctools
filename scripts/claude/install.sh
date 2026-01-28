@@ -23,6 +23,8 @@ if [ -d "$SCRIPT_DIR/skills" ]; then
     for skill in "$SCRIPT_DIR/skills"/*/; do
         [ -d "$skill" ] || continue
         skill_name=$(basename "$skill")
+        # Remove existing (handles symlinks from older setups)
+        rm -rf ~/.claude/skills/"$skill_name"
         cp -r "$skill" ~/.claude/skills/
         echo "  Installed skill: $skill_name"
     done
@@ -58,32 +60,33 @@ if [ -f "$SCRIPT_DIR/statusline.sh" ]; then
     echo "  Configured statusLine in settings.json"
 fi
 
-# Add cdsp alias to shell rc file
-# Check user's default shell, not the script's running shell
-if [[ "$SHELL" == */fish ]]; then
-    RC_FILE=~/.config/fish/config.fish
-    ALIAS_LINE="alias cdsp 'claude --dangerously-skip-permissions'"
-    GREP_PATTERN="alias cdsp "
-    mkdir -p ~/.config/fish
-elif [[ "$SHELL" == */zsh ]]; then
-    RC_FILE=~/.zshrc
-    ALIAS_LINE="alias cdsp='claude --dangerously-skip-permissions'"
-    GREP_PATTERN="alias cdsp="
-elif [[ "$SHELL" == */bash ]]; then
-    RC_FILE=~/.bashrc
-    ALIAS_LINE="alias cdsp='claude --dangerously-skip-permissions'"
-    GREP_PATTERN="alias cdsp="
-fi
+# Add cdsp alias to all shell rc files (so switching shells doesn't lose the alias)
+add_alias_if_missing() {
+    local rc_file="$1"
+    local alias_line="$2"
+    local grep_pattern="$3"
 
-if [ -n "$RC_FILE" ]; then
-    if ! grep -q "$GREP_PATTERN" "$RC_FILE" 2>/dev/null; then
-        echo "" >> "$RC_FILE"
-        echo "# Claude Code shortcut" >> "$RC_FILE"
-        echo "$ALIAS_LINE" >> "$RC_FILE"
-        echo "  Added cdsp alias to $RC_FILE"
+    [[ ! -f "$rc_file" ]] && return
+    if ! grep -q "$grep_pattern" "$rc_file" 2>/dev/null; then
+        echo "" >> "$rc_file"
+        echo "# Claude Code shortcut" >> "$rc_file"
+        echo "$alias_line" >> "$rc_file"
+        echo "  Added cdsp alias to $rc_file"
     else
-        echo "  cdsp alias already exists in $RC_FILE"
+        echo "  cdsp alias already exists in $rc_file"
     fi
+}
+
+# Bash
+add_alias_if_missing ~/.bashrc "alias cdsp='claude --dangerously-skip-permissions'" "alias cdsp="
+
+# Zsh
+add_alias_if_missing ~/.zshrc "alias cdsp='claude --dangerously-skip-permissions'" "alias cdsp="
+
+# Fish (create config if fish dir exists but config doesn't)
+if [[ -d ~/.config/fish ]]; then
+    [[ ! -f ~/.config/fish/config.fish ]] && touch ~/.config/fish/config.fish
+    add_alias_if_missing ~/.config/fish/config.fish "alias cdsp 'claude --dangerously-skip-permissions'" "alias cdsp "
 fi
 
 echo ""
