@@ -55,8 +55,8 @@ Zorin = " "
 
 [username]
 show_always = true
-format = "[$user]($style)"
-style = "bold green"
+format = "[$user]($style_user)"
+style_user = "bold green"
 
 [directory]
 truncation_length = 3
