@@ -16,7 +16,8 @@ mypctools/
 ├── install.sh           # Bootstrap: installs gum, creates ~/.local/bin/mypctools symlink
 ├── uninstall.sh         # Removes symlink and cleans up
 ├── lib/
-│   ├── helpers.sh       # Print functions, gum wrappers, logging
+│   ├── helpers.sh       # Print functions, logging, utility checks
+│   ├── theme.sh         # Gum theming: themed_choose, themed_confirm, colors
 │   ├── distro-detect.sh # Sets DISTRO_TYPE (arch/debian/fedora) and DISTRO_NAME
 │   └── package-manager.sh # install_package() with apt/pacman/flatpak fallback chain
 ├── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
