@@ -1,6 +1,12 @@
 #!/bin/bash
 # Claude Code statusline - matches Starship theme
-# v1.0 - Model, context %, git branch, directory
+# v1.1 - Model, context %, git branch, directory
+
+# Fallback if jq not available
+if ! command -v jq &>/dev/null; then
+    printf "statusline requires jq"
+    exit 0
+fi
 
 # Read JSON from stdin
 input=$(cat)

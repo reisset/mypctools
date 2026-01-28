@@ -29,12 +29,6 @@ if [ ! -d "$HOME/.claude" ]; then
     exit 0
 fi
 
-# Remove CLAUDE.md
-if [ -f "$HOME/.claude/CLAUDE.md" ]; then
-    rm "$HOME/.claude/CLAUDE.md"
-    log_info "Removed CLAUDE.md"
-fi
-
 # Remove skills
 if [ -d "$HOME/.claude/skills" ]; then
     # Only remove skills that came from this repo

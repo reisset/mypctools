@@ -8,7 +8,7 @@ source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.4.0"
+VERSION="0.4.1"
 UPDATE_AVAILABLE=""
 
 LOGO='                              _              _
@@ -52,7 +52,7 @@ check_for_updates() {
 
 # ASCII logo with version
 show_logo() {
-    sleep 0.1  # Brief wait for background check
+    sleep 0.5  # Wait for background update check
     gum style --foreground "$THEME_PRIMARY" --align center "$LOGO"
     local version_line="v$VERSION"
     if [[ -n "$UPDATE_AVAILABLE" ]]; then

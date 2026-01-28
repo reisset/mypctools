@@ -1,19 +1,22 @@
 #!/bin/bash
 # Claude Code config installer
-# v1.5 - Changed from symlinks to copies for portability
+# v1.6 - Removed CLAUDE.md (users manage their own), added jq check
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Check for jq (required for settings.json manipulation)
+if ! command -v jq &>/dev/null; then
+    echo "Error: jq is required but not installed."
+    echo "Install it with: apt install jq / pacman -S jq / dnf install jq"
+    exit 1
+fi
+
 echo "Installing Claude Code config..."
 
 # Create directories
 mkdir -p ~/.claude/skills ~/.claude/commands
-
-# Copy CLAUDE.md
-cp "$SCRIPT_DIR/CLAUDE.md" ~/.claude/CLAUDE.md
-echo "  Installed CLAUDE.md"
 
 # Copy skills (directories containing SKILL.md)
 if [ -d "$SCRIPT_DIR/skills" ]; then
