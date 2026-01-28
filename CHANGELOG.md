@@ -52,6 +52,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.2.0] - 2026-01-27
+
+#### Terminal (v1.3.0)
+- Fixed COSMIC default terminal - xdg-terminals.list doesn't work (COSMIC hardcodes cosmic-term)
+- COSMIC now creates custom keybinding: Super+Enter launches foot
+- Keybinding stored in `~/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/custom`
+
 ### [1.1.0] - 2026-01-27
 
 #### Shell (v1.1.0)
@@ -64,7 +71,7 @@ All notable changes to mypctools and its bundled scripts.
 #### Terminal (v1.2.0)
 - Improved default terminal detection for multiple desktop environments
 - GNOME (Ubuntu): uses `update-alternatives` for x-terminal-emulator
-- COSMIC (Pop!_OS 24.04+): uses `xdg-terminals.list` (xdg-terminal-exec spec)
+- COSMIC (Pop!_OS 24.04+): uses `xdg-terminals.list` (xdg-terminal-exec spec) - **Note: doesn't work, fixed in v1.3.0**
 - Hyprland/Sway: uses `xdg-terminals.list`
 - Case-insensitive desktop detection
 
