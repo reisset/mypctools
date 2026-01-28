@@ -292,7 +292,7 @@ main() {
     install_from_github "ajeetdsouza/zoxide" "zoxide" "${ARCH}.*linux.*musl"
     install_from_github "jesseduffield/lazygit" "lazygit" "linux_${ARCH}\.tar\.gz"
     install_from_github "tealdeer-rs/tealdeer" "tldr" "linux-${ARCH}-musl$"
-    install_from_github "charmbracelet/glow" "glow" "Linux_${ARCH}\.tar\.gz$"
+    install_from_github "charmbracelet/glow" "glow" "Linux_${ARCH}\.tar\.gz"
     install_dysk
     install_dust
     install_from_github "sxyazi/yazi" "yazi" "${ARCH}-unknown-linux-musl\.zip"
