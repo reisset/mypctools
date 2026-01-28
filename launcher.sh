@@ -8,7 +8,7 @@ source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.4.2"
+VERSION="0.4.5"
 UPDATE_AVAILABLE=""
 
 LOGO='                              _              _
@@ -59,6 +59,8 @@ show_logo() {
         version_line="v$VERSION  •  ⬆ Update available ($UPDATE_AVAILABLE new)"
     fi
     gum style --foreground "$THEME_MUTED" --align center "$version_line"
+    local sys_line="$DISTRO_NAME · $(uname -r) · $(basename "$SHELL")"
+    gum style --foreground "$THEME_MUTED" --align center "$sys_line"
     echo
 }
 
@@ -439,32 +441,6 @@ show_system_setup_menu() {
     done
 }
 
-show_settings_menu() {
-    while true; do
-        clear
-        show_subheader "Settings"
-        local choice
-        choice=$(themed_choose "" \
-            "About" \
-            "Back")
-
-        case "$choice" in
-            "About")
-                clear
-                show_title "mypctools v$VERSION"
-                print_info "A personal TUI for managing scripts and apps"
-                print_info "Built with Gum by Charm"
-                print_info "https://github.com/reisset/mypctools"
-                echo ""
-                read -rp "Press Enter to continue..."
-                ;;
-            "Back"|"")
-                break
-                ;;
-        esac
-    done
-}
-
 # Main menu
 main_menu() {
     while true; do
@@ -472,7 +448,7 @@ main_menu() {
         show_logo
 
         # Build menu options (add Pull Updates if available)
-        local menu_options=("Install Apps" "My Scripts" "System Setup" "Settings")
+        local menu_options=("Install Apps" "My Scripts" "System Setup")
         if [[ -n "$UPDATE_AVAILABLE" ]]; then
             menu_options+=("⬆ Pull Updates")
         fi
@@ -490,9 +466,6 @@ main_menu() {
                 ;;
             "System Setup")
                 show_system_setup_menu
-                ;;
-            "Settings")
-                show_settings_menu
                 ;;
             "⬆ Pull Updates")
                 clear
@@ -512,6 +485,35 @@ main_menu() {
         esac
     done
 }
+
+# CLI flags
+case "${1:-}" in
+    --help|-h)
+        echo "mypctools v$VERSION"
+        echo "A personal TUI for managing scripts and apps"
+        echo "Built with Gum by Charm"
+        echo ""
+        echo "Usage: mypctools [option]"
+        echo ""
+        echo "Options:"
+        echo "  --help, -h       Show this help message"
+        echo "  --version, -v    Show version number"
+        echo ""
+        echo "https://github.com/reisset/mypctools"
+        exit 0
+        ;;
+    --version|-v)
+        echo "mypctools v$VERSION"
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        echo "Unknown option: $1"
+        echo "Run 'mypctools --help' for usage."
+        exit 1
+        ;;
+esac
 
 # Run
 main_menu

@@ -6,6 +6,17 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.5] - 2026-01-28
+
+#### Added
+- `--help` and `--version` CLI flags
+- Compact system info line (distro, kernel, shell) on main menu screen
+
+#### Removed
+- Settings menu (only contained an About page — info moved to `--help`)
+
+---
+
 ### [0.4.4] - 2026-01-28
 
 #### Removed

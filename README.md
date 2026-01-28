@@ -2,7 +2,7 @@
 
 A personal TUI for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum).
 
-**v0.4.2**
+**v0.4.5**
 
 ## Quick Start
 
@@ -46,10 +46,14 @@ Bundled script collections with install/uninstall options:
 - Service Manager - TUI for systemctl services
 - System Info - fastfetch-style details (OS, kernel, CPU, GPU, memory, disk, packages)
 
-### Settings
+### CLI Flags
 
-- About info
-- Updates checked automatically on launch
+```bash
+mypctools --help      # Usage info, description, GitHub link
+mypctools --version   # Version number
+```
+
+Updates are checked automatically on launch.
 
 ## How Package Installation Works
 
