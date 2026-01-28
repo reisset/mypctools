@@ -306,8 +306,8 @@ main() {
     cp "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/"
     cp "$SCRIPT_DIR/TOOLS.md" "$LITEBASH_DIR/"
 
-    # Install starship config
-    cp "$SCRIPT_DIR/prompt/starship.toml" "$HOME/.config/starship.toml"
+    # Install starship config (symlink so edits to source file take effect)
+    ln -sf "$SCRIPT_DIR/prompt/starship.toml" "$HOME/.config/starship.toml"
 
     # Add to bashrc (idempotent)
     if ! grep -q "litebash/litebash.sh" "$HOME/.bashrc" 2>/dev/null; then

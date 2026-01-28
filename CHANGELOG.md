@@ -52,6 +52,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.3.1] - 2026-01-27
+
+#### Shell (v1.2.1)
+- Fixed starship config: symlink instead of copy (edits now take effect immediately)
+- Fixed starship format string syntax ($os $username)
+- Fixed username style variable (style instead of style_user)
+
 ### [1.3.0] - 2026-01-27
 
 #### Shell (v1.2.0)
