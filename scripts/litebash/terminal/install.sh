@@ -162,7 +162,7 @@ create_config() {
 # LiteBash foot configuration
 
 [main]
-font=${FONT_NAME}:size=14
+font=${FONT_NAME}:size=17
 pad=10x10
 dpi-aware=yes
 
@@ -177,7 +177,7 @@ lines=10000
 launch=xdg-open \${url}
 
 [cursor]
-style=beam
+style=block
 blink=yes
 
 [mouse]

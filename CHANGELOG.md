@@ -52,6 +52,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.2.1] - 2026-01-27
+
+#### Terminal (v1.3.1)
+- Fixed font size (14 → 17) - was too small on COSMIC
+- Changed cursor style from beam to block
+- Added selection colors to HackTheBox theme (green highlight)
+
 ### [1.2.0] - 2026-01-27
 
 #### Terminal (v1.3.0)
