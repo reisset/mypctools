@@ -6,6 +6,14 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.4] - 2026-01-28
+
+#### Removed
+- Bash Setup script bundle (`scripts/bash/`) — deprecated, superseded by LiteBash
+- Screensavers script bundle (`scripts/screensavers/`) — unused
+
+---
+
 ### [0.4.3] - 2026-01-28
 
 #### Fixed
