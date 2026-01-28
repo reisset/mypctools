@@ -185,6 +185,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litezsh
 
+### [1.0.1] - 2026-01-28
+
+#### Fixed
+- Starship prompt OS icon missing — symbols were plain spaces instead of Nerd Font glyphs
+
+---
+
 ### [1.0.0] - 2026-01-28
 - Initial release
 - Zsh counterpart to LiteBash (same tools, same prompt)
