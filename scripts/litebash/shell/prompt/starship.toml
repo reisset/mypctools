@@ -3,7 +3,7 @@
 # git_status DISABLED for performance
 
 format = """
-[┌──](bold cyan) $os$username in $directory$git_branch$python$cmd_duration
+[┌─](bold cyan) $os $username in $directory$git_branch$python$cmd_duration
 [└─](bold cyan)$character"""
 
 add_newline = true
@@ -32,8 +32,8 @@ Unknown = " "
 
 [username]
 show_always = true
-format = "[$user]($style_user)"
-style_user = "bold green"
+format = "[$user]($style)"
+style = "bold green"
 
 [directory]
 truncation_length = 3
