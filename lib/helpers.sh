@@ -57,7 +57,7 @@ check_root() {
 
 # Check if a command exists
 command_exists() {
-    command -v "$1" &>/dev/null
+    [[ -n "$1" ]] && command -v "$1" &>/dev/null
 }
 
 # Ensure sudo credentials are cached (prompts user if needed)

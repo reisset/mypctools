@@ -2,7 +2,7 @@
 
 A personal TUI for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum).
 
-**v0.4.0**
+**v0.4.1**
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ One menu to install apps across distros. Uses native package managers first, fal
 | Gaming | Steam, Lutris, Heroic, ProtonUp-Qt |
 | Media | Spotify, VLC, OBS, Discord |
 | Dev Tools | Docker, LazyDocker, VSCode, Cursor, .NET SDK, Python |
-| CLI Utils | btop, neofetch, bat, eza, zoxide, fzf, Caligula |
+| CLI Utils | btop, neofetch, bat, eza, zoxide, fzf |
 | AI Tools | OpenCode, Claude Code, Mistral Vibe, Ollama, LM Studio |
 
 ### My Scripts
@@ -37,7 +37,7 @@ Bundled script collections with install/uninstall options:
 - **Bash Setup** - Kitty terminal, Starship prompt, modern CLI tools (bat, eza, fzf, zoxide). Has `--server` flag for headless installs.
 - **LiteBash** - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi). Optional foot terminal setup for Wayland.
 - **Screensavers** - Terminal eye candy (cmatrix, pipes, asciiquarium, etc.)
-- **Claude Setup** - Claude Code preferences, CLAUDE.md templates, custom skills
+- **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
 
 ### System Setup
 
@@ -64,7 +64,6 @@ The installer tries each method in order and stops at the first success. Custom 
 | Brave | Official install script |
 | VSCode | Microsoft apt repo |
 | Spotify | Spotify apt repo |
-| Caligula | GitHub binary release |
 | LazyDocker | GitHub binary release |
 | Cursor | AppImage download |
 | OpenCode | Official install script |

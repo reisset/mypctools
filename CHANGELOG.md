@@ -6,6 +6,33 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.1] - 2026-01-28
+
+#### Fixed
+- `command_exists()` now rejects empty strings (was returning true)
+- Update check race condition: increased wait from 0.1s to 0.5s
+
+#### Changed
+- Claude Setup no longer installs CLAUDE.md (users manage their own preferences)
+
+---
+
+## scripts/claude
+
+### [1.6.0] - 2026-01-28
+
+#### Added
+- jq dependency check before installation (fails clearly if missing)
+- statusline.sh fallback message if jq unavailable at runtime
+
+#### Removed
+- Bundled CLAUDE.md (redundant - users should maintain their own ~/.claude/CLAUDE.md)
+
+#### Changed
+- statusline.sh bumped to v1.1
+
+---
+
 ### [0.4.0] - 2026-01-25
 
 #### Added
