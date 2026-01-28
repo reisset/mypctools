@@ -6,6 +6,15 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.3] - 2026-01-28
+
+#### Fixed
+- litezsh: FZF keybindings now work on Debian (added `/usr/share/doc/fzf/examples/` fallback path)
+- screensavers: PATH instructions now detect user's shell and suggest correct rc file (~/.zshrc or ~/.bashrc)
+- spicetify: Added `/usr/lib/spotify` path for Debian official repo installs
+
+---
+
 ### [0.4.2] - 2026-01-28
 
 #### Added

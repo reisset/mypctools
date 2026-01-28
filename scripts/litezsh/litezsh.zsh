@@ -18,9 +18,17 @@ export FZF_DEFAULT_OPTS="--multi"
 # Initialize tools (same as litebash)
 command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 command -v fzf &>/dev/null && source <(fzf --zsh 2>/dev/null) || {
-    # Fallback for older fzf versions
-    [[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
-    [[ -f /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
+    # Fallback for older fzf versions (Arch path, then Debian path)
+    if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
+        source /usr/share/fzf/key-bindings.zsh
+    elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+        source /usr/share/doc/fzf/examples/key-bindings.zsh
+    fi
+    if [[ -f /usr/share/fzf/completion.zsh ]]; then
+        source /usr/share/fzf/completion.zsh
+    elif [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
+        source /usr/share/doc/fzf/examples/completion.zsh
+    fi
 }
 command -v starship &>/dev/null && eval "$(starship init zsh)"
 

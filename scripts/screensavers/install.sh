@@ -81,9 +81,10 @@ if ! command -v tte &>/dev/null; then
     # Make sure ~/.local/bin is in PATH
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
         export PATH="$HOME/.local/bin:$PATH"
+        local rc_file="$([[ "$SHELL" == *zsh ]] && echo "~/.zshrc" || echo "~/.bashrc")"
         echo ""
         echo "NOTE: Add ~/.local/bin to your PATH permanently:"
-        echo "  echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ~/.bashrc"
+        echo "  echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> $rc_file"
         echo ""
     fi
 fi

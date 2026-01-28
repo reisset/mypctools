@@ -34,6 +34,8 @@ get_spotify_path() {
         echo "/opt/spotify"
     elif [[ -d "/usr/share/spotify" ]]; then
         echo "/usr/share/spotify"
+    elif [[ -d "/usr/lib/spotify" ]]; then
+        echo "/usr/lib/spotify"
     else
         echo ""
     fi
