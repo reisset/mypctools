@@ -405,9 +405,9 @@ show_system_setup_menu() {
                             echo "$orphans" | sudo pacman -Rns --noconfirm -
                         fi
                         if command_exists paccache; then
-                            sudo paccache -rk2
+                            sudo paccache -rk2 < /dev/null
                         else
-                            sudo pacman -Sc --noconfirm
+                            sudo pacman -Sc --noconfirm < /dev/null
                         fi
                         ;;
                     fedora)
@@ -533,21 +533,6 @@ show_settings_menu() {
     done
 }
 
-show_windows_menu() {
-    clear
-    show_subheader "Windows PowerShell Scripts"
-    print_warning "These scripts are for Windows and cannot be run from here."
-    print_info "Location: $MYPCTOOLS_ROOT/windows/powershell/"
-    print_info "GitHub: https://github.com/reisset/mypowershell"
-    echo ""
-
-    if themed_confirm "Open folder in file manager?"; then
-        if command_exists xdg-open; then
-            xdg-open "$MYPCTOOLS_ROOT/windows/powershell/" 2>/dev/null || true
-        fi
-    fi
-}
-
 # Main menu
 main_menu() {
     while true; do
@@ -555,7 +540,7 @@ main_menu() {
         show_logo
 
         # Build menu options (add Pull Updates if available)
-        local menu_options=("Install Apps" "My Scripts" "System Setup" "Windows Scripts (Reference)" "Settings")
+        local menu_options=("Install Apps" "My Scripts" "System Setup" "Settings")
         if [[ -n "$UPDATE_AVAILABLE" ]]; then
             menu_options+=("⬆ Pull Updates")
         fi
@@ -573,9 +558,6 @@ main_menu() {
                 ;;
             "System Setup")
                 show_system_setup_menu
-                ;;
-            "Windows Scripts (Reference)")
-                show_windows_menu
                 ;;
             "Settings")
                 show_settings_menu

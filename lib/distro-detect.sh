@@ -5,7 +5,10 @@
 
 detect_distro() {
     if [[ -f /etc/os-release ]]; then
+        # Save LOGO before sourcing (Arch's os-release sets LOGO=archlinux-logo)
+        local _saved_logo="${LOGO:-}"
         source /etc/os-release
+        [[ -n "$_saved_logo" ]] && LOGO="$_saved_logo"
 
         case "$ID" in
             arch|manjaro|endeavouros|garuda|artix)
