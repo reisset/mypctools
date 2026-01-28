@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Installer
-# v1.3.0 - COSMIC: custom keybinding for Super+Enter (xdg-terminals.list doesn't work)
+# v1.4.0 - Symlink configs instead of generating; removed Shift+Space binding
 
 set -e
 
@@ -131,64 +131,26 @@ install_font() {
     print_success "Installed Iosevka Nerd Font"
 }
 
-# Detect installed font name
-detect_font_name() {
-    # Check various naming conventions
-    local font_names=("IosevkaTerm Nerd Font" "IosevkaTerm NF" "Iosevka Term Nerd Font" "Iosevka Nerd Font")
-
-    for name in "${font_names[@]}"; do
-        if fc-list | grep -qi "$name"; then
-            FONT_NAME="$name"
-            return 0
-        fi
-    done
-
-    # Default fallback
-    FONT_NAME="IosevkaTerm Nerd Font"
-}
-
-# Create foot config
+# Create foot config (symlink to repo config)
 create_config() {
     local config_dir="$HOME/.config/foot"
     mkdir -p "$config_dir"
 
-    print_status "Creating foot config..."
+    print_status "Linking foot config..."
 
-    # Detect font name
-    detect_font_name
+    # Map theme name to config file
+    local config_file
+    case "$THEME" in
+        hackthebox) config_file="foot-hackthebox.ini" ;;
+        catppuccin-mocha) config_file="foot-catppuccin-mocha.ini" ;;
+        tokyo-night) config_file="foot-tokyo-night.ini" ;;
+        *) config_file="foot-hackthebox.ini" ;;
+    esac
 
-    # Create config with detected font name
-    cat > "$config_dir/foot.ini" << EOF
-# LiteBash foot configuration
+    # Symlink config (edits to repo file take effect immediately)
+    ln -sf "$SCRIPT_DIR/configs/$config_file" "$config_dir/foot.ini"
 
-[main]
-font=${FONT_NAME}:size=17
-pad=10x10
-dpi-aware=yes
-
-[bell]
-urgent=no
-notify=no
-
-[scrollback]
-lines=10000
-
-[url]
-launch=xdg-open \${url}
-
-[cursor]
-style=block
-blink=yes
-
-[mouse]
-hide-when-typing=yes
-
-EOF
-
-    # Append theme colors
-    cat "$SCRIPT_DIR/themes/${THEME}.ini" >> "$config_dir/foot.ini"
-
-    print_success "Created foot.ini with $THEME theme"
+    print_success "Linked foot.ini -> $config_file"
 }
 
 # Set foot as default terminal
