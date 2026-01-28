@@ -29,7 +29,6 @@ All notable changes to mypctools and its bundled scripts.
 
 #### Fixed
 - litezsh: FZF keybindings now work on Debian (added `/usr/share/doc/fzf/examples/` fallback path)
-- screensavers: PATH instructions now detect user's shell and suggest correct rc file (~/.zshrc or ~/.bashrc)
 - spicetify: Added `/usr/lib/spotify` path for Debian official repo installs
 
 ---
@@ -86,7 +85,7 @@ All notable changes to mypctools and its bundled scripts.
 - "Check for Updates" submenu (replaced by automatic check)
 - "Coming Soon..." placeholder in System Setup
 
-### [0.3.1] - Unreleased
+### [0.3.1]
 
 #### Added
 - Fedora/dnf support in `install_package()`
@@ -94,7 +93,6 @@ All notable changes to mypctools and its bundled scripts.
 
 #### Removed
 - Caligula ISO burner from CLI Utilities menu
-- Stale tool references from bash/uninstall.sh
 
 #### Fixed
 - Fedora support was broken: `get_package_manager()` returned "dnf" but `install_package()` didn't handle it
@@ -169,7 +167,7 @@ All notable changes to mypctools and its bundled scripts.
 #### Terminal (v1.2.0)
 - Improved default terminal detection for multiple desktop environments
 - GNOME (Ubuntu): uses `update-alternatives` for x-terminal-emulator
-- COSMIC (Pop!_OS 24.04+): uses `xdg-terminals.list` (xdg-terminal-exec spec) - **Note: doesn't work, fixed in v1.3.0**
+- COSMIC (Pop!_OS 24.04+): uses `xdg-terminals.list` (xdg-terminal-exec spec)
 - Hyprland/Sway: uses `xdg-terminals.list`
 - Case-insensitive desktop detection
 
@@ -208,72 +206,3 @@ All notable changes to mypctools and its bundled scripts.
 - Iosevka Nerd Font installation
 - Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway)
 
----
-
-## scripts/bash (MyBash)
-
-### [2.8.8] - 2026-01-22
-- Fixed lazygit GitHub release pattern (releases use `x86_64` not `amd64`)
-
-### [2.8.6] - 2026-01-22
-- Added COSMIC Desktop Support (Pop!_OS 24.04)
-
-### [2.8.0] - 2026-01-16
-- Added GitHub CLI (gh)
-- Fixed KDE Plasma Ctrl+Alt+T shortcut
-
-### [2.7.2] - 2026-01-15
-- Added KDE Plasma Support for Kitty default terminal
-
-### [2.7.0] - 2026-01-11
-- Added Starship time display
-- Added Docker context display in prompt
-
-### [2.6.0] - 2026-01-10
-- Added Kitty Kitten integration (icat, kdiff, hints)
-
-### [2.5.0] - 2026-01-10
-- Added Kitty framed aesthetic (tab bar, borders)
-- Removed Zellij (redundant with Kitty features)
-- Removed unused CLI tools (bandwhich, hyperfine, tokei)
-
-### [2.3.0] - 2026-01-02
-- Added unified `mybash` CLI
-- Added Micro editor as default
-- FZF auto-enabled on install
-
-### [2.2.0] - 2025-12-22
-- Added uninstall script with manifest tracking
-
-### [2.0.0] - 2024-12-20
-- Major release: Modern CLI toolset (zoxide, eza, bat, fzf, fd, ripgrep, delta, lazygit, btop)
-- Kitty terminal with Tokyo Night theme
-- Starship prompt
-- Server mode (`--server` flag)
-- ARM64 support
-
----
-
-## scripts/screensavers
-
-### [v1.2.1] - 2026-01-15
-- Fixed daemon startup validation
-
-### [v1.2.0] - 2026-01-15
-- Added Ghostty terminal support
-- Added config file support (`~/.config/myscreensavers/config`)
-- Added screen lock integration
-- Added uninstall script
-
-### [v1.1.0] - 2026-01-13
-- Multi-distro support (Arch, Fedora, Debian)
-- Multi-DE support (GNOME, Hyprland, Sway, X11, KDE)
-- Added foot terminal support
-
-### [v1.0.0] - 2026-01-07
-- Battery saver mode
-- Instant wake-up on user activity
-
-### [v0.8.0] - 2026-01-05
-- Major rewrite from Python/YAML to Bash
-- Seamless effect transitions
