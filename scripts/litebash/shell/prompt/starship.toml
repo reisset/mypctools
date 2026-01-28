@@ -33,7 +33,7 @@ Unknown = " "
 [username]
 show_always = true
 format = "[$user]($style)"
-style = "bold green"
+style_user = "bold green"
 
 [directory]
 truncation_length = 3
