@@ -8,7 +8,7 @@ source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.4.5"
+VERSION="0.4.6"
 UPDATE_AVAILABLE=""
 
 LOGO='                              _              _
@@ -336,7 +336,10 @@ show_system_setup_menu() {
                     arch)
                         orphans=$(pacman -Qtdq 2>/dev/null)
                         if [[ -n "$orphans" ]]; then
-                            echo "$orphans" | sudo pacman -Rns --noconfirm -
+                            echo "$orphans"
+                            if gum confirm "Remove these orphan packages?"; then
+                                echo "$orphans" | sudo pacman -Rns --noconfirm -
+                            fi
                         fi
                         if command_exists paccache; then
                             sudo paccache -rk2 < /dev/null

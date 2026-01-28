@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Shell Installer
-# v1.1.0 - Added dust utility
+# v1.2.0 - Uses shared tool installation lib
 
 set -e
 
@@ -51,7 +51,6 @@ detect_distro() {
     print_status "Detected package manager: $PKG_MGR"
 }
 
-
 # Install package via package manager
 pkg_install() {
     local name="$1"
@@ -72,188 +71,12 @@ pkg_install() {
     fi
 }
 
-# Install from GitHub releases
-install_from_github() {
-    local repo="$1"
-    local binary="$2"
-    local pattern="$3"
-    local extract_path="$4"  # Optional: path inside archive
-
-    if command -v "$binary" &>/dev/null; then
-        print_success "$binary already installed"
-        return 0
-    fi
-
-    print_status "Installing $binary from GitHub ($repo)..."
-
-    # Get latest release download URL
-    local api_url="https://api.github.com/repos/$repo/releases/latest"
-    local download_url
-    download_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP "\"browser_download_url\":\s*\"\K[^\"]*${pattern}[^\"]*" | head -1)
-
-    if [ -z "$download_url" ]; then
-        print_warning "Could not find release for $binary (pattern: $pattern)"
-        return 1
-    fi
-
-    local tmp_dir=$(mktemp -d)
-    local filename=$(basename "$download_url")
-
-    cd "$tmp_dir"
-    if ! curl -fsSL -o "$filename" "$download_url"; then
-        print_warning "Failed to download $binary"
-        rm -rf "$tmp_dir"
-        return 1
-    fi
-
-    # Extract based on file type
-    case "$filename" in
-        *.tar.gz|*.tgz)
-            tar xzf "$filename"
-            ;;
-        *.tar.xz)
-            tar xJf "$filename"
-            ;;
-        *.zip)
-            unzip -q "$filename"
-            ;;
-        *)
-            # Assume raw binary
-            chmod +x "$filename"
-            mv "$filename" "$LOCAL_BIN/$binary"
-            rm -rf "$tmp_dir"
-            print_success "Installed $binary"
-            return 0
-            ;;
-    esac
-
-    # Find and install binary
-    local binary_path
-    if [ -n "$extract_path" ]; then
-        binary_path="$extract_path"
-    else
-        binary_path=$(find . -name "$binary" -type f -executable 2>/dev/null | head -1)
-        [ -z "$binary_path" ] && binary_path=$(find . -name "$binary" -type f 2>/dev/null | head -1)
-    fi
-
-    if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
-        chmod +x "$binary_path"
-        mv "$binary_path" "$LOCAL_BIN/$binary"
-        print_success "Installed $binary"
-    else
-        print_warning "Could not find $binary in archive"
-        rm -rf "$tmp_dir"
-        return 1
-    fi
-
-    rm -rf "$tmp_dir"
-    return 0
-}
-
-# Install dysk (single zip, no arch-specific builds)
-install_dysk() {
-    if command -v dysk &>/dev/null; then
-        print_success "dysk already installed"
-        return 0
-    fi
-
-    print_status "Installing dysk from GitHub..."
-    local api_url="https://api.github.com/repos/Canop/dysk/releases/latest"
-    local download_url
-    download_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP '"browser_download_url":\s*"\K[^"]+\.zip' | head -1)
-
-    if [ -z "$download_url" ]; then
-        print_warning "Could not find dysk release"
-        return 1
-    fi
-
-    local tmp_dir=$(mktemp -d)
-    cd "$tmp_dir"
-
-    curl -fsSL -o "dysk.zip" "$download_url" || { print_warning "Failed to download dysk"; rm -rf "$tmp_dir"; return 1; }
-    unzip -q "dysk.zip"
-
-    # Find the dysk binary (it's in build/x86_64-linux/ or similar)
-    local binary_path
-    binary_path=$(find . -name "dysk" -type f -executable 2>/dev/null | head -1)
-    [ -z "$binary_path" ] && binary_path=$(find . -name "dysk" -type f 2>/dev/null | head -1)
-
-    if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
-        chmod +x "$binary_path"
-        mv "$binary_path" "$LOCAL_BIN/dysk"
-        print_success "Installed dysk"
-    else
-        print_warning "Could not find dysk binary in archive"
-        rm -rf "$tmp_dir"
-        return 1
-    fi
-
-    rm -rf "$tmp_dir"
-}
-
-# Install dust (disk usage analyzer)
-install_dust() {
-    if command -v dust &>/dev/null; then
-        print_success "dust already installed"
-        return 0
-    fi
-
-    print_status "Installing dust from GitHub..."
-    local api_url="https://api.github.com/repos/bootandy/dust/releases/latest"
-    local download_url
-    local pattern
-
-    case "$ARCH" in
-        x86_64) pattern="x86_64-unknown-linux-musl.tar.gz" ;;
-        aarch64) pattern="aarch64-unknown-linux-musl.tar.gz" ;;
-        *) print_warning "Unsupported architecture for dust: $ARCH"; return 1 ;;
-    esac
-
-    download_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP '"browser_download_url":\s*"\K[^"]*'"$pattern"'[^"]*' | head -1)
-
-    if [ -z "$download_url" ]; then
-        print_warning "Could not find dust release"
-        return 1
-    fi
-
-    local tmp_dir=$(mktemp -d)
-    cd "$tmp_dir"
-
-    curl -fsSL -o "dust.tar.gz" "$download_url" || { print_warning "Failed to download dust"; rm -rf "$tmp_dir"; return 1; }
-    tar xzf "dust.tar.gz"
-
-    # Find the dust binary (it's in dust-*/dust)
-    local binary_path
-    binary_path=$(find . -name "dust" -type f -executable 2>/dev/null | head -1)
-    [ -z "$binary_path" ] && binary_path=$(find . -name "dust" -type f 2>/dev/null | head -1)
-
-    if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
-        chmod +x "$binary_path"
-        mv "$binary_path" "$LOCAL_BIN/dust"
-        print_success "Installed dust"
-    else
-        print_warning "Could not find dust binary in archive"
-        rm -rf "$tmp_dir"
-        return 1
-    fi
-
-    rm -rf "$tmp_dir"
-}
-
-# Install starship via official script
-install_starship() {
-    if command -v starship &>/dev/null; then
-        print_success "starship already installed"
-        return 0
-    fi
-    print_status "Installing starship..."
-    curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$LOCAL_BIN"
-    print_success "Installed starship"
-}
-
 # Main installation
 main() {
     detect_distro
+
+    # Source shared tool installation lib
+    source "$SCRIPT_DIR/../../lib/tools-install.sh"
 
     # Create directories
     mkdir -p "$LOCAL_BIN"
@@ -282,22 +105,9 @@ main() {
     pkg_install "micro" "micro" "micro" "micro"
     pkg_install "gh" "github-cli" "gh" "gh"
 
-    # Create symlinks for Debian/Ubuntu naming differences
-    if [ "$PKG_MGR" = "apt" ]; then
-        [ -f /usr/bin/batcat ] && [ ! -f "$LOCAL_BIN/bat" ] && ln -sf /usr/bin/batcat "$LOCAL_BIN/bat"
-        [ -f /usr/bin/fdfind ] && [ ! -f "$LOCAL_BIN/fd" ] && ln -sf /usr/bin/fdfind "$LOCAL_BIN/fd"
-    fi
-
-    # Install tools from GitHub
-    install_from_github "ajeetdsouza/zoxide" "zoxide" "${ARCH}.*linux.*musl"
-    install_from_github "jesseduffield/lazygit" "lazygit" "linux_${ARCH}\.tar\.gz"
-    install_from_github "tealdeer-rs/tealdeer" "tldr" "linux-${ARCH}-musl$"
-    install_from_github "charmbracelet/glow" "glow" "Linux_${ARCH}\.tar\.gz"
-    install_dysk
-    install_dust
-    install_from_github "sxyazi/yazi" "yazi" "${ARCH}-unknown-linux-musl\.zip"
-
-    install_starship
+    # Create Debian symlinks + install all GitHub tools
+    create_debian_symlinks
+    install_all_tools
 
     # Copy config files
     print_status "Installing LiteBash config..."
@@ -306,8 +116,8 @@ main() {
     cp "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/"
     cp "$SCRIPT_DIR/TOOLS.md" "$LITEBASH_DIR/"
 
-    # Install starship config (symlink so edits to source file take effect)
-    ln -sf "$SCRIPT_DIR/prompt/starship.toml" "$HOME/.config/starship.toml"
+    # Install starship config (shared location)
+    install_starship_config
 
     # Add to bashrc (idempotent)
     if ! grep -q "litebash/litebash.sh" "$HOME/.bashrc" 2>/dev/null; then

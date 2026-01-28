@@ -36,9 +36,11 @@ install_gum() {
         debian)
             # Add Charm repo
             sudo mkdir -p /etc/apt/keyrings
-            local gpg_key="/tmp/charm_gpg.key"
+            local gpg_key
+            gpg_key=$(mktemp)
             if ! curl -fsSL --retry 3 --connect-timeout 10 https://repo.charm.sh/apt/gpg.key -o "$gpg_key"; then
                 print_fail "Failed to download Charm GPG key"
+                rm -f "$gpg_key"
                 exit 1
             fi
             sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg < "$gpg_key"
@@ -84,8 +86,8 @@ mkdir -p "$HOME/.local/bin"
 
 SYMLINK_PATH="$HOME/.local/bin/mypctools"
 
-if [[ -L "$SYMLINK_PATH" ]]; then
-    rm "$SYMLINK_PATH"
+if [[ -e "$SYMLINK_PATH" || -L "$SYMLINK_PATH" ]]; then
+    rm -f "$SYMLINK_PATH"
 fi
 
 ln -s "$SCRIPT_DIR/launcher.sh" "$SYMLINK_PATH"

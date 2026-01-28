@@ -19,10 +19,12 @@ mypctools/
 │   ├── helpers.sh       # Print functions, logging, utility checks
 │   ├── theme.sh         # Gum theming: themed_choose, themed_confirm, colors
 │   ├── distro-detect.sh # Sets DISTRO_TYPE (arch/debian/fedora) and DISTRO_NAME
-│   └── package-manager.sh # install_package() with apt/pacman/flatpak fallback chain
+│   ├── package-manager.sh # install_package() with apt/pacman/flatpak fallback chain
+│   └── tools-install.sh # Shared CLI tool install/uninstall for litebash & litezsh
 ├── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
 │   └── service-manager.sh # TUI for systemctl services
 └── scripts/             # Personal script bundles with install/uninstall.sh each
+    ├── shared/          # Shared assets (starship.toml) used by multiple bundles
     ├── litebash/        # Speed-focused bash (shell config only)
     ├── litezsh/         # Speed-focused zsh (syntax highlighting, autosuggestions)
     ├── terminal/        # foot terminal config (shell-agnostic, Wayland only)
@@ -49,6 +51,14 @@ install_toolname_fallback() {
 Then reference it in `install_package` calls: `install_package "Tool" "" "" "" "install_toolname_fallback"`
 
 **Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Add menu entry in `launcher.sh:show_scripts_menu()`.
+
+**Shared CLI tool installation** uses `lib/tools-install.sh`. Both litebash and litezsh source this lib to avoid duplicating GitHub-release download logic. Key functions:
+- `install_all_tools` - installs zoxide, lazygit, tldr, glow, dysk, dust, yazi, starship
+- `create_debian_symlinks` - creates bat/fd symlinks on Debian
+- `uninstall_local_tools` - removes all tools from `~/.local/bin`
+- `install_starship_config` / `uninstall_starship_config` - manages the shared starship.toml symlink
+
+The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles symlink to it.
 
 ## System Setup Features
 

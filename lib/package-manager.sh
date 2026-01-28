@@ -93,9 +93,11 @@ is_installed() {
 
 # Brave Browser - official installer works on any distro
 install_brave_fallback() {
-    local installer="/tmp/brave_install.sh"
+    local installer
+    installer=$(mktemp)
     if ! curl -fsS --retry 3 --connect-timeout 10 https://dl.brave.com/install.sh -o "$installer"; then
         print_error "Failed to download Brave installer"
+        rm -f "$installer"
         return 1
     fi
     chmod +x "$installer"
@@ -114,14 +116,17 @@ install_vscode_fallback() {
 
     ensure_sudo || return 1
     sudo apt-get install -y wget gpg || return 1
-    local gpg_key="/tmp/microsoft.asc"
+    local gpg_key gpg_dearmored
+    gpg_key=$(mktemp)
+    gpg_dearmored=$(mktemp)
     if ! wget --timeout=10 --tries=3 -qO "$gpg_key" https://packages.microsoft.com/keys/microsoft.asc; then
         print_error "Failed to download Microsoft GPG key"
+        rm -f "$gpg_key" "$gpg_dearmored"
         return 1
     fi
-    gpg --dearmor < "$gpg_key" > /tmp/microsoft.gpg
-    sudo install -D -o root -g root -m 644 /tmp/microsoft.gpg /usr/share/keyrings/microsoft.gpg
-    rm -f "$gpg_key" /tmp/microsoft.gpg
+    gpg --dearmor < "$gpg_key" > "$gpg_dearmored"
+    sudo install -D -o root -g root -m 644 "$gpg_dearmored" /usr/share/keyrings/microsoft.gpg
+    rm -f "$gpg_key" "$gpg_dearmored"
     echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list
     sudo apt-get update && sudo apt-get install -y code
 }
@@ -157,12 +162,14 @@ install_discord_fallback() {
         return 1
     fi
 
-    local tmp_deb="/tmp/discord.deb"
+    local tmp_deb
+    tmp_deb=$(mktemp --suffix=.deb)
     if ! curl -fsSL "https://discord.com/api/download?platform=linux&format=deb" -o "$tmp_deb"; then
         print_error "Failed to download Discord .deb"
+        rm -f "$tmp_deb"
         return 1
     fi
-    ensure_sudo || return 1
+    ensure_sudo || { rm -f "$tmp_deb"; return 1; }
     sudo dpkg -i "$tmp_deb"
     sudo apt-get install -f -y  # Fix any dependency issues
     rm -f "$tmp_deb"
@@ -175,12 +182,14 @@ install_spotify_fallback() {
         return 1
     fi
 
-    local gpg_key="/tmp/spotify_pubkey.asc"
+    local gpg_key
+    gpg_key=$(mktemp)
     if ! curl -sS --retry 3 --connect-timeout 10 https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.asc -o "$gpg_key"; then
         print_error "Failed to download Spotify GPG key"
+        rm -f "$gpg_key"
         return 1
     fi
-    ensure_sudo || return 1
+    ensure_sudo || { rm -f "$gpg_key"; return 1; }
     sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg < "$gpg_key"
     rm -f "$gpg_key"
     echo "deb https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
@@ -190,7 +199,11 @@ install_spotify_fallback() {
 # LazyDocker - binary download from GitHub releases
 install_lazydocker_fallback() {
     local version
-    version=$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+    if command -v jq &>/dev/null; then
+        version=$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+    else
+        version=$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+    fi
     if [[ -z "$version" ]]; then
         print_error "Failed to fetch LazyDocker version"
         return 1
