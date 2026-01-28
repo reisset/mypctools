@@ -208,7 +208,14 @@ install_lazydocker_fallback() {
         print_error "Failed to fetch LazyDocker version"
         return 1
     fi
-    curl -Lo /tmp/lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/download/v${version}/lazydocker_${version}_Linux_x86_64.tar.gz" || return 1
+    local arch
+    case "$(uname -m)" in
+        x86_64)  arch="x86_64" ;;
+        aarch64) arch="arm64" ;;
+        armv7*)  arch="armv7" ;;
+        *)       print_error "Unsupported architecture: $(uname -m)"; return 1 ;;
+    esac
+    curl -Lo /tmp/lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/download/v${version}/lazydocker_${version}_Linux_${arch}.tar.gz" || return 1
     tar -xzf /tmp/lazydocker.tar.gz -C /tmp lazydocker || return 1
     ensure_sudo || return 1
     sudo mv /tmp/lazydocker /usr/local/bin/

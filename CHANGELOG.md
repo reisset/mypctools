@@ -6,6 +6,24 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.7] - 2026-01-28
+
+#### Fixed
+- `lib/tools-install.sh`: starship install now checks exit code instead of silently succeeding on failure
+- `lib/tools-install.sh`: GitHub tool installers no longer leak CWD into deleted tmpdir (wrapped in subshells)
+- `lib/tools-install.sh`: Debian symlink check uses `-e` instead of `-f` (handles broken symlinks)
+- `lib/package-manager.sh`: lazydocker fallback detects CPU architecture instead of hardcoding x86_64
+- `launcher.sh`: update check guards empty `$behind` variable before numeric comparison
+
+#### Added
+- `lib/tools-install.sh`: `install_starship_config()` creates `~/.config` if missing
+- `apps/service-manager.sh`: `crond` service for Fedora (alongside `cron` for Debian/Arch)
+
+#### Removed
+- Dead `scripts/litebash/prompt/starship.toml` and `scripts/litezsh/prompt/starship.toml` (superseded by shared config)
+
+---
+
 ### [0.4.6] - 2026-01-28
 
 #### Added

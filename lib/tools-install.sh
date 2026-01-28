@@ -45,11 +45,11 @@ _tools_install_from_github() {
     local filename
     filename=$(basename "$download_url")
 
-    cd "$tmp_dir"
+    # Use subshell to avoid leaking CWD into deleted tmpdir
+    (
+    cd "$tmp_dir" || exit 1
     if ! curl -fsSL -o "$filename" "$download_url"; then
-        print_warning "Failed to download $binary"
-        rm -rf "$tmp_dir"
-        return 1
+        exit 1
     fi
 
     # Extract based on file type
@@ -67,9 +67,7 @@ _tools_install_from_github() {
             # Assume raw binary
             chmod +x "$filename"
             mv "$filename" "$LOCAL_BIN/$binary"
-            rm -rf "$tmp_dir"
-            print_success "Installed $binary"
-            return 0
+            exit 0
             ;;
     esac
 
@@ -85,15 +83,20 @@ _tools_install_from_github() {
     if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
         chmod +x "$binary_path"
         mv "$binary_path" "$LOCAL_BIN/$binary"
-        print_success "Installed $binary"
     else
-        print_warning "Could not find $binary in archive"
-        rm -rf "$tmp_dir"
-        return 1
+        exit 1
     fi
+    )
+    local rc=$?
 
     rm -rf "$tmp_dir"
-    return 0
+
+    if [ $rc -eq 0 ]; then
+        print_success "Installed $binary"
+    else
+        print_warning "Failed to install $binary"
+    fi
+    return $rc
 }
 
 # Install dysk (single zip, no arch-specific builds)
@@ -115,9 +118,11 @@ _tools_install_dysk() {
 
     local tmp_dir
     tmp_dir=$(mktemp -d)
-    cd "$tmp_dir"
 
-    curl -fsSL -o "dysk.zip" "$download_url" || { print_warning "Failed to download dysk"; rm -rf "$tmp_dir"; return 1; }
+    # Use subshell to avoid leaking CWD into deleted tmpdir
+    (
+    cd "$tmp_dir" || exit 1
+    curl -fsSL -o "dysk.zip" "$download_url" || exit 1
     unzip -q "dysk.zip"
 
     local binary_path
@@ -127,14 +132,20 @@ _tools_install_dysk() {
     if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
         chmod +x "$binary_path"
         mv "$binary_path" "$LOCAL_BIN/dysk"
-        print_success "Installed dysk"
     else
-        print_warning "Could not find dysk binary in archive"
-        rm -rf "$tmp_dir"
-        return 1
+        exit 1
     fi
+    )
+    local rc=$?
 
     rm -rf "$tmp_dir"
+
+    if [ $rc -eq 0 ]; then
+        print_success "Installed dysk"
+    else
+        print_warning "Failed to install dysk"
+    fi
+    return $rc
 }
 
 # Install dust (disk usage analyzer)
@@ -164,9 +175,11 @@ _tools_install_dust() {
 
     local tmp_dir
     tmp_dir=$(mktemp -d)
-    cd "$tmp_dir"
 
-    curl -fsSL -o "dust.tar.gz" "$download_url" || { print_warning "Failed to download dust"; rm -rf "$tmp_dir"; return 1; }
+    # Use subshell to avoid leaking CWD into deleted tmpdir
+    (
+    cd "$tmp_dir" || exit 1
+    curl -fsSL -o "dust.tar.gz" "$download_url" || exit 1
     tar xzf "dust.tar.gz"
 
     local binary_path
@@ -176,14 +189,20 @@ _tools_install_dust() {
     if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
         chmod +x "$binary_path"
         mv "$binary_path" "$LOCAL_BIN/dust"
-        print_success "Installed dust"
     else
-        print_warning "Could not find dust binary in archive"
-        rm -rf "$tmp_dir"
-        return 1
+        exit 1
     fi
+    )
+    local rc=$?
 
     rm -rf "$tmp_dir"
+
+    if [ $rc -eq 0 ]; then
+        print_success "Installed dust"
+    else
+        print_warning "Failed to install dust"
+    fi
+    return $rc
 }
 
 # Install starship via official script
@@ -193,8 +212,12 @@ _tools_install_starship() {
         return 0
     fi
     print_status "Installing starship..."
-    curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$LOCAL_BIN"
-    print_success "Installed starship"
+    if curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$LOCAL_BIN"; then
+        print_success "Installed starship"
+    else
+        print_warning "Failed to install starship"
+        return 1
+    fi
 }
 
 # Install all GitHub-release tools + Debian symlinks
@@ -212,13 +235,14 @@ install_all_tools() {
 # Create Debian/Ubuntu symlinks for bat/fd naming differences
 create_debian_symlinks() {
     if [ "$PKG_MGR" = "apt" ]; then
-        [ -f /usr/bin/batcat ] && [ ! -f "$LOCAL_BIN/bat" ] && ln -sf /usr/bin/batcat "$LOCAL_BIN/bat"
-        [ -f /usr/bin/fdfind ] && [ ! -f "$LOCAL_BIN/fd" ] && ln -sf /usr/bin/fdfind "$LOCAL_BIN/fd"
+        [ -f /usr/bin/batcat ] && [ ! -e "$LOCAL_BIN/bat" ] && ln -sf /usr/bin/batcat "$LOCAL_BIN/bat"
+        [ -f /usr/bin/fdfind ] && [ ! -e "$LOCAL_BIN/fd" ] && ln -sf /usr/bin/fdfind "$LOCAL_BIN/fd"
     fi
 }
 
 # Install starship config symlink (points to shared location)
 install_starship_config() {
+    mkdir -p "$HOME/.config"
     ln -sf "$SHARED_STARSHIP_TOML" "$HOME/.config/starship.toml"
 }
 
