@@ -1,14 +1,62 @@
-# LiteBash Starship Config - Speed Optimized
-# git_status is DISABLED for performance
-# Uses ANSI colors so terminal theme controls appearance
+# LiteBash Starship Config v2.0
+# Two-line prompt with OS icon + username
+# git_status DISABLED for performance
 
-format = """$directory$git_branch$python$character"""
+format = """
+[┌──](bold cyan) $os$username in $directory$git_branch$python$cmd_duration
+[└─](bold cyan)$character"""
 
 add_newline = false
 
 [character]
-success_symbol = "[❯](green)"
-error_symbol = "[❯](red)"
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+[os]
+disabled = false
+style = "bold white"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CachyOS = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+Kali = " "
+Linux = " "
+Macos = " "
+Manjaro = " "
+Mint = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RockyLinux = " "
+Solus = "󰠳 "
+Ubuntu = " "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+Zorin = " "
+
+[username]
+show_always = true
+format = "[$user]($style)"
+style = "bold green"
 
 [directory]
 truncation_length = 3
@@ -17,7 +65,7 @@ style = "bold blue"
 read_only = " 󰌾"
 
 [git_branch]
-format = "[$symbol$branch]($style) "
+format = " on [$symbol$branch]($style)"
 symbol = " "
 style = "bold purple"
 
@@ -25,7 +73,7 @@ style = "bold purple"
 disabled = true
 
 [python]
-format = '[( $virtualenv)]($style) '
+format = '[ $virtualenv]($style)'
 style = "yellow"
 detect_extensions = []
 detect_files = []
@@ -38,5 +86,5 @@ disabled = true
 
 [cmd_duration]
 min_time = 2000
-format = "[$duration]($style) "
+format = " took [$duration]($style)"
 style = "bold yellow"
