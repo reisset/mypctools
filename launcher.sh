@@ -8,7 +8,7 @@ source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.4.6"
+VERSION="0.4.7"
 UPDATE_AVAILABLE=""
 
 LOGO='                              _              _
@@ -45,7 +45,7 @@ check_for_updates() {
         if timeout 3 git -C "$MYPCTOOLS_ROOT" fetch origin main &>/dev/null; then
             local behind
             behind=$(git -C "$MYPCTOOLS_ROOT" rev-list HEAD..origin/main --count 2>/dev/null)
-            [[ "$behind" -gt 0 ]] && UPDATE_AVAILABLE="$behind"
+            [[ -n "$behind" && "$behind" -gt 0 ]] && UPDATE_AVAILABLE="$behind"
         fi
     fi
 }

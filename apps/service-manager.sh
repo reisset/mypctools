@@ -17,6 +17,7 @@ SERVICES=(
     "NetworkManager"
     "avahi-daemon"
     "cron"
+    "crond"
     "ufw"
     "firewalld"
 )
