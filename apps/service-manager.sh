@@ -80,36 +80,51 @@ show_service_actions() {
         case "$action" in
             "Start")
                 ensure_sudo || continue
-                sudo systemctl start "$service"
-                print_success "Started $service"
+                if sudo systemctl start "$service"; then
+                    print_success "Started $service"
+                else
+                    print_error "Failed to start $service"
+                fi
                 read -rp "Press Enter to continue..."
                 clear
                 ;;
             "Stop")
                 ensure_sudo || continue
-                sudo systemctl stop "$service"
-                print_success "Stopped $service"
+                if sudo systemctl stop "$service"; then
+                    print_success "Stopped $service"
+                else
+                    print_error "Failed to stop $service"
+                fi
                 read -rp "Press Enter to continue..."
                 clear
                 ;;
             "Restart")
                 ensure_sudo || continue
-                sudo systemctl restart "$service"
-                print_success "Restarted $service"
+                if sudo systemctl restart "$service"; then
+                    print_success "Restarted $service"
+                else
+                    print_error "Failed to restart $service"
+                fi
                 read -rp "Press Enter to continue..."
                 clear
                 ;;
             "Enable")
                 ensure_sudo || continue
-                sudo systemctl enable "$service"
-                print_success "Enabled $service"
+                if sudo systemctl enable "$service"; then
+                    print_success "Enabled $service"
+                else
+                    print_error "Failed to enable $service"
+                fi
                 read -rp "Press Enter to continue..."
                 clear
                 ;;
             "Disable")
                 ensure_sudo || continue
-                sudo systemctl disable "$service"
-                print_success "Disabled $service"
+                if sudo systemctl disable "$service"; then
+                    print_success "Disabled $service"
+                else
+                    print_error "Failed to disable $service"
+                fi
                 read -rp "Press Enter to continue..."
                 clear
                 ;;

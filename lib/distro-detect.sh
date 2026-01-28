@@ -44,6 +44,10 @@ detect_distro() {
 
     export DISTRO_TYPE
     export DISTRO_NAME
+
+    if [[ "$DISTRO_TYPE" == "unknown" ]]; then
+        echo -e "\033[33mWarning: Unrecognized distro '$DISTRO_NAME'. Package installation may not work.\033[0m" >&2
+    fi
 }
 
 # Run detection on source

@@ -6,6 +6,22 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.6] - 2026-01-28
+
+#### Added
+- `lib/tools-install.sh` — shared CLI tool install/uninstall lib for litebash & litezsh
+- `scripts/shared/prompt/starship.toml` — canonical starship config used by both bundles
+- Confirmation prompt before orphan package removal on Arch (System Cleanup)
+- Unknown distro warning in `lib/distro-detect.sh`
+
+#### Fixed
+- Service Manager: systemctl actions now check return codes and show errors on failure
+- `install.sh`: symlink creation handles pre-existing regular files (not just symlinks)
+- `lib/package-manager.sh`: temp files use `mktemp` instead of predictable `/tmp` paths
+- `lib/package-manager.sh`: lazydocker version parsing uses `jq` when available (grep fallback)
+
+---
+
 ### [0.4.5] - 2026-01-28
 
 #### Added
@@ -117,6 +133,15 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.5.0] - 2026-01-28
+
+#### Changed
+- Tool installation refactored to use shared `lib/tools-install.sh`
+- Starship config now symlinks to `scripts/shared/prompt/starship.toml`
+- Uninstaller uses shared lib (now correctly removes `dust` on uninstall)
+
+---
+
 ### [1.4.0] - 2026-01-27
 
 #### Terminal (v1.4.0)
@@ -184,6 +209,18 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/litezsh
+
+### [1.1.0] - 2026-01-28
+
+#### Changed
+- Tool installation refactored to use shared `lib/tools-install.sh`
+- Starship config now symlinks to `scripts/shared/prompt/starship.toml`
+- Uninstaller uses shared lib
+
+#### Removed
+- Unnecessary `jq` dependency (was copy-pasted from claude/install.sh, never used)
+
+---
 
 ### [1.0.1] - 2026-01-28
 
