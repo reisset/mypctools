@@ -6,6 +6,23 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.8] - 2026-01-28
+
+#### Removed
+- Unused `show_title()` function from `lib/theme.sh` (defined but never called)
+
+#### Audited (all clean)
+- 87 functions across all `.sh` files — all called (except the removed `show_title`)
+- All `source` statements point to existing files
+- All `launcher.sh` menu entries map to real functions/scripts
+- All config files in `scripts/shared/` and `scripts/terminal/configs/` are referenced
+- All `.md` documentation is accurate with no references to deleted features
+- No commented-out code blocks, no TODO/FIXME/HACK markers, no debug prints
+- No orphaned files — every file is sourced, executed, copied, or symlinked
+- No unused variables — all exports consumed by child scripts/sourced libs
+
+---
+
 ### [0.4.7] - 2026-01-28
 
 #### Fixed

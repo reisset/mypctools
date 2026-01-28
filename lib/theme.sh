@@ -8,19 +8,6 @@ THEME_PRIMARY=51       # Cyan/teal - headers, accents, cursor
 THEME_SECONDARY=33     # Soft blue - borders, secondary elements
 THEME_MUTED=242        # Gray - help text, dimmed info
 
-# Main app title with double border
-show_title() {
-    gum style \
-        --foreground "$THEME_PRIMARY" \
-        --border-foreground "$THEME_PRIMARY" \
-        --border double \
-        --align center \
-        --width 40 \
-        --padding "1 2" \
-        --margin "1" \
-        "$1"
-}
-
 # Styled section header line
 show_subheader() {
     gum style --foreground "$THEME_PRIMARY" "═══ $1 ═══"
