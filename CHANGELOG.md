@@ -52,6 +52,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.4.0] - 2026-01-27
+
+#### Terminal (v1.4.0)
+- Refactored to symlink configs instead of generating (edits now take effect immediately)
+- Removed Shift+Space text binding
+- Moved complete theme configs to `terminal/configs/`
+
 ### [1.3.1] - 2026-01-27
 
 #### Shell (v1.2.1)
