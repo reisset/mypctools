@@ -52,6 +52,16 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.3.0] - 2026-01-27
+
+#### Shell (v1.2.0)
+- New two-line prompt with box-drawing connectors
+- Added OS icon (auto-detects distro via nerd fonts)
+- Added username display
+- Added "in" / "on" / "took" connectors for readability
+- cmd_duration now shows "took Xs" for slow commands
+- git_status still disabled for speed
+
 ### [1.2.1] - 2026-01-27
 
 #### Terminal (v1.3.1)
