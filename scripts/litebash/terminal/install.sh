@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Installer
-# v1.2.0 - Improved default terminal handling for GNOME/COSMIC/Hyprland
+# v1.3.0 - COSMIC: custom keybinding for Super+Enter (xdg-terminals.list doesn't work)
 
 set -e
 
@@ -231,8 +231,26 @@ set_default_terminal() {
         return 0
     fi
 
-    # COSMIC (Pop!_OS) and Hyprland/wlroots - use xdg-terminal-exec spec
-    # This covers: COSMIC, Hyprland, Sway, and other wlroots compositors
+    # COSMIC - uses custom keybinding (xdg-terminals.list doesn't work)
+    # COSMIC hardcodes cosmic-term in system_actions, so we create a custom Super+Enter binding
+    if [[ "$desktop_lower" == *"cosmic"* ]]; then
+        print_status "COSMIC detected - setting up custom keybinding"
+        local cosmic_shortcuts_dir="$HOME/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1"
+        mkdir -p "$cosmic_shortcuts_dir"
+
+        # Create custom shortcuts file with Super+Enter -> foot
+        cat > "$cosmic_shortcuts_dir/custom" << 'EOF'
+{
+    (modifiers: [Super], key: "Return"): Spawn("foot"),
+}
+EOF
+        print_success "Set Super+Enter to launch foot"
+        print_status "Note: Log out and back in for changes to take effect"
+        return 0
+    fi
+
+    # Hyprland/wlroots - use xdg-terminal-exec spec
+    # This covers: Hyprland, Sway, and other wlroots compositors
     print_status "Using xdg-terminals.list (xdg-terminal-exec spec)"
 
     # Backup original config (only if we haven't already)
