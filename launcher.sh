@@ -118,8 +118,6 @@ show_scripts_menu() {
         show_subheader "My Scripts"
         local choice
         choice=$(themed_choose "" \
-            "Bash Setup" \
-            "Screensavers" \
             "Claude Setup" \
             "Spicetify Theme" \
             "LiteBash" \
@@ -128,72 +126,6 @@ show_scripts_menu() {
             "Back")
 
         case "$choice" in
-            "Bash Setup")
-                while true; do
-                    clear
-                    show_subheader "Bash Setup"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/bash/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/bash/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/bash/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/bash/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "Screensavers")
-                while true; do
-                    clear
-                    show_subheader "Screensavers"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/screensavers/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensavers/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/screensavers/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
             "Claude Setup")
                 while true; do
                     clear
