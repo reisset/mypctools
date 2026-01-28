@@ -6,6 +6,18 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.2] - 2026-01-28
+
+#### Added
+- LiteZsh script bundle (zsh shell config with native syntax highlighting and autosuggestions)
+- Terminal - foot as standalone script (moved from litebash)
+
+#### Changed
+- Restructured scripts/litebash: terminal config moved to scripts/terminal
+- TUI menu now shows LiteBash, LiteZsh, and Terminal - foot as separate items
+
+---
+
 ### [0.4.1] - 2026-01-28
 
 #### Fixed
@@ -142,6 +154,31 @@ All notable changes to mypctools and its bundled scripts.
 - Shell: eza, bat, ripgrep, fd, fzf, zoxide, btop, lazygit, micro, yazi, starship, tealdeer, glow, dysk, gh
 - Terminal: foot with Catppuccin Mocha, Tokyo Night, HackTheBox themes
 - Speed-optimized starship prompt (git_status disabled)
+
+---
+
+## scripts/litezsh
+
+### [1.0.0] - 2026-01-28
+- Initial release
+- Zsh counterpart to LiteBash (same tools, same prompt)
+- Zsh-native syntax highlighting (zsh-syntax-highlighting plugin)
+- Zsh-native autosuggestions (zsh-autosuggestions plugin)
+- Arrow-key completion with menu navigation
+- History substring search (type partial command, press up-arrow)
+- Auto-sets zsh as default shell
+- Same CLI tools: eza, bat, ripgrep, fd, fzf, zoxide, btop, lazygit, micro, yazi, starship, tealdeer, glow, dysk, dust, gh
+
+---
+
+## scripts/terminal
+
+### [1.0.0] - 2026-01-28
+- Standalone foot terminal config (moved from litebash/terminal)
+- Shell-agnostic: works with bash, zsh, fish, or any shell
+- Themes: Catppuccin Mocha (default), Tokyo Night, HackTheBox
+- Iosevka Nerd Font installation
+- Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway)
 
 ---
 

@@ -2,7 +2,7 @@
 
 A personal TUI for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum).
 
-**v0.4.1**
+**v0.4.2**
 
 ## Quick Start
 
@@ -35,7 +35,9 @@ One menu to install apps across distros. Uses native package managers first, fal
 Bundled script collections with install/uninstall options:
 
 - **Bash Setup** - Kitty terminal, Starship prompt, modern CLI tools (bat, eza, fzf, zoxide). Has `--server` flag for headless installs.
-- **LiteBash** - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi). Optional foot terminal setup for Wayland.
+- **LiteBash** - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi).
+- **LiteZsh** - Zsh counterpart to LiteBash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
+- **Terminal - foot** - Wayland terminal with curated themes (Catppuccin Mocha, Tokyo Night, HackTheBox). Shell-agnostic.
 - **Screensavers** - Terminal eye candy (cmatrix, pipes, asciiquarium, etc.)
 - **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
 

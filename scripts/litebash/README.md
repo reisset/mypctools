@@ -5,7 +5,6 @@ Speed-focused bash environment for Linux power users.
 ## Philosophy
 
 - **Speed over features** — git_status disabled in prompt, no language version scanning
-- **Split architecture** — Shell config works everywhere; terminal config is Wayland-only
 - **Modern tools as defaults** — `ls` is eza, `cat` is bat, `grep` is ripgrep
 
 ## What's Included
@@ -30,11 +29,6 @@ Speed-focused bash environment for Linux power users.
 | dust | — | Disk usage (directory sizes) |
 | gh | — | GitHub CLI |
 
-### Terminal Themes (foot only)
-- **Catppuccin Mocha** (default) — Warm, pastel colors
-- **Tokyo Night** — Cool blues and purples
-- **HackTheBox** — Green hacker aesthetic
-
 ## Installation
 
 LiteBash is part of the **mypctools** TUI.
@@ -42,34 +36,32 @@ LiteBash is part of the **mypctools** TUI.
 ```bash
 # Via mypctools (recommended)
 mypctools
-# Navigate to: Scripts → LiteBash Shell
-# Optionally: Scripts → LiteBash Terminal (Wayland only)
+# Navigate to: Scripts → LiteBash
 ```
 
 ### Manual Installation
 
-If running standalone outside mypctools:
-
 ```bash
-# Shell config (works everywhere)
-./shell/install.sh
-
-# Terminal config (Wayland only)
-./terminal/install.sh
+./install.sh
 ```
 
-Both components are independent — install one or both.
+## Terminal Config
 
-## Theme Switching
+Terminal theming (foot) is shell-agnostic and lives separately at `../terminal/`.
 
-Re-run the terminal installer via mypctools and select a different theme, or manually edit `~/.config/foot/foot.ini` and replace the `[colors]` section with one from `terminal/themes/`.
+```bash
+# Via mypctools
+mypctools → Scripts → Terminal - foot
+
+# Or manually
+../terminal/install.sh
+```
 
 ## Customization
 
 ### Config Locations
 - Shell: `~/.local/share/litebash/`
 - Starship prompt: `~/.config/starship.toml`
-- foot terminal: `~/.config/foot/foot.ini`
 
 ### Adding Aliases
 Edit `~/.local/share/litebash/aliases.sh`
@@ -82,12 +74,10 @@ Edit `~/.config/starship.toml`. See [Starship docs](https://starship.rs/config/)
 ```bash
 # Via mypctools
 mypctools
-# Navigate to: Scripts → LiteBash Shell → Uninstall
-# Navigate to: Scripts → LiteBash Terminal → Uninstall
+# Navigate to: Scripts → LiteBash → Uninstall
 
 # Or manually
-./shell/uninstall.sh
-./terminal/uninstall.sh
+./uninstall.sh
 ```
 
 ## Quick Reference
