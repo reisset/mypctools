@@ -6,6 +6,14 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.0] - 2026-01-29
+
+#### Removed
+- CLI Utilities menu from Install Apps (redundant — all tools already installed by LiteBash/LiteZsh, gum installed by bootstrap)
+- `apps/cli-utils.sh`
+
+---
+
 ### [0.4.9] - 2026-01-29
 
 #### Changed
