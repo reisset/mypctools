@@ -1,5 +1,5 @@
-#!/usr/bin/env zsh
-# LiteZsh Aliases
+# Shared shell aliases (sourced by litebash and litezsh)
+# The 'tools' alias is defined separately by each shell bundle
 
 # Core replacements - modern tools become the default
 alias ls='eza -lh --group-directories-first --icons=auto'
@@ -33,6 +33,3 @@ alias q='exit'
 alias md='mkdir -p'
 alias rd='rmdir'
 alias please='sudo'
-
-# Quick reference
-alias tools='glow ~/.local/share/litezsh/TOOLS.md 2>/dev/null || cat ~/.local/share/litezsh/TOOLS.md'

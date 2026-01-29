@@ -8,9 +8,12 @@
 LITEZSH_DIR="$HOME/.local/share/litezsh"
 
 # Source config files
-[[ -f "$LITEZSH_DIR/aliases.zsh" ]] && source "$LITEZSH_DIR/aliases.zsh"
+[[ -f "$LITEZSH_DIR/aliases.sh" ]] && source "$LITEZSH_DIR/aliases.sh"
 [[ -f "$LITEZSH_DIR/functions.zsh" ]] && source "$LITEZSH_DIR/functions.zsh"
 [[ -f "$LITEZSH_DIR/completions.zsh" ]] && source "$LITEZSH_DIR/completions.zsh"
+
+# Quick reference (points to local copy)
+alias tools='glow "$LITEZSH_DIR/TOOLS.md" 2>/dev/null || cat "$LITEZSH_DIR/TOOLS.md"'
 
 # FZF defaults
 export FZF_DEFAULT_OPTS="--multi"

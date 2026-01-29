@@ -6,6 +6,21 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.4.9] - 2026-01-29
+
+#### Changed
+- Consolidated shared shell aliases into `scripts/shared/shell/aliases.sh`
+- Consolidated TOOLS.md into `scripts/shared/shell/TOOLS.md` (includes zsh features for all users)
+- LiteBash and LiteZsh now source the same shared files
+
+#### Removed
+- `scripts/litebash/aliases.sh` — moved to shared
+- `scripts/litebash/TOOLS.md` — moved to shared
+- `scripts/litezsh/aliases.zsh` — moved to shared
+- `scripts/litezsh/TOOLS.md` — moved to shared
+
+---
+
 ### [0.4.8] - 2026-01-28
 
 #### Removed
@@ -168,6 +183,15 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.6.0] - 2026-01-29
+
+#### Changed
+- Aliases now sourced from shared `scripts/shared/shell/aliases.sh`
+- TOOLS.md now copied from shared `scripts/shared/shell/TOOLS.md`
+- `tools` alias moved from aliases.sh to litebash.sh
+
+---
+
 ### [1.5.0] - 2026-01-28
 
 #### Changed
@@ -244,6 +268,16 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/litezsh
+
+### [1.2.0] - 2026-01-29
+
+#### Changed
+- Aliases now sourced from shared `scripts/shared/shell/aliases.sh`
+- TOOLS.md now symlinked from shared `scripts/shared/shell/TOOLS.md`
+- `tools` alias moved from aliases.zsh to litezsh.zsh
+- Alias file now named `aliases.sh` (was `aliases.zsh`, compatible with both shells)
+
+---
 
 ### [1.1.0] - 2026-01-28
 

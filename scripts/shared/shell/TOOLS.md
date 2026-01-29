@@ -1,4 +1,4 @@
-# LiteBash Quick Reference
+# Shell Tools Quick Reference
 
 ## Core Replacements
 | Command | Tool | Description |
@@ -32,6 +32,12 @@
 `..` `...` `....` = cd up 1/2/3 levels
 `z <dir>` = smart jump (zoxide)
 `y` = yazi file manager
+
+## Zsh Features
+- **Syntax highlighting** — commands colored as you type (red = invalid)
+- **Autosuggestions** — ghost text from history (press → to accept)
+- **History search** — type partial command, press ↑ to find matches
+- **Tab completion** — navigate with arrow keys
 
 ## Tips
 - `c` = clear, `h` = history, `q` = exit
