@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # mypctools/launcher.sh
 # Main TUI launcher for mypctools
-# v0.4.0
+# v0.5.1
 
 MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.5.0"
+VERSION="0.5.1"
 UPDATE_AVAILABLE=""
 
 LOGO='                              _              _

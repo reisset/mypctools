@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/lib/package-manager.sh
 # Package installation logic (apt/pacman primary, flatpak fallback)
-# v0.2.0
+# v0.3.0
 
 # Source distro detection
 _PKG_MGR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
