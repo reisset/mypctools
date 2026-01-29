@@ -111,19 +111,23 @@ install_font() {
     fi
 
     local tmp_dir=$(mktemp -d)
-    cd "$tmp_dir"
 
-    print_status "Downloading font..."
-    if ! curl -fsSL -o "IosevkaTerm.zip" "$download_url"; then
-        print_warning "Failed to download font"
-        rm -rf "$tmp_dir"
-        return 1
-    fi
-
-    print_status "Extracting font..."
-    unzip -q "IosevkaTerm.zip" -d "$FONT_DIR"
+    # Use subshell to avoid CWD issues after tmpdir deletion
+    (
+        cd "$tmp_dir" || exit 1
+        print_status "Downloading font..."
+        curl -fsSL -o "IosevkaTerm.zip" "$download_url" || exit 1
+        print_status "Extracting font..."
+        unzip -q "IosevkaTerm.zip" -d "$FONT_DIR"
+    )
+    local rc=$?
 
     rm -rf "$tmp_dir"
+
+    if [[ $rc -ne 0 ]]; then
+        print_warning "Failed to download font"
+        return 1
+    fi
 
     print_status "Updating font cache..."
     fc-cache -fv >/dev/null 2>&1
