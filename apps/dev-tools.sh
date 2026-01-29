@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/apps/dev-tools.sh
 # Developer tools installation menu
-# v0.3.0
+# v0.4.0
 
 _DEV_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_DEV_TOOLS_DIR/../lib/helpers.sh"
