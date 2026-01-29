@@ -4,9 +4,9 @@
 # Auto-ls after cd (handles both arguments and no arguments)
 cd() {
     if [ -n "$1" ]; then
-        builtin cd "$@" && eza -a --icons --group-directories-first
+        builtin cd "$@" && eza -lh --group-directories-first --icons=auto
     else
-        builtin cd ~ && eza -a --icons --group-directories-first
+        builtin cd ~ && eza -lh --group-directories-first --icons=auto
     fi
 }
 

@@ -183,6 +183,14 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.7.0] - 2026-01-29
+
+#### Fixed
+- Auto-ls on `cd` now matches updated `ls` alias (`eza -lh --group-directories-first --icons=auto`)
+- Auto-ls now triggers on zoxide `z` and `zi` commands (overrides `__zoxide_cd` after init)
+
+---
+
 ### [1.6.0] - 2026-01-29
 
 #### Changed
@@ -268,6 +276,14 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/litezsh
+
+### [1.3.0] - 2026-01-29
+
+#### Fixed
+- Auto-ls on `cd` now matches updated `ls` alias (`eza -lh --group-directories-first --icons=auto`)
+- Auto-ls now triggers on zoxide `z` and `zi` commands (overrides `__zoxide_cd` after init)
+
+---
 
 ### [1.2.0] - 2026-01-29
 

@@ -3,7 +3,7 @@
 
 # Auto-ls after cd
 cd() {
-    builtin cd "$@" && eza -a --icons --group-directories-first
+    builtin cd "$@" && eza -lh --group-directories-first --icons=auto
 }
 
 # Yazi wrapper - changes directory on exit
