@@ -342,9 +342,9 @@ show_system_setup_menu() {
                             fi
                         fi
                         if command_exists paccache; then
-                            sudo paccache -rk2 < /dev/null
+                            sudo paccache -rk2
                         else
-                            sudo pacman -Sc --noconfirm < /dev/null
+                            sudo pacman -Sc --noconfirm
                         fi
                         ;;
                     fedora)
