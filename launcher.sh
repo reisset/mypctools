@@ -8,7 +8,7 @@ source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.4.7"
+VERSION="0.5.0"
 UPDATE_AVAILABLE=""
 
 LOGO='                              _              _
@@ -79,7 +79,6 @@ show_install_apps_menu() {
             "Gaming" \
             "Media" \
             "Dev Tools" \
-            "CLI Utilities" \
             "Back")
 
         case "$choice" in
@@ -102,10 +101,6 @@ show_install_apps_menu() {
             "Dev Tools")
                 source "$MYPCTOOLS_ROOT/apps/dev-tools.sh"
                 show_dev_tools_menu
-                ;;
-            "CLI Utilities")
-                source "$MYPCTOOLS_ROOT/apps/cli-utils.sh"
-                show_cli_utils_menu
                 ;;
             "Back"|"")
                 break
