@@ -216,11 +216,11 @@ EOF
     # Create xdg-terminals.list with alacritty first
     if [ -f "$xdg_terminals" ]; then
         grep -v "^alacritty.desktop$" "$xdg_terminals" > "$xdg_terminals.tmp" 2>/dev/null || true
-        echo "alacritty.desktop" > "$xdg_terminals"
+        echo "Alacritty.desktop" > "$xdg_terminals"
         cat "$xdg_terminals.tmp" >> "$xdg_terminals" 2>/dev/null || true
         rm -f "$xdg_terminals.tmp"
     else
-        echo "alacritty.desktop" > "$xdg_terminals"
+        echo "Alacritty.desktop" > "$xdg_terminals"
     fi
 
     print_success "Set alacritty as default terminal"
