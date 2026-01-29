@@ -30,6 +30,7 @@ mypctools/
     ├── litebash/        # Speed-focused bash (shell config only)
     ├── litezsh/         # Speed-focused zsh (syntax highlighting, autosuggestions)
     ├── terminal/        # foot terminal config (shell-agnostic, Wayland only)
+    ├── alacritty/       # alacritty terminal config (shell-agnostic, X11 + Wayland)
     ├── claude/          # Claude Code skills and statusline
     └── spicetify/       # Spotify theming
 ```
@@ -82,6 +83,7 @@ All sudo operations use `ensure_sudo` to pre-authenticate before running.
 - `scripts/litebash/` - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, lazygit, yazi, starship). Shell config only.
 - `scripts/litezsh/` - Zsh counterpart to litebash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
 - `scripts/terminal/` - foot terminal config (Wayland only). Shell-agnostic — works with bash, zsh, or any shell. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox.
+- `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Same themes as foot.
 - `scripts/claude/` - Claude Code skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
 - `scripts/spicetify/` - Spicetify + StarryNight theme for native Spotify installs
 

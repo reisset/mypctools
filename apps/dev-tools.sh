@@ -16,6 +16,7 @@ show_dev_tools_menu() {
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
         "Docker" \
         "LazyDocker" \
+        "Lazygit" \
         "VSCode" \
         "Cursor" \
         ".NET SDK 10" \
@@ -40,6 +41,9 @@ show_dev_tools_menu() {
                     ;;
                 "LazyDocker")
                     install_package "LazyDocker" "" "lazydocker" "" "install_lazydocker_fallback"
+                    ;;
+                "Lazygit")
+                    install_package "Lazygit" "" "lazygit" "" "install_lazygit_fallback"
                     ;;
                 "VSCode")
                     install_package "VSCode" "code" "code" "com.visualstudio.code" "install_vscode_fallback"

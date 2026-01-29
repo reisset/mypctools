@@ -120,6 +120,7 @@ show_scripts_menu() {
             "LiteBash" \
             "LiteZsh" \
             "Terminal - foot" \
+            "Terminal - alacritty" \
             "Back")
 
         case "$choice" in
@@ -277,6 +278,39 @@ show_scripts_menu() {
                         "Uninstall")
                             if [[ -f "$MYPCTOOLS_ROOT/scripts/terminal/uninstall.sh" ]]; then
                                 bash "$MYPCTOOLS_ROOT/scripts/terminal/uninstall.sh"
+                            else
+                                print_warning "Uninstall script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Back"|"")
+                            break
+                            ;;
+                    esac
+                done
+                ;;
+            "Terminal - alacritty")
+                while true; do
+                    clear
+                    show_subheader "Terminal - alacritty"
+                    local action
+                    action=$(themed_choose "" \
+                        "Install" \
+                        "Uninstall" \
+                        "Back")
+
+                    case "$action" in
+                        "Install")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/alacritty/install.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/alacritty/install.sh"
+                            else
+                                print_warning "Install script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Uninstall")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/alacritty/uninstall.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/alacritty/uninstall.sh"
                             else
                                 print_warning "Uninstall script not found."
                             fi

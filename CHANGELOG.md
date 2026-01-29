@@ -6,6 +6,16 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.1] - 2026-01-29
+
+#### Added
+- Lazygit to Dev Tools menu (standalone install option)
+- `install_lazygit_fallback()` in `lib/package-manager.sh` (GitHub binary release)
+- Alacritty terminal script bundle (`scripts/alacritty/`)
+- Alacritty themes: Catppuccin Mocha, Tokyo Night, HackTheBox (matching foot)
+
+---
+
 ### [0.5.0] - 2026-01-29
 
 #### Removed
@@ -342,4 +352,16 @@ All notable changes to mypctools and its bundled scripts.
 - Themes: Catppuccin Mocha (default), Tokyo Night, HackTheBox
 - Iosevka Nerd Font installation
 - Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway)
+
+---
+
+## scripts/alacritty
+
+### [1.0.0] - 2026-01-29
+- Initial release
+- Shell-agnostic: works with bash, zsh, fish, or any shell
+- Works on both X11 and Wayland (unlike foot)
+- Themes: Catppuccin Mocha (default), Tokyo Night, HackTheBox
+- Iosevka Nerd Font installation (same as foot)
+- Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway/X11)
 

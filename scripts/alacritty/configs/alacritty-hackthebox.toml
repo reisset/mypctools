@@ -1,0 +1,49 @@
+# Alacritty config: HackTheBox theme
+
+[font]
+normal = { family = "IosevkaTerm Nerd Font", style = "Regular" }
+bold = { family = "IosevkaTerm Nerd Font", style = "Bold" }
+italic = { family = "IosevkaTerm Nerd Font", style = "Italic" }
+size = 14.0
+
+[window]
+padding = { x = 10, y = 10 }
+dynamic_padding = true
+
+[scrolling]
+history = 10000
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval = 750
+
+[mouse]
+hide_when_typing = true
+
+[colors.primary]
+background = "#141d2b"
+foreground = "#a4b1cd"
+
+[colors.selection]
+text = "#141d2b"
+background = "#9fef00"
+
+[colors.normal]
+black = "#141d2b"
+red = "#ff3e3e"
+green = "#9fef00"
+yellow = "#ffaf00"
+blue = "#2b6cb0"
+magenta = "#9f7aea"
+cyan = "#0bc5ea"
+white = "#a4b1cd"
+
+[colors.bright]
+black = "#1a2332"
+red = "#ff3e3e"
+green = "#9fef00"
+yellow = "#ffaf00"
+blue = "#63b3ed"
+magenta = "#b794f4"
+cyan = "#0bc5ea"
+white = "#ffffff"
