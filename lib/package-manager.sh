@@ -57,7 +57,9 @@ is_installed() {
             [[ -n "$apt_pkg" ]] && dpkg -s "$apt_pkg" &>/dev/null && return 0
             ;;
         dnf)
+            # Fedora names sometimes match Debian, sometimes Arch - try both
             [[ -n "$apt_pkg" ]] && rpm -q "$apt_pkg" &>/dev/null && return 0
+            [[ -n "$pacman_pkg" ]] && rpm -q "$pacman_pkg" &>/dev/null && return 0
             ;;
     esac
 
@@ -308,14 +310,21 @@ install_package() {
             fi
             ;;
         dnf)
-            if [[ -n "$apt_pkg" ]]; then  # Fedora package names usually match Debian
-                ensure_sudo || return 1
+            # Fedora names sometimes match Debian, sometimes Arch - try both
+            ensure_sudo || return 1
+            if [[ -n "$apt_pkg" ]]; then
                 if run_with_spinner "Installing $display_name..." sudo dnf install -y "$apt_pkg"; then
                     print_success "$display_name installed successfully"
                     return 0
                 fi
-                print_warning "dnf install failed, trying fallback..."
             fi
+            if [[ -n "$pacman_pkg" && "$pacman_pkg" != "$apt_pkg" ]]; then
+                if run_with_spinner "Installing $display_name..." sudo dnf install -y "$pacman_pkg"; then
+                    print_success "$display_name installed successfully"
+                    return 0
+                fi
+            fi
+            [[ -n "$apt_pkg" || -n "$pacman_pkg" ]] && print_warning "dnf install failed, trying fallback..."
             ;;
     esac
 
