@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteZsh Shell Installer
-# v1.1.0 - Uses shared tool installation lib
+# v1.2.0 - Uses shared aliases and TOOLS.md
 
 set -e
 
@@ -182,13 +182,13 @@ main() {
     create_debian_symlinks
     install_all_tools
 
-    # Symlink config files (source of truth in repo)
+    # Symlink config files (source of truth in repo, aliases and TOOLS.md are shared)
     print_status "Installing LiteZsh config..."
     ln -sf "$SCRIPT_DIR/litezsh.zsh" "$LITEZSH_DIR/litezsh.zsh"
-    ln -sf "$SCRIPT_DIR/aliases.zsh" "$LITEZSH_DIR/aliases.zsh"
+    ln -sf "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEZSH_DIR/aliases.sh"
     ln -sf "$SCRIPT_DIR/functions.zsh" "$LITEZSH_DIR/functions.zsh"
     ln -sf "$SCRIPT_DIR/completions.zsh" "$LITEZSH_DIR/completions.zsh"
-    ln -sf "$SCRIPT_DIR/TOOLS.md" "$LITEZSH_DIR/TOOLS.md"
+    ln -sf "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEZSH_DIR/TOOLS.md"
 
     # Install starship config (shared location)
     install_starship_config

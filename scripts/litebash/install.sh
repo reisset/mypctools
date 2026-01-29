@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Shell Installer
-# v1.2.0 - Uses shared tool installation lib
+# v1.3.0 - Uses shared aliases and TOOLS.md
 
 set -e
 
@@ -109,12 +109,12 @@ main() {
     create_debian_symlinks
     install_all_tools
 
-    # Copy config files
+    # Copy config files (aliases and TOOLS.md are shared)
     print_status "Installing LiteBash config..."
     cp "$SCRIPT_DIR/litebash.sh" "$LITEBASH_DIR/"
-    cp "$SCRIPT_DIR/aliases.sh" "$LITEBASH_DIR/"
+    cp "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEBASH_DIR/"
     cp "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/"
-    cp "$SCRIPT_DIR/TOOLS.md" "$LITEBASH_DIR/"
+    cp "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEBASH_DIR/"
 
     # Install starship config (shared location)
     install_starship_config

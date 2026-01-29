@@ -24,7 +24,9 @@ mypctools/
 ├── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
 │   └── service-manager.sh # TUI for systemctl services
 └── scripts/             # Personal script bundles with install/uninstall.sh each
-    ├── shared/          # Shared assets (starship.toml) used by multiple bundles
+    ├── shared/          # Shared assets used by multiple bundles
+    │   ├── prompt/      # starship.toml (shared prompt config)
+    │   └── shell/       # aliases.sh, TOOLS.md (shared by litebash & litezsh)
     ├── litebash/        # Speed-focused bash (shell config only)
     ├── litezsh/         # Speed-focused zsh (syntax highlighting, autosuggestions)
     ├── terminal/        # foot terminal config (shell-agnostic, Wayland only)
@@ -59,6 +61,10 @@ Then reference it in `install_package` calls: `install_package "Tool" "" "" "" "
 - `install_starship_config` / `uninstall_starship_config` - manages the shared starship.toml symlink
 
 The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles symlink to it.
+
+**Shared shell assets** live in `scripts/shared/shell/`:
+- `aliases.sh` - 26 aliases shared by litebash and litezsh
+- `TOOLS.md` - quick reference for all CLI tools (includes zsh features section)
 
 ## System Setup Features
 
