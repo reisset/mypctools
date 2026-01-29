@@ -2,9 +2,9 @@
 # LiteBash Aliases
 
 # Core replacements - modern tools become the default
-alias ls='eza -a --icons --group-directories-first'
-alias ll='eza -al --icons --group-directories-first'
-alias lt='eza -a --tree --level=2 --icons --group-directories-first'
+alias ls='eza -lh --group-directories-first --icons=auto'
+alias ll='eza -alh --group-directories-first --icons=auto'
+alias lt='eza --tree --level=2 --long --icons --git'
 alias cat='bat --paging=never'
 alias grep='rg'
 alias find='fd'
