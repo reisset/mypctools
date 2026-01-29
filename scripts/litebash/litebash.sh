@@ -17,7 +17,12 @@ alias tools='glow "$LITEBASH_DIR/TOOLS.md" 2>/dev/null || cat "$LITEBASH_DIR/TOO
 export FZF_DEFAULT_OPTS="--multi"
 
 # Initialize tools
-command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
+command -v zoxide &>/dev/null && eval "$(zoxide init bash)" && {
+    # Override zoxide's cd to enable auto-ls
+    __zoxide_cd() {
+        \builtin cd -- "$@" && eza -lh --group-directories-first --icons=auto
+    }
+}
 command -v fzf &>/dev/null && eval "$(fzf --bash 2>/dev/null)" || eval "$(fzf --completion --key-bindings 2>/dev/null)"
 command -v starship &>/dev/null && eval "$(starship init bash)"
 

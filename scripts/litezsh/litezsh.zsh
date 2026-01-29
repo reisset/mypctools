@@ -19,7 +19,12 @@ alias tools='glow "$LITEZSH_DIR/TOOLS.md" 2>/dev/null || cat "$LITEZSH_DIR/TOOLS
 export FZF_DEFAULT_OPTS="--multi"
 
 # Initialize tools (same as litebash)
-command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)" && {
+    # Override zoxide's cd to enable auto-ls
+    __zoxide_cd() {
+        \builtin cd -- "$@" && eza -lh --group-directories-first --icons=auto
+    }
+}
 command -v fzf &>/dev/null && source <(fzf --zsh 2>/dev/null) || {
     # Fallback for older fzf versions (Arch path, then Debian path)
     if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
