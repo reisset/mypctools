@@ -6,6 +6,16 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.2] - 2026-01-29
+
+#### Fixed
+- `lib/package-manager.sh`: `install_lazygit_fallback()` now uses `mktemp -d` with subshell (was using fixed `/tmp` paths)
+- `lib/package-manager.sh`: `install_lazydocker_fallback()` same fix
+- `scripts/alacritty/install.sh`: Font install wrapped in subshell to avoid CWD in deleted directory
+- `scripts/terminal/install.sh`: Same subshell fix for font install
+
+---
+
 ### [0.5.1] - 2026-01-29
 
 #### Added

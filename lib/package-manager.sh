@@ -217,10 +217,17 @@ install_lazygit_fallback() {
         *)       print_error "Unsupported architecture: $(uname -m)"; return 1 ;;
     esac
     mkdir -p "$HOME/.local/bin"
-    curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${version}/lazygit_${version}_Linux_${arch}.tar.gz" || return 1
-    tar -xzf /tmp/lazygit.tar.gz -C /tmp lazygit || return 1
-    mv /tmp/lazygit "$HOME/.local/bin/"
-    rm -f /tmp/lazygit.tar.gz
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    (
+        cd "$tmp_dir" || exit 1
+        curl -fsSL -o "lazygit.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${version}/lazygit_${version}_Linux_${arch}.tar.gz" || exit 1
+        tar -xzf "lazygit.tar.gz" || exit 1
+        mv lazygit "$HOME/.local/bin/"
+    )
+    local rc=$?
+    rm -rf "$tmp_dir"
+    [[ $rc -eq 0 ]] || return 1
     print_info "Lazygit installed to ~/.local/bin/lazygit"
 }
 
@@ -243,11 +250,21 @@ install_lazydocker_fallback() {
         armv7*)  arch="armv7" ;;
         *)       print_error "Unsupported architecture: $(uname -m)"; return 1 ;;
     esac
-    curl -Lo /tmp/lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/download/v${version}/lazydocker_${version}_Linux_${arch}.tar.gz" || return 1
-    tar -xzf /tmp/lazydocker.tar.gz -C /tmp lazydocker || return 1
-    ensure_sudo || return 1
-    sudo mv /tmp/lazydocker /usr/local/bin/
-    rm -f /tmp/lazydocker.tar.gz
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    (
+        cd "$tmp_dir" || exit 1
+        curl -fsSL -o "lazydocker.tar.gz" "https://github.com/jesseduffield/lazydocker/releases/download/v${version}/lazydocker_${version}_Linux_${arch}.tar.gz" || exit 1
+        tar -xzf "lazydocker.tar.gz" || exit 1
+    )
+    local rc=$?
+    if [[ $rc -ne 0 ]]; then
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+    ensure_sudo || { rm -rf "$tmp_dir"; return 1; }
+    sudo mv "$tmp_dir/lazydocker" /usr/local/bin/
+    rm -rf "$tmp_dir"
 }
 
 # Cursor - AppImage download
