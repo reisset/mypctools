@@ -1,0 +1,45 @@
+# Alacritty config: Catppuccin Mocha theme
+
+[font]
+normal = { family = "IosevkaTerm Nerd Font", style = "Regular" }
+bold = { family = "IosevkaTerm Nerd Font", style = "Bold" }
+italic = { family = "IosevkaTerm Nerd Font", style = "Italic" }
+size = 14.0
+
+[window]
+padding = { x = 10, y = 10 }
+dynamic_padding = true
+
+[scrolling]
+history = 10000
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval = 750
+
+[mouse]
+hide_when_typing = true
+
+[colors.primary]
+background = "#1e1e2e"
+foreground = "#cdd6f4"
+
+[colors.normal]
+black = "#45475a"
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+white = "#bac2de"
+
+[colors.bright]
+black = "#585b70"
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+white = "#a6adc8"

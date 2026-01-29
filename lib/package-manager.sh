@@ -198,6 +198,32 @@ install_spotify_fallback() {
     sudo apt-get update && sudo apt-get install -y spotify-client
 }
 
+# Lazygit - binary download from GitHub releases
+install_lazygit_fallback() {
+    local version
+    if command -v jq &>/dev/null; then
+        version=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+    else
+        version=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+    fi
+    if [[ -z "$version" ]]; then
+        print_error "Failed to fetch Lazygit version"
+        return 1
+    fi
+    local arch
+    case "$(uname -m)" in
+        x86_64)  arch="x86_64" ;;
+        aarch64) arch="arm64" ;;
+        *)       print_error "Unsupported architecture: $(uname -m)"; return 1 ;;
+    esac
+    mkdir -p "$HOME/.local/bin"
+    curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${version}/lazygit_${version}_Linux_${arch}.tar.gz" || return 1
+    tar -xzf /tmp/lazygit.tar.gz -C /tmp lazygit || return 1
+    mv /tmp/lazygit "$HOME/.local/bin/"
+    rm -f /tmp/lazygit.tar.gz
+    print_info "Lazygit installed to ~/.local/bin/lazygit"
+}
+
 # LazyDocker - binary download from GitHub releases
 install_lazydocker_fallback() {
     local version
