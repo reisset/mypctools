@@ -107,13 +107,43 @@ else
     print_ok "Symlink created: $SYMLINK_PATH"
 fi
 
-# Check if ~/.local/bin is in PATH
+# Add ~/.local/bin to PATH in shell configs if not present
+add_path_to_shell() {
+    local shell_rc="$1"
+    local path_line='export PATH="$HOME/.local/bin:$PATH"'
+
+    if [[ -f "$shell_rc" ]]; then
+        if ! grep -q '\.local/bin' "$shell_rc" 2>/dev/null; then
+            echo "" >> "$shell_rc"
+            echo "# Added by mypctools" >> "$shell_rc"
+            echo "$path_line" >> "$shell_rc"
+            print_ok "Added ~/.local/bin to PATH in $(basename "$shell_rc")"
+            return 0
+        fi
+    fi
+    return 1
+}
+
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     print_warn "~/.local/bin is not in your PATH"
-    print_warn "Add this to your .bashrc or .zshrc:"
-    echo ""
-    echo '    export PATH="$HOME/.local/bin:$PATH"'
-    echo ""
+
+    # Add to current shell's rc file
+    added=false
+    if [[ -f "$HOME/.bashrc" ]]; then
+        add_path_to_shell "$HOME/.bashrc" && added=true
+    fi
+    if [[ -f "$HOME/.zshrc" ]]; then
+        add_path_to_shell "$HOME/.zshrc" && added=true
+    fi
+
+    if [[ "$added" == "true" ]]; then
+        print_warn "Restart your shell or run: source ~/.bashrc (or ~/.zshrc)"
+    else
+        print_warn "Could not add PATH automatically. Add this to your shell config:"
+        echo ""
+        echo '    export PATH="$HOME/.local/bin:$PATH"'
+        echo ""
+    fi
 fi
 
 echo ""

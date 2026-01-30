@@ -286,9 +286,10 @@ create_debian_symlinks() {
 }
 
 # Install starship config symlink (points to shared location)
+# Returns 0 even on failure to prevent set -e from exiting the installer
 install_starship_config() {
     mkdir -p "$HOME/.config"
-    safe_symlink "$SHARED_STARSHIP_TOML" "$HOME/.config/starship.toml" "starship.toml"
+    safe_symlink "$SHARED_STARSHIP_TOML" "$HOME/.config/starship.toml" "starship.toml" || true
 }
 
 # Uninstall all tools from ~/.local/bin + symlinks
