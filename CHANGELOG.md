@@ -6,6 +6,22 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.3] - 2026-01-29
+
+#### Added
+- `safe_symlink()` helper in `lib/tools-install.sh` — validates source exists, skips if already configured, backs up existing files
+- Same helper added to `scripts/terminal/install.sh` and `scripts/alacritty/install.sh`
+
+#### Fixed
+- `lib/tools-install.sh`: `SHARED_STARSHIP_TOML` now resolved to absolute path (was relative `../`)
+- `lib/tools-install.sh`: `install_starship_config()` now backs up existing user configs instead of silently overwriting
+- `install.sh`: Bootstrap symlink now checks if already pointing to our launcher before replacing
+- `scripts/litezsh/install.sh`: Now verifies ALL 5 symlinks (was only checking first one)
+- `scripts/terminal/uninstall.sh`: Now detects broken symlinks (`[ -L ]` added to `[ -f ]` check)
+- `scripts/alacritty/install.sh`: Config symlink now uses safe_symlink with backup
+
+---
+
 ### [0.5.2] - 2026-01-29
 
 #### Fixed
@@ -211,6 +227,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.8.0] - 2026-01-29
+
+#### Fixed
+- `install.sh`: Starship config now uses safe_symlink with backup (was silently overwriting)
+
+---
+
 ### [1.7.0] - 2026-01-29
 
 #### Fixed
@@ -305,6 +328,14 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litezsh
 
+### [1.4.0] - 2026-01-29
+
+#### Fixed
+- `install.sh`: All 5 config symlinks now validated (was only checking first)
+- `install.sh`: Uses safe_symlink with source validation and backup
+
+---
+
 ### [1.3.0] - 2026-01-29
 
 #### Fixed
@@ -356,6 +387,14 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/terminal
 
+### [1.1.0] - 2026-01-29
+
+#### Fixed
+- `install.sh`: Config symlink now uses safe_symlink with source validation and backup
+- `uninstall.sh`: Now detects and removes broken symlinks (added `[ -L ]` check)
+
+---
+
 ### [1.0.0] - 2026-01-28
 - Standalone foot terminal config (moved from litebash/terminal)
 - Shell-agnostic: works with bash, zsh, fish, or any shell
@@ -366,6 +405,13 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/alacritty
+
+### [1.1.0] - 2026-01-29
+
+#### Fixed
+- `install.sh`: Config symlink now uses safe_symlink with source validation and backup
+
+---
 
 ### [1.0.0] - 2026-01-29
 - Initial release

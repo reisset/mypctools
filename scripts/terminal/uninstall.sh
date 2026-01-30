@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Uninstaller
-# v1.2.0 - Added COSMIC keybinding cleanup
+# v1.3.0 - Fixed broken symlink detection
 
 set -e
 
@@ -24,12 +24,12 @@ echo "This uninstaller requires sudo privileges to function properly."
 echo ""
 sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
 
-# Remove foot config
-if [ -f "$FOOT_CONFIG" ]; then
-    # Check if there are other files in the foot config dir
-    file_count=$(find "$FOOT_DIR" -maxdepth 1 -type f | wc -l)
+# Remove foot config (including broken symlinks)
+if [ -f "$FOOT_CONFIG" ] || [ -L "$FOOT_CONFIG" ]; then
+    # Check if there are other files in the foot config dir (exclude our config from count)
+    file_count=$(find "$FOOT_DIR" -maxdepth 1 -type f ! -name "foot.ini" | wc -l)
 
-    if [ "$file_count" -eq 1 ]; then
+    if [ "$file_count" -eq 0 ]; then
         # Only our config exists, remove the whole directory
         print_status "Removing foot config directory..."
         rm -rf "$FOOT_DIR"
