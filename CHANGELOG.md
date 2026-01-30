@@ -13,8 +13,10 @@ All notable changes to mypctools and its bundled scripts.
 
 ### [0.5.7] - 2026-01-30
 
-#### Added
-- Docker context indicator in starship prompt (shows ` context` in Docker project directories)
+#### Fixed
+- Docker indicator in starship prompt now works with modern `compose.yaml` files
+  - Replaced `docker_context` module with `custom.docker` (starship bug ignores `compose.yaml`)
+  - Nerd Font glyph () required UTF-8 byte insertion via bash printf (same fix as OS icons)
 
 ---
 
