@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Uninstaller
-# v1.1.0 - Added restore of original default terminal
+# v1.2.0 - Added COSMIC keybinding cleanup
 
 set -e
 
@@ -69,6 +69,17 @@ restore_default_terminal() {
 }
 
 restore_default_terminal
+
+# Remove COSMIC keybinding if it points to foot
+remove_cosmic_keybinding() {
+    local cosmic_shortcuts="$HOME/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/custom"
+    if [ -f "$cosmic_shortcuts" ] && grep -q "foot" "$cosmic_shortcuts"; then
+        rm "$cosmic_shortcuts"
+        print_success "Removed COSMIC keybinding"
+    fi
+}
+
+remove_cosmic_keybinding
 
 # Note about fonts
 print_status "Fonts left in place (~/.local/share/fonts)"
