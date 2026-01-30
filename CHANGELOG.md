@@ -11,6 +11,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.7] - 2026-01-30
+
+#### Added
+- Docker context indicator in starship prompt (shows ` context` in Docker project directories)
+
+---
+
 ### [0.5.6] - 2026-01-30
 
 #### Fixed
