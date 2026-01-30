@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # LiteBash Shell Installer
-# v1.3.0 - Uses shared aliases and TOOLS.md
+# v1.4.0 - Removed set -e for reliability, explicit error handling
 
-set -e
+# NOTE: We intentionally do NOT use 'set -e' here.
+# The script must complete all critical steps (config, .bashrc, shell change)
+# even if optional steps fail (individual package installs, etc.)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LITEBASH_DIR="$HOME/.local/share/litebash"
@@ -51,6 +53,51 @@ detect_distro() {
     print_status "Detected package manager: $PKG_MGR"
 }
 
+# Set bash as default shell (for users switching from zsh)
+set_default_shell() {
+    local bash_path
+    bash_path=$(which bash)
+
+    # Check /etc/passwd directly (more reliable than $SHELL)
+    local current_shell
+    current_shell=$(getent passwd "$USER" | cut -d: -f7)
+
+    if [[ "$current_shell" == "$bash_path" ]]; then
+        print_success "bash is already the default shell"
+        return 0
+    fi
+
+    # Refresh sudo credentials (may have expired during long install)
+    print_status "Requesting sudo for shell change..."
+    if ! sudo -v; then
+        print_error "Could not get sudo access for shell change"
+        print_status "Please run manually: chsh -s $bash_path"
+        return 1
+    fi
+
+    print_status "Setting bash as default shell..."
+
+    # Try chsh first, then usermod as fallback
+    local changed=false
+    if sudo chsh -s "$bash_path" "$USER" 2>/dev/null; then
+        changed=true
+    elif sudo usermod -s "$bash_path" "$USER" 2>/dev/null; then
+        changed=true
+    fi
+
+    if [[ "$changed" == "true" ]]; then
+        local new_shell
+        new_shell=$(getent passwd "$USER" | cut -d: -f7)
+        if [[ "$new_shell" == "$bash_path" ]]; then
+            print_success "Set bash as default shell"
+            return 0
+        fi
+    fi
+
+    print_warning "Could not change shell automatically. Run: chsh -s $bash_path"
+    return 1
+}
+
 # Install package via package manager
 pkg_install() {
     local name="$1"
@@ -85,7 +132,7 @@ main() {
 
     # Update package database
     print_status "Updating package database..."
-    $PKG_UPDATE
+    $PKG_UPDATE || print_warning "Package database update had issues (continuing anyway)"
 
     # Install dependencies
     print_status "Installing dependencies..."
@@ -111,13 +158,26 @@ main() {
 
     # Copy config files (aliases and TOOLS.md are shared)
     print_status "Installing LiteBash config..."
-    cp "$SCRIPT_DIR/litebash.sh" "$LITEBASH_DIR/"
-    cp "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEBASH_DIR/"
-    cp "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/"
-    cp "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEBASH_DIR/"
+    local copy_errors=0
+    cp "$SCRIPT_DIR/litebash.sh" "$LITEBASH_DIR/" || ((copy_errors++))
+    cp "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEBASH_DIR/" || ((copy_errors++))
+    cp "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/" || ((copy_errors++))
+    cp "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEBASH_DIR/" || ((copy_errors++))
+
+    if [[ $copy_errors -eq 0 ]]; then
+        print_success "LiteBash config installed"
+    else
+        print_warning "Some config files failed to copy ($copy_errors errors)"
+    fi
 
     # Install starship config (shared location)
     install_starship_config
+
+    # Verify starship config was created
+    if [[ ! -L "$HOME/.config/starship.toml" ]] && [[ ! -f "$HOME/.config/starship.toml" ]]; then
+        print_warning "Starship config not created - creating manually..."
+        ln -sf "$(readlink -f "$SCRIPT_DIR/../shared/prompt/starship.toml")" "$HOME/.config/starship.toml"
+    fi
 
     # Add to bashrc (idempotent)
     if ! grep -q "litebash/litebash.sh" "$HOME/.bashrc" 2>/dev/null; then
@@ -128,6 +188,9 @@ main() {
     else
         print_status "LiteBash already in ~/.bashrc"
     fi
+
+    # Set bash as default shell
+    set_default_shell
 
     echo ""
     print_success "Installation complete!"

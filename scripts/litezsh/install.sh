@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # LiteZsh Shell Installer
-# v1.5.0 - Safe symlink helper with validation and backup
+# v1.6.0 - Removed set -e for reliability, explicit error handling
 
-set -e
+# NOTE: We intentionally do NOT use 'set -e' here.
+# The script must complete all critical steps (symlinks, .zshrc, shell change)
+# even if optional steps fail (individual package installs, etc.)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LITEZSH_DIR="$HOME/.local/share/litezsh"
@@ -60,47 +62,71 @@ install_zsh() {
 
     print_status "Installing zsh..."
     case "$PKG_MGR" in
-        pacman) $PKG_INSTALL zsh ;;
-        apt) $PKG_INSTALL zsh ;;
-        dnf) $PKG_INSTALL zsh ;;
+        pacman) $PKG_INSTALL zsh || { print_error "Failed to install zsh"; return 1; } ;;
+        apt) $PKG_INSTALL zsh || { print_error "Failed to install zsh"; return 1; } ;;
+        dnf) $PKG_INSTALL zsh || { print_error "Failed to install zsh"; return 1; } ;;
     esac
-    print_success "Installed zsh"
+
+    if command -v zsh &>/dev/null; then
+        print_success "Installed zsh"
+    else
+        print_error "zsh installation failed"
+        return 1
+    fi
 }
 
 # Set zsh as default shell
 set_default_shell() {
-    local current_shell
-    current_shell=$(basename "$SHELL")
+    local zsh_path
+    zsh_path=$(which zsh)
 
-    if [[ "$current_shell" == "zsh" ]]; then
+    # Check /etc/passwd directly (more reliable than $SHELL)
+    local current_shell
+    current_shell=$(getent passwd "$USER" | cut -d: -f7)
+
+    if [[ "$current_shell" == "$zsh_path" ]]; then
         print_success "zsh is already the default shell"
         return 0
     fi
 
-    local zsh_path
-    zsh_path=$(which zsh)
+    # Refresh sudo credentials (may have expired during long install)
+    print_status "Requesting sudo for shell change..."
+    if ! sudo -v; then
+        print_error "Could not get sudo access for shell change"
+        print_status "Please run manually: chsh -s $zsh_path"
+        return 1
+    fi
 
     # Ensure zsh is in /etc/shells
-    if ! grep -q "$zsh_path" /etc/shells; then
+    if ! grep -q "^${zsh_path}$" /etc/shells 2>/dev/null; then
         print_status "Adding zsh to /etc/shells..."
         echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
     fi
 
     print_status "Setting zsh as default shell..."
 
-    # Use sudo chsh to avoid TTY issues when running from scripts
-    if sudo chsh -s "$zsh_path" "$USER"; then
+    # Try chsh first, then usermod as fallback
+    local changed=false
+    if sudo chsh -s "$zsh_path" "$USER" 2>/dev/null; then
+        changed=true
+    elif sudo usermod -s "$zsh_path" "$USER" 2>/dev/null; then
+        changed=true
+    fi
+
+    if [[ "$changed" == "true" ]]; then
         # Verify the change took effect
         local new_shell
-        new_shell=$(grep "^$USER:" /etc/passwd | cut -d: -f7)
+        new_shell=$(getent passwd "$USER" | cut -d: -f7)
         if [[ "$new_shell" == "$zsh_path" ]]; then
             print_success "Set zsh as default shell"
-        else
-            print_warning "chsh completed but shell unchanged - try manually: chsh -s $zsh_path"
+            return 0
         fi
-    else
-        print_error "Failed to change shell. Run manually: chsh -s $zsh_path"
     fi
+
+    # If we get here, both methods failed
+    print_error "Failed to change default shell automatically"
+    print_status "Please run manually: chsh -s $zsh_path"
+    return 1
 }
 
 # Install zsh plugins via git
@@ -113,9 +139,12 @@ install_plugins() {
         print_success "zsh-autosuggestions already installed"
     else
         print_status "Installing zsh-autosuggestions..."
-        git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git \
-            "$plugins_dir/zsh-autosuggestions"
-        print_success "Installed zsh-autosuggestions"
+        if git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git \
+            "$plugins_dir/zsh-autosuggestions" 2>/dev/null; then
+            print_success "Installed zsh-autosuggestions"
+        else
+            print_warning "Failed to install zsh-autosuggestions (optional)"
+        fi
     fi
 
     # zsh-syntax-highlighting
@@ -123,9 +152,12 @@ install_plugins() {
         print_success "zsh-syntax-highlighting already installed"
     else
         print_status "Installing zsh-syntax-highlighting..."
-        git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git \
-            "$plugins_dir/zsh-syntax-highlighting"
-        print_success "Installed zsh-syntax-highlighting"
+        if git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git \
+            "$plugins_dir/zsh-syntax-highlighting" 2>/dev/null; then
+            print_success "Installed zsh-syntax-highlighting"
+        else
+            print_warning "Failed to install zsh-syntax-highlighting (optional)"
+        fi
     fi
 }
 
@@ -164,7 +196,7 @@ main() {
 
     # Update package database
     print_status "Updating package database..."
-    $PKG_UPDATE
+    $PKG_UPDATE || print_warning "Package database update had issues (continuing anyway)"
 
     # Install zsh
     install_zsh
@@ -220,6 +252,12 @@ main() {
 
     # Install starship config (shared location)
     install_starship_config
+
+    # Verify starship config was created
+    if [[ ! -L "$HOME/.config/starship.toml" ]] && [[ ! -f "$HOME/.config/starship.toml" ]]; then
+        print_warning "Starship config not created - creating manually..."
+        ln -sf "$(readlink -f "$SCRIPT_DIR/../shared/prompt/starship.toml")" "$HOME/.config/starship.toml"
+    fi
 
     # Add to .zshrc BEFORE changing shell (prevents zsh newuser wizard)
     if ! grep -q "litezsh/litezsh.zsh" "$HOME/.zshrc" 2>/dev/null; then

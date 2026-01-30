@@ -2,9 +2,22 @@
 
 All notable changes to mypctools and its bundled scripts.
 
+> **Maintenance Note**: When fixing bugs, always fix THE SCRIPT, not the user's
+> system manually. Scripts must work end-to-end on first run. If a script fails,
+> the fix goes in the script—never patch the user's config files directly as a
+> workaround. The goal: run once, log out, done.
+
 ---
 
 ## mypctools
+
+### [0.5.5] - 2026-01-30
+
+#### Fixed
+- `install.sh`: Now automatically adds `~/.local/bin` to PATH in `.bashrc`/`.zshrc` (was only warning)
+- `lib/tools-install.sh`: `install_starship_config()` now uses `|| true` to prevent `set -e` script death
+
+---
 
 ### [0.5.4] - 2026-01-29
 
@@ -235,6 +248,19 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [1.9.0] - 2026-01-30
+
+#### Fixed
+- **CRITICAL**: Removed `set -e` — was causing silent script death on any error
+- Script now completes ALL critical steps (config copy, .bashrc, shell change) even if optional steps fail
+- `set_default_shell()`: Now checks `/etc/passwd` directly (not `$SHELL`)
+- `set_default_shell()`: Refreshes sudo before shell change
+- `set_default_shell()`: Falls back to `usermod -s` if `chsh` fails
+- Config file copy failures now tracked and reported (was silent crash)
+- Package database update failures no longer abort install
+
+---
+
 ### [1.8.0] - 2026-01-29
 
 #### Fixed
@@ -335,6 +361,27 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/litezsh
+
+### [1.6.0] - 2026-01-30
+
+#### Fixed
+- **CRITICAL**: Removed `set -e` — was causing silent script death on any error
+- Script now completes ALL critical steps (symlinks, .zshrc, shell change) even if optional steps fail
+- `set_default_shell()`: Now checks `/etc/passwd` directly (not `$SHELL` which was empty in TUI)
+- `set_default_shell()`: Refreshes sudo before shell change (credentials may expire during long install)
+- `set_default_shell()`: Falls back to `usermod -s` if `chsh` fails
+- `install_zsh()`: Verifies zsh actually installed after package manager runs
+- `install_plugins()`: Git clone failures now warn instead of crashing script
+- Package database update failures no longer abort install
+
+---
+
+### [1.5.0] - 2026-01-30
+
+#### Fixed
+- `install.sh`: Added starship config verification with manual fallback
+
+---
 
 ### [1.4.0] - 2026-01-29
 
