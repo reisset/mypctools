@@ -267,6 +267,33 @@ install_lazydocker_fallback() {
     rm -rf "$tmp_dir"
 }
 
+# Docker Compose - binary download from GitHub releases (installs as Docker CLI plugin)
+install_docker_compose_fallback() {
+    local version
+    if command -v jq &>/dev/null; then
+        version=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+    else
+        version=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+    fi
+    if [[ -z "$version" ]]; then
+        print_error "Failed to fetch Docker Compose version"
+        return 1
+    fi
+    local arch
+    case "$(uname -m)" in
+        x86_64)  arch="x86_64" ;;
+        aarch64) arch="aarch64" ;;
+        *)       print_error "Unsupported architecture: $(uname -m)"; return 1 ;;
+    esac
+    local plugin_dir="$HOME/.docker/cli-plugins"
+    mkdir -p "$plugin_dir"
+    curl -fsSL -o "$plugin_dir/docker-compose" \
+        "https://github.com/docker/compose/releases/download/v${version}/docker-compose-linux-${arch}" || return 1
+    chmod +x "$plugin_dir/docker-compose"
+    print_info "Docker Compose v${version} installed to ~/.docker/cli-plugins/"
+    print_info "Use: docker compose <command>"
+}
+
 # Cursor - AppImage download
 install_cursor_fallback() {
     local appimage_url="https://downloader.cursor.sh/linux/appImage/x64"

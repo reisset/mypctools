@@ -41,7 +41,7 @@ show_dev_tools_menu() {
                     install_package "Docker" "docker.io" "docker" "" ""
                     ;;
                 "Docker Compose")
-                    install_package "Docker Compose" "docker-compose-plugin" "docker-compose" "" ""
+                    install_package "Docker Compose" "docker-compose-plugin" "docker-compose" "" "install_docker_compose_fallback"
                     ;;
                 "LazyDocker")
                     install_package "LazyDocker" "" "lazydocker" "" "install_lazydocker_fallback"
