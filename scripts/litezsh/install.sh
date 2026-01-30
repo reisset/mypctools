@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteZsh Shell Installer
-# v1.2.0 - Uses shared aliases and TOOLS.md
+# v1.4.0 - Fix chsh via sudo, symlink verification, reorder .zshrc setup
 
 set -e
 
@@ -87,8 +87,20 @@ set_default_shell() {
     fi
 
     print_status "Setting zsh as default shell..."
-    chsh -s "$zsh_path"
-    print_success "Set zsh as default shell (logout/login to apply)"
+
+    # Use sudo chsh to avoid TTY issues when running from scripts
+    if sudo chsh -s "$zsh_path" "$USER"; then
+        # Verify the change took effect
+        local new_shell
+        new_shell=$(grep "^$USER:" /etc/passwd | cut -d: -f7)
+        if [[ "$new_shell" == "$zsh_path" ]]; then
+            print_success "Set zsh as default shell"
+        else
+            print_warning "chsh completed but shell unchanged - try manually: chsh -s $zsh_path"
+        fi
+    else
+        print_error "Failed to change shell. Run manually: chsh -s $zsh_path"
+    fi
 }
 
 # Install zsh plugins via git
@@ -184,16 +196,23 @@ main() {
 
     # Symlink config files (source of truth in repo, aliases and TOOLS.md are shared)
     print_status "Installing LiteZsh config..."
-    ln -sf "$SCRIPT_DIR/litezsh.zsh" "$LITEZSH_DIR/litezsh.zsh"
-    ln -sf "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEZSH_DIR/aliases.sh"
-    ln -sf "$SCRIPT_DIR/functions.zsh" "$LITEZSH_DIR/functions.zsh"
-    ln -sf "$SCRIPT_DIR/completions.zsh" "$LITEZSH_DIR/completions.zsh"
-    ln -sf "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEZSH_DIR/TOOLS.md"
+    ln -sf "$SCRIPT_DIR/litezsh.zsh" "$LITEZSH_DIR/litezsh.zsh" || print_warning "Failed to link litezsh.zsh"
+    ln -sf "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEZSH_DIR/aliases.sh" || print_warning "Failed to link aliases.sh"
+    ln -sf "$SCRIPT_DIR/functions.zsh" "$LITEZSH_DIR/functions.zsh" || print_warning "Failed to link functions.zsh"
+    ln -sf "$SCRIPT_DIR/completions.zsh" "$LITEZSH_DIR/completions.zsh" || print_warning "Failed to link completions.zsh"
+    ln -sf "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEZSH_DIR/TOOLS.md" || print_warning "Failed to link TOOLS.md"
+
+    # Verify symlinks were created
+    if [[ -L "$LITEZSH_DIR/litezsh.zsh" ]]; then
+        print_success "LiteZsh config installed"
+    else
+        print_error "Failed to create config symlinks - check permissions"
+    fi
 
     # Install starship config (shared location)
     install_starship_config
 
-    # Add to .zshrc (idempotent)
+    # Add to .zshrc BEFORE changing shell (prevents zsh newuser wizard)
     if ! grep -q "litezsh/litezsh.zsh" "$HOME/.zshrc" 2>/dev/null; then
         print_status "Adding LiteZsh to ~/.zshrc..."
         # Create .zshrc if it doesn't exist
@@ -205,14 +224,17 @@ main() {
         print_status "LiteZsh already in ~/.zshrc"
     fi
 
-    # Set zsh as default shell
+    # Set zsh as default shell (after .zshrc is set up)
     set_default_shell
 
     echo ""
     print_success "Installation complete!"
     echo ""
-    echo "Log out and back in to start using zsh."
-    echo "Or run: zsh"
+    echo -e "${YELLOW}╔════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}║  LOG OUT AND BACK IN to start using zsh!   ║${NC}"
+    echo -e "${YELLOW}╚════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo "Or run 'zsh' to try it now without logging out."
     echo "Type 'tools' to see the quick reference."
 }
 
