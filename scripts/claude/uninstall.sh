@@ -1,8 +1,6 @@
 #!/bin/bash
 # Claude Code config uninstaller
-# v1.0 - Reverses install.sh changes
-
-set -e
+# v1.1 - Removed set -e for reliability
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 

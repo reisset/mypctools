@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # Alacritty Terminal Uninstaller
-# v1.1.0 - Fixed Alacritty.desktop capitalization
-
-set -e
+# v1.2.0 - Removed set -e for reliability
 
 # Colors
 RED='\033[0;31m'

@@ -11,6 +11,22 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.6] - 2026-01-30
+
+#### Fixed
+- **Removed `set -e` from 11 scripts** — prevents silent failures, ensures all cleanup steps complete:
+  - `install.sh`, `uninstall.sh` (root)
+  - `scripts/litebash/uninstall.sh`, `scripts/litezsh/uninstall.sh`
+  - `scripts/terminal/install.sh`, `scripts/terminal/uninstall.sh`
+  - `scripts/alacritty/install.sh`, `scripts/alacritty/uninstall.sh`
+  - `scripts/claude/install.sh`, `scripts/claude/uninstall.sh`
+  - `scripts/spicetify/install.sh`
+- `scripts/litezsh/uninstall.sh`: Shell detection now uses `getent passwd` (was `$SHELL` which is empty in TUI)
+- `scripts/litezsh/uninstall.sh`: Added `chsh` → `usermod` fallback (matches install.sh pattern)
+- Terminal font size standardized to 15 across all themes (foot + alacritty configs)
+
+---
+
 ### [0.5.5] - 2026-01-30
 
 #### Fixed

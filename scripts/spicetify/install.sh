@@ -12,8 +12,7 @@
 #         - Installs spicetify CLI
 #         - Configures StarryNight theme with gum-based color scheme selection
 #         - Works with native Spotify installs (apt/pacman/dnf) - NOT Flatpak/Snap
-
-set -e
+#   1.2.0 - Removed set -e for reliability
 
 _SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_SCRIPT_DIR/../../lib/helpers.sh"

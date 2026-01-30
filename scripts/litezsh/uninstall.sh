@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # LiteZsh Shell Uninstaller
-# v1.1.0 - Uses shared tool installation lib
-
-set -e
+# v1.2.0 - Removed set -e, fixed shell detection and chsh fallback
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LITEZSH_DIR="$HOME/.local/share/litezsh"
@@ -30,8 +28,9 @@ sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
 
 # Restore bash as default shell
 restore_default_shell() {
+    # Use getent passwd instead of $SHELL (which can be empty in TUI context)
     local current_shell
-    current_shell=$(basename "$SHELL")
+    current_shell=$(basename "$(getent passwd "$USER" | cut -d: -f7)")
 
     if [[ "$current_shell" != "zsh" ]]; then
         print_status "Shell is not zsh, skipping shell change"
@@ -41,7 +40,18 @@ restore_default_shell() {
     local bash_path
     bash_path=$(which bash)
     print_status "Restoring bash as default shell..."
-    chsh -s "$bash_path"
+
+    # Refresh sudo (may have expired during uninstall)
+    sudo -v
+
+    if ! chsh -s "$bash_path" 2>/dev/null; then
+        print_warning "chsh failed, trying usermod..."
+        if ! sudo usermod -s "$bash_path" "$USER" 2>/dev/null; then
+            print_error "Could not change shell. Run manually: chsh -s $bash_path"
+            return 1
+        fi
+    fi
+
     print_success "Restored bash as default shell (logout/login to apply)"
 }
 
