@@ -6,6 +6,14 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.4] - 2026-01-29
+
+#### Fixed
+- `launcher.sh`: Version synced to 0.5.4 (was showing 0.5.1/0.5.2)
+- `scripts/alacritty/uninstall.sh`: Fixed `Alacritty.desktop` capitalization (missed in bb3f95d)
+
+---
+
 ### [0.5.3] - 2026-01-29
 
 #### Added
@@ -405,6 +413,13 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/alacritty
+
+### [1.2.0] - 2026-01-29
+
+#### Fixed
+- `uninstall.sh`: Fixed `Alacritty.desktop` capitalization (missed in bb3f95d)
+
+---
 
 ### [1.1.0] - 2026-01-29
 

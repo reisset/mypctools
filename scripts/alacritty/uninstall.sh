@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Alacritty Terminal Uninstaller
-# v1.0.0
+# v1.1.0 - Fixed Alacritty.desktop capitalization
 
 set -e
 
@@ -49,8 +49,8 @@ restore_default_terminal() {
         print_success "Restored original xdg-terminals.list"
     elif [ -f "$XDG_TERMINALS" ]; then
         # Remove alacritty entry if no backup exists
-        if grep -q "^alacritty.desktop$" "$XDG_TERMINALS"; then
-            grep -v "^alacritty.desktop$" "$XDG_TERMINALS" > "$XDG_TERMINALS.tmp" || true
+        if grep -q "^Alacritty.desktop$" "$XDG_TERMINALS"; then
+            grep -v "^Alacritty.desktop$" "$XDG_TERMINALS" > "$XDG_TERMINALS.tmp" || true
             if [ -s "$XDG_TERMINALS.tmp" ]; then
                 mv "$XDG_TERMINALS.tmp" "$XDG_TERMINALS"
             else
