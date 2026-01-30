@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Alacritty Terminal Installer
-# v1.0.0 - Works on both X11 and Wayland
+# v1.1.0 - Safe symlink helper with validation and backup
 
 set -e
 
@@ -18,6 +18,38 @@ print_status() { echo -e "${BLUE}[*]${NC} $1"; }
 print_success() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[!]${NC} $1"; }
 print_error() { echo -e "${RED}[✗]${NC} $1"; }
+
+# Safe symlink with validation and backup
+safe_symlink() {
+    local source="$1"
+    local target="$2"
+    local name="${3:-$(basename "$target")}"
+
+    local resolved_source
+    resolved_source=$(readlink -f "$source" 2>/dev/null)
+
+    if [[ ! -f "$resolved_source" ]]; then
+        print_warning "Source file not found: $source"
+        return 1
+    fi
+
+    if [[ -L "$target" ]]; then
+        local current_target
+        current_target=$(readlink -f "$target" 2>/dev/null)
+        if [[ "$current_target" == "$resolved_source" ]]; then
+            print_success "$name already configured"
+            return 0
+        fi
+    fi
+
+    if [[ -e "$target" || -L "$target" ]]; then
+        local backup="$target.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$target" "$backup"
+        print_status "Backed up existing $name"
+    fi
+
+    ln -sf "$resolved_source" "$target" && print_success "Linked $name" || { print_warning "Failed to link $name"; return 1; }
+}
 
 # Sudo check
 echo "This installer requires sudo privileges to function properly."
@@ -143,10 +175,8 @@ create_config() {
         *) config_file="alacritty-catppuccin-mocha.toml" ;;
     esac
 
-    # Symlink config (edits to repo file take effect immediately)
-    ln -sf "$SCRIPT_DIR/configs/$config_file" "$config_dir/alacritty.toml"
-
-    print_success "Linked alacritty.toml -> $config_file"
+    # Symlink config with validation and backup
+    safe_symlink "$SCRIPT_DIR/configs/$config_file" "$config_dir/alacritty.toml" "alacritty.toml ($config_file)"
 }
 
 # Set alacritty as default terminal

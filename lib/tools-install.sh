@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/lib/tools-install.sh
 # Shared tool installation/uninstallation for litebash and litezsh
-# v1.0.0
+# v1.1.0 - Added safe_symlink helper with backup support
 
 # Required variables from caller:
 #   LOCAL_BIN - path to ~/.local/bin
@@ -12,7 +12,52 @@
 #   print_status, print_success, print_warning, pkg_install
 
 _TOOLS_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SHARED_STARSHIP_TOML="$_TOOLS_LIB_DIR/../scripts/shared/prompt/starship.toml"
+SHARED_STARSHIP_TOML="$(readlink -f "$_TOOLS_LIB_DIR/../scripts/shared/prompt/starship.toml")"
+
+# Safe symlink creation with validation and backup
+# Usage: safe_symlink <source> <target> [name]
+# Returns 0 on success, 1 on failure
+safe_symlink() {
+    local source="$1"
+    local target="$2"
+    local name="${3:-$(basename "$target")}"
+
+    # Resolve source to absolute path
+    local resolved_source
+    resolved_source=$(readlink -f "$source" 2>/dev/null)
+
+    # Validate source exists
+    if [[ ! -f "$resolved_source" ]]; then
+        print_warning "Source file not found: $source"
+        return 1
+    fi
+
+    # If target is already a symlink pointing to our source, skip
+    if [[ -L "$target" ]]; then
+        local current_target
+        current_target=$(readlink -f "$target" 2>/dev/null)
+        if [[ "$current_target" == "$resolved_source" ]]; then
+            print_success "$name already configured"
+            return 0
+        fi
+    fi
+
+    # Backup existing file/symlink if it's not ours
+    if [[ -e "$target" || -L "$target" ]]; then
+        local backup="$target.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$target" "$backup"
+        print_status "Backed up existing $name to: $(basename "$backup")"
+    fi
+
+    # Create symlink
+    if ln -sf "$resolved_source" "$target"; then
+        print_success "Linked $name"
+        return 0
+    else
+        print_warning "Failed to link $name"
+        return 1
+    fi
+}
 
 # All tools installed to ~/.local/bin from GitHub releases
 LOCAL_TOOLS=(zoxide lazygit tldr glow dysk dust yazi starship)
@@ -243,7 +288,7 @@ create_debian_symlinks() {
 # Install starship config symlink (points to shared location)
 install_starship_config() {
     mkdir -p "$HOME/.config"
-    ln -sf "$SHARED_STARSHIP_TOML" "$HOME/.config/starship.toml"
+    safe_symlink "$SHARED_STARSHIP_TOML" "$HOME/.config/starship.toml" "starship.toml"
 }
 
 # Uninstall all tools from ~/.local/bin + symlinks

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LiteZsh Shell Installer
-# v1.4.0 - Fix chsh via sudo, symlink verification, reorder .zshrc setup
+# v1.5.0 - Safe symlink helper with validation and backup
 
 set -e
 
@@ -196,17 +196,26 @@ main() {
 
     # Symlink config files (source of truth in repo, aliases and TOOLS.md are shared)
     print_status "Installing LiteZsh config..."
-    ln -sf "$SCRIPT_DIR/litezsh.zsh" "$LITEZSH_DIR/litezsh.zsh" || print_warning "Failed to link litezsh.zsh"
-    ln -sf "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEZSH_DIR/aliases.sh" || print_warning "Failed to link aliases.sh"
-    ln -sf "$SCRIPT_DIR/functions.zsh" "$LITEZSH_DIR/functions.zsh" || print_warning "Failed to link functions.zsh"
-    ln -sf "$SCRIPT_DIR/completions.zsh" "$LITEZSH_DIR/completions.zsh" || print_warning "Failed to link completions.zsh"
-    ln -sf "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEZSH_DIR/TOOLS.md" || print_warning "Failed to link TOOLS.md"
+    local symlink_errors=0
+    safe_symlink "$SCRIPT_DIR/litezsh.zsh" "$LITEZSH_DIR/litezsh.zsh" "litezsh.zsh" || ((symlink_errors++))
+    safe_symlink "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEZSH_DIR/aliases.sh" "aliases.sh" || ((symlink_errors++))
+    safe_symlink "$SCRIPT_DIR/functions.zsh" "$LITEZSH_DIR/functions.zsh" "functions.zsh" || ((symlink_errors++))
+    safe_symlink "$SCRIPT_DIR/completions.zsh" "$LITEZSH_DIR/completions.zsh" "completions.zsh" || ((symlink_errors++))
+    safe_symlink "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEZSH_DIR/TOOLS.md" "TOOLS.md" || ((symlink_errors++))
 
-    # Verify symlinks were created
-    if [[ -L "$LITEZSH_DIR/litezsh.zsh" ]]; then
-        print_success "LiteZsh config installed"
+    # Verify ALL symlinks were created and point to valid targets
+    local expected_links=("litezsh.zsh" "aliases.sh" "functions.zsh" "completions.zsh" "TOOLS.md")
+    local verified=0
+    for link in "${expected_links[@]}"; do
+        if [[ -L "$LITEZSH_DIR/$link" ]] && [[ -e "$LITEZSH_DIR/$link" ]]; then
+            ((verified++))
+        fi
+    done
+
+    if [[ $verified -eq ${#expected_links[@]} ]]; then
+        print_success "LiteZsh config installed ($verified/${#expected_links[@]} symlinks verified)"
     else
-        print_error "Failed to create config symlinks - check permissions"
+        print_error "Only $verified/${#expected_links[@]} symlinks verified - check permissions"
     fi
 
     # Install starship config (shared location)

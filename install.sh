@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/install.sh
 # Bootstrap script - installs gum, sets up PATH
-# v0.1.0
+# v0.2.0 - Safe symlink handling with backup
 
 set -e
 
@@ -85,13 +85,27 @@ print_step "Setting up PATH..."
 mkdir -p "$HOME/.local/bin"
 
 SYMLINK_PATH="$HOME/.local/bin/mypctools"
+OUR_TARGET="$SCRIPT_DIR/launcher.sh"
 
 if [[ -e "$SYMLINK_PATH" || -L "$SYMLINK_PATH" ]]; then
-    rm -f "$SYMLINK_PATH"
-fi
+    # Check if it already points to our launcher
+    current_target=$(readlink -f "$SYMLINK_PATH" 2>/dev/null || echo "")
+    our_resolved=$(readlink -f "$OUR_TARGET" 2>/dev/null)
 
-ln -s "$SCRIPT_DIR/launcher.sh" "$SYMLINK_PATH"
-print_ok "Symlink created: $SYMLINK_PATH"
+    if [[ "$current_target" == "$our_resolved" ]]; then
+        print_ok "Symlink already configured"
+    else
+        # Backup existing file/symlink before replacing
+        backup_path="$SYMLINK_PATH.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$SYMLINK_PATH" "$backup_path"
+        print_warn "Backed up existing mypctools to: $backup_path"
+        ln -s "$OUR_TARGET" "$SYMLINK_PATH"
+        print_ok "Symlink created: $SYMLINK_PATH"
+    fi
+else
+    ln -s "$OUR_TARGET" "$SYMLINK_PATH"
+    print_ok "Symlink created: $SYMLINK_PATH"
+fi
 
 # Check if ~/.local/bin is in PATH
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
