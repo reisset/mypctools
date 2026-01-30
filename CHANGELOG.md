@@ -11,6 +11,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.8] - 2026-01-30
+
+#### Added
+- Docker Compose to Dev Tools menu (separate from Docker engine)
+
+---
+
 ### [0.5.7] - 2026-01-30
 
 #### Fixed
