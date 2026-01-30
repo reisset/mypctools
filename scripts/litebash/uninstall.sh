@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Shell Uninstaller
-# v1.1.0 - Uses shared tool installation lib
-
-set -e
+# v1.2.0 - Removed set -e for reliability
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LITEBASH_DIR="$HOME/.local/share/litebash"

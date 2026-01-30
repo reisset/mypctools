@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/uninstall.sh
 # Clean removal script
-# v0.1.0
-
-set -e
+# v0.1.1 - Removed set -e for reliability
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

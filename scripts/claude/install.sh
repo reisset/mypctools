@@ -1,8 +1,6 @@
 #!/bin/bash
 # Claude Code config installer
-# v1.6 - Removed CLAUDE.md (users manage their own), added jq check
-
-set -e
+# v1.7 - Removed set -e for reliability
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 

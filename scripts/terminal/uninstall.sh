@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Uninstaller
-# v1.3.0 - Fixed broken symlink detection
-
-set -e
+# v1.4.0 - Removed set -e for reliability
 
 FOOT_CONFIG="$HOME/.config/foot/foot.ini"
 FOOT_DIR="$HOME/.config/foot"

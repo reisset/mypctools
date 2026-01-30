@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # LiteBash Terminal (foot) Installer
-# v1.5.0 - Safe symlink helper with validation and backup
-
-set -e
+# v1.6.0 - Removed set -e for reliability
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FONT_DIR="$HOME/.local/share/fonts"

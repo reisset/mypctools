@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/install.sh
 # Bootstrap script - installs gum, sets up PATH
-# v0.2.0 - Safe symlink handling with backup
-
-set -e
+# v0.2.1 - Removed set -e for reliability
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/distro-detect.sh"
