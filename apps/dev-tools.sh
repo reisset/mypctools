@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/apps/dev-tools.sh
 # Developer tools installation menu
-# v0.4.0
+# v0.5.0
 
 _DEV_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_DEV_TOOLS_DIR/../lib/helpers.sh"
@@ -15,6 +15,7 @@ show_dev_tools_menu() {
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
         "Docker" \
+        "Docker Compose" \
         "LazyDocker" \
         "Lazygit" \
         "VSCode" \
@@ -38,6 +39,9 @@ show_dev_tools_menu() {
             case "$choice" in
                 "Docker")
                     install_package "Docker" "docker.io" "docker" "" ""
+                    ;;
+                "Docker Compose")
+                    install_package "Docker Compose" "docker-compose-plugin" "docker-compose" "" ""
                     ;;
                 "LazyDocker")
                     install_package "LazyDocker" "" "lazydocker" "" "install_lazydocker_fallback"
