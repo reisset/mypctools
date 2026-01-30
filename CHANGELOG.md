@@ -15,6 +15,7 @@ All notable changes to mypctools and its bundled scripts.
 
 #### Added
 - Docker Compose to Dev Tools menu (separate from Docker engine)
+- `install_docker_compose_fallback()` - downloads from GitHub when apt package unavailable
 
 ---
 
