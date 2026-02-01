@@ -11,6 +11,17 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.5.9] - 2026-02-01
+
+#### Added
+- Ghostty terminal script bundle (`scripts/ghostty/`)
+- Kitty terminal script bundle (`scripts/kitty/`)
+- Both terminals include: Catppuccin Mocha, Tokyo Night, HackTheBox themes
+- Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway/X11)
+- Menu entries in My Scripts for "Terminal - ghostty" and "Terminal - kitty"
+
+---
+
 ### [0.5.8] - 2026-01-30
 
 #### Added
@@ -514,5 +525,29 @@ All notable changes to mypctools and its bundled scripts.
 - Works on both X11 and Wayland (unlike foot)
 - Themes: Catppuccin Mocha (default), Tokyo Night, HackTheBox
 - Iosevka Nerd Font installation (same as foot)
+- Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway/X11)
+
+---
+
+## scripts/ghostty
+
+### [1.0.0] - 2026-02-01
+- Initial release
+- Shell-agnostic: works with bash, zsh, fish, or any shell
+- Works on both X11 and Wayland
+- Themes: Catppuccin Mocha (default), Tokyo Night, HackTheBox
+- Iosevka Nerd Font installation
+- Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway/X11)
+
+---
+
+## scripts/kitty
+
+### [1.0.0] - 2026-02-01
+- Initial release
+- Shell-agnostic: works with bash, zsh, fish, or any shell
+- Works on both X11 and Wayland
+- Themes: Catppuccin Mocha (default), Tokyo Night, HackTheBox
+- Iosevka Nerd Font installation
 - Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway/X11)
 
