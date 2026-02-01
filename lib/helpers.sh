@@ -1,40 +1,31 @@
 #!/usr/bin/env bash
 # mypctools/lib/helpers.sh
 # Shared helper functions for mypctools
-# v0.2.0
+# v0.3.0
 
 # Source theme
 _HELPERS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_HELPERS_DIR/theme.sh"
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
-
-# Print functions
+# Print functions using gum for consistent styled output
 print_header() {
-    echo -e "${MAGENTA}==>${NC} ${CYAN}$1${NC}"
+    gum style --foreground "$THEME_PRIMARY" --bold "==> $1"
 }
 
 print_success() {
-    echo -e "${GREEN}✓${NC} $1"
+    gum style --foreground "$THEME_SUCCESS" "✓ $1"
 }
 
 print_error() {
-    echo -e "${RED}✗${NC} $1" >&2
+    gum style --foreground "$THEME_ERROR" "✗ $1" >&2
 }
 
 print_warning() {
-    echo -e "${YELLOW}!${NC} $1"
+    gum style --foreground "$THEME_WARNING" "! $1"
 }
 
 print_info() {
-    echo -e "${BLUE}→${NC} $1"
+    gum style --foreground "$THEME_SECONDARY" "→ $1"
 }
 
 # Logging

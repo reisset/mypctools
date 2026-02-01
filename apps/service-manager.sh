@@ -131,9 +131,8 @@ show_service_actions() {
                 ;;
             "View Status")
                 clear
-                systemctl status "$service" --no-pager || true
-                echo ""
-                read -rp "Press Enter to continue..."
+                show_subheader "Service Status: $service"
+                systemctl status "$service" --no-pager 2>&1 | themed_pager
                 clear
                 ;;
             "Back"|"")
@@ -161,10 +160,7 @@ show_service_manager() {
         fi
 
         local choice
-        choice=$(echo -e "$services_list\nBack" | gum choose \
-            --cursor.foreground="$THEME_PRIMARY" \
-            --item.foreground="$THEME_SECONDARY" \
-            --selected.foreground="$THEME_PRIMARY")
+        choice=$(echo -e "$services_list\nBack" | themed_filter "Type to search services...")
 
         if [[ "$choice" == "Back" || -z "$choice" ]]; then
             break
