@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # mypctools/launcher.sh
 # Main TUI launcher for mypctools
-# v0.5.4
+# v0.6.0
 
 MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.5.4"
+VERSION="0.6.0"
 UPDATE_AVAILABLE=""
 
 LOGO='                              _              _
@@ -412,49 +412,60 @@ show_system_setup_menu() {
         case "$choice" in
             "Full System Update")
                 ensure_sudo || continue
+                print_info "Running system update..."
                 case "$DISTRO_TYPE" in
-                    debian) sudo apt update && sudo apt upgrade -y ;;
-                    arch)   sudo pacman -Syu --noconfirm ;;
-                    fedora) sudo dnf upgrade -y ;;
-                    *)      print_error "Unsupported distro type: $DISTRO_TYPE" ;;
+                    debian)
+                        themed_spin "$SPINNER_UPDATE" "Updating package lists..." sudo apt update
+                        themed_spin "$SPINNER_UPDATE" "Upgrading packages..." sudo apt upgrade -y
+                        ;;
+                    arch)
+                        themed_spin "$SPINNER_UPDATE" "Syncing and upgrading..." sudo pacman -Syu --noconfirm
+                        ;;
+                    fedora)
+                        themed_spin "$SPINNER_UPDATE" "Upgrading packages..." sudo dnf upgrade -y
+                        ;;
+                    *)
+                        print_error "Unsupported distro type: $DISTRO_TYPE"
+                        ;;
                 esac
+                print_success "System update complete"
                 echo ""
                 read -rp "Press Enter to continue..."
                 clear
                 ;;
             "System Cleanup")
                 ensure_sudo || continue
+                print_info "Running system cleanup..."
                 case "$DISTRO_TYPE" in
                     debian)
-                        sudo apt autoremove -y
-                        sudo apt autoclean
-                        sudo apt clean
+                        themed_spin "$SPINNER_CLEANUP" "Removing unused packages..." sudo apt autoremove -y
+                        themed_spin "$SPINNER_CLEANUP" "Cleaning package cache..." sudo apt autoclean
+                        themed_spin "$SPINNER_CLEANUP" "Clearing apt cache..." sudo apt clean
                         ;;
                     arch)
                         orphans=$(pacman -Qtdq 2>/dev/null)
                         if [[ -n "$orphans" ]]; then
                             echo "$orphans"
-                            if gum confirm "Remove these orphan packages?"; then
-                                echo "$orphans" | sudo pacman -Rns --noconfirm -
+                            if themed_confirm "Remove these orphan packages?"; then
+                                themed_spin "$SPINNER_CLEANUP" "Removing orphans..." bash -c "echo '$orphans' | sudo pacman -Rns --noconfirm -"
                             fi
                         fi
                         if command_exists paccache; then
-                            sudo paccache -rk2
+                            themed_spin "$SPINNER_CLEANUP" "Clearing package cache..." sudo paccache -rk2
                         else
-                            sudo pacman -Sc --noconfirm
+                            themed_spin "$SPINNER_CLEANUP" "Clearing package cache..." sudo pacman -Sc --noconfirm
                         fi
                         ;;
                     fedora)
-                        sudo dnf autoremove -y
-                        sudo dnf clean all
+                        themed_spin "$SPINNER_CLEANUP" "Removing unused packages..." sudo dnf autoremove -y
+                        themed_spin "$SPINNER_CLEANUP" "Cleaning dnf cache..." sudo dnf clean all
                         ;;
                     *)
                         print_error "Unsupported distro type: $DISTRO_TYPE"
                         ;;
                 esac
                 # User caches (all distros)
-                rm -rf "$HOME/.cache/thumbnails"/* 2>/dev/null
-                rm -rf "$HOME/.local/share/Trash"/* 2>/dev/null
+                themed_spin "$SPINNER_CLEANUP" "Clearing user caches..." bash -c 'rm -rf "$HOME/.cache/thumbnails"/* 2>/dev/null; rm -rf "$HOME/.local/share/Trash"/* 2>/dev/null'
                 print_success "Cleanup complete"
                 read -rp "Press Enter to continue..."
                 clear
@@ -467,24 +478,22 @@ show_system_setup_menu() {
                 clear
                 show_subheader "System Information"
 
-                # User@Host
-                print_info "User: $USER@$(hostname)"
-
-                # OS
-                print_info "OS: $DISTRO_NAME"
+                # Build info lines
+                local info_lines=""
+                info_lines+="  User       $USER@$(hostname)"$'\n'
+                info_lines+="  OS         $DISTRO_NAME"$'\n'
 
                 # Host (hardware model)
                 local host_model=""
                 [[ -f /sys/devices/virtual/dmi/id/product_name ]] && host_model=$(cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null)
-                [[ -n "$host_model" ]] && print_info "Host: $host_model"
+                [[ -n "$host_model" ]] && info_lines+="  Host       $host_model"$'\n'
 
-                # Kernel
-                print_info "Kernel: $(uname -r)"
+                info_lines+="  Kernel     $(uname -r)"$'\n'
 
                 # Uptime
                 local uptime_str
                 uptime_str=$(uptime -p 2>/dev/null | sed 's/up //')
-                print_info "Uptime: $uptime_str"
+                [[ -n "$uptime_str" ]] && info_lines+="  Uptime     $uptime_str"$'\n'
 
                 # Packages
                 local pkg_count=""
@@ -496,40 +505,44 @@ show_system_setup_menu() {
                 if command_exists flatpak; then
                     local flatpak_count
                     flatpak_count=$(flatpak list --app 2>/dev/null | wc -l)
-                    [[ -n "$pkg_count" ]] && pkg_count="$pkg_count, $flatpak_count (flatpak)" || pkg_count="$flatpak_count (flatpak)"
+                    [[ -n "$pkg_count" ]] && pkg_count="$pkg_count + $flatpak_count (flatpak)" || pkg_count="$flatpak_count (flatpak)"
                 fi
-                [[ -n "$pkg_count" ]] && print_info "Packages: $pkg_count"
+                [[ -n "$pkg_count" ]] && info_lines+="  Packages   $pkg_count"$'\n'
 
-                # Shell
-                print_info "Shell: $(basename "$SHELL")"
-
-                # DE / WM
-                [[ -n "$XDG_CURRENT_DESKTOP" ]] && print_info "DE: $XDG_CURRENT_DESKTOP"
-                [[ -n "$XDG_SESSION_TYPE" ]] && print_info "Session: $XDG_SESSION_TYPE"
-
-                # Terminal
-                [[ -n "$TERM" ]] && print_info "Terminal: $TERM"
+                info_lines+="  Shell      $(basename "$SHELL")"$'\n'
+                [[ -n "$XDG_CURRENT_DESKTOP" ]] && info_lines+="  DE         $XDG_CURRENT_DESKTOP"$'\n'
+                [[ -n "$XDG_SESSION_TYPE" ]] && info_lines+="  Session    $XDG_SESSION_TYPE"$'\n'
+                [[ -n "$TERM" ]] && info_lines+="  Terminal   $TERM"$'\n'
 
                 # CPU
                 local cpu_model
                 cpu_model=$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2 | sed 's/^ //')
-                [[ -n "$cpu_model" ]] && print_info "CPU: $cpu_model"
+                [[ -n "$cpu_model" ]] && info_lines+="  CPU        $cpu_model"$'\n'
 
                 # GPU
                 local gpu_info
                 gpu_info=$(lspci 2>/dev/null | grep -i 'vga\|3d\|display' | head -1 | sed 's/.*: //')
-                [[ -n "$gpu_info" ]] && print_info "GPU: $gpu_info"
+                [[ -n "$gpu_info" ]] && info_lines+="  GPU        $gpu_info"$'\n'
 
                 # Memory
                 local mem_total mem_used
                 mem_total=$(grep MemTotal /proc/meminfo 2>/dev/null | awk '{printf "%.1f", $2/1024/1024}')
                 mem_used=$(free -m 2>/dev/null | awk '/Mem:/ {printf "%.1f", $3/1024}')
-                [[ -n "$mem_total" ]] && print_info "Memory: ${mem_used}GB / ${mem_total}GB"
+                [[ -n "$mem_total" ]] && info_lines+="  Memory     ${mem_used}GB / ${mem_total}GB"$'\n'
 
                 # Disk
                 local disk_info
                 disk_info=$(df -h / 2>/dev/null | awk 'NR==2 {print $3 " / " $2 " (" $5 " used)"}')
-                [[ -n "$disk_info" ]] && print_info "Disk (/): $disk_info"
+                [[ -n "$disk_info" ]] && info_lines+="  Disk (/)   $disk_info"$'\n'
+
+                # Display in styled box
+                info_lines="${info_lines%$'\n'}"  # Remove trailing newline
+                gum style \
+                    --border rounded \
+                    --border-foreground "$THEME_SECONDARY" \
+                    --foreground "$THEME_PRIMARY" \
+                    --padding "1 2" \
+                    "$info_lines"
 
                 echo ""
                 read -rp "Press Enter to continue..."

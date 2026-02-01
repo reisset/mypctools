@@ -32,10 +32,12 @@ has_flatpak() {
 }
 
 # Run command with spinner, show output only on failure
+# Usage: run_with_spinner "Title..." command args
+# Uses themed_spin from theme.sh for consistent styling
 run_with_spinner() {
     local title="$1"
     shift
-    gum spin --spinner dot --show-error --title "$title" -- "$@" < /dev/null
+    themed_spin "$SPINNER_INSTALL" "$title" "$@"
 }
 
 # Check if a package is already installed

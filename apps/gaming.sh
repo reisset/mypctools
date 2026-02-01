@@ -23,11 +23,12 @@ show_gaming_menu() {
         return
     fi
 
-    echo ""
-    show_subheader "Would install"
+    # Build preview list
+    local preview_items=()
     while read -r choice; do
-        print_info "$choice"
+        preview_items+=("$choice")
     done <<< "$choices"
+    show_preview_box "Selected for installation:" "${preview_items[@]}"
     echo ""
 
     if themed_confirm "Proceed with installation?"; then

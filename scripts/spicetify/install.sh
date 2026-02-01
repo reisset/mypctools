@@ -132,7 +132,7 @@ fi
 # Theme selection
 echo ""
 print_header "Select a theme"
-THEME=$(gum choose --header "Available themes:" "StarryNight" "text")
+THEME=$(themed_choose "Available themes:" "StarryNight" "text")
 
 if [[ -z "$THEME" ]]; then
     print_warning "No selection - using StarryNight"
@@ -154,7 +154,7 @@ echo ""
 print_header "Select a color scheme"
 
 if [[ "$THEME" == "StarryNight" ]]; then
-    selected=$(gum choose --header "StarryNight color schemes:" \
+    selected=$(themed_choose "StarryNight color schemes:" \
         "Base" \
         "Cotton Candy" \
         "Forest" \
@@ -164,7 +164,7 @@ if [[ "$THEME" == "StarryNight" ]]; then
         "Sunrise")
     [[ -z "$selected" ]] && selected="Base"
 else
-    selected=$(gum choose --header "text color schemes:" \
+    selected=$(themed_choose "text color schemes:" \
         "Spotify" \
         "Spicetify" \
         "CatppuccinMocha" \

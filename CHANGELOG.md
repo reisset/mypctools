@@ -11,6 +11,38 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.6.0] - 2026-02-01
+
+#### Added
+- **TUI Visual Refresh** — Enhanced look and UX using more Gum features
+- State colors in theme: `THEME_SUCCESS` (green), `THEME_WARNING` (orange), `THEME_ERROR` (red), `THEME_ACCENT` (purple)
+- Spinner types: `SPINNER_INSTALL` (dot), `SPINNER_UPDATE` (globe), `SPINNER_CLEANUP` (pulse), `SPINNER_DOWNLOAD` (moon)
+- Boxed section headers with rounded borders (`show_subheader()` now uses `gum style --border rounded`)
+- New theme functions:
+  - `themed_choose_stdin()` — single-select from stdin for dynamic lists
+  - `themed_filter()` — fuzzy search with styled indicator
+  - `themed_spin()` — styled spinner with configurable animation type
+  - `themed_pager()` — soft-wrap pager for long output
+  - `show_keyhints()` — keyboard hint display
+  - `show_preview_box()` — boxed preview for installation selections
+- Service Manager now uses `gum filter` for fuzzy-searchable service list
+- Service status view now uses `gum pager` for scrollable output
+- System Update/Cleanup now show animated spinners during operations
+- Installation preview boxes in all app menus (AI, Browsers, Gaming, Media, Dev Tools)
+
+#### Changed
+- `lib/theme.sh` bumped to v0.2.0
+- `lib/helpers.sh` bumped to v0.3.0 — print functions now use `gum style` with theme colors
+- System Info now displays in a styled box with aligned labels
+- `run_with_spinner()` in package-manager.sh now uses `themed_spin()`
+
+#### Fixed
+- Theming inconsistency: `launcher.sh` cleanup confirm now uses `themed_confirm()`
+- Theming inconsistency: `service-manager.sh` now uses themed wrappers
+- Theming inconsistency: `spicetify/install.sh` now uses `themed_choose()`
+
+---
+
 ### [0.5.9] - 2026-02-01
 
 #### Added
