@@ -2,7 +2,7 @@
 
 A personal TUI for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum).
 
-**v0.5.1**
+**v0.5.4**
 
 ## Quick Start
 
@@ -26,7 +26,7 @@ One menu to install apps across distros. Uses native package managers first, fal
 | Browsers | Brave, Firefox, Chrome, Zen |
 | Gaming | Steam, Lutris, Heroic, ProtonUp-Qt |
 | Media | Spotify, VLC, OBS, Discord |
-| Dev Tools | Docker, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK, Python |
+| Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK 10, Python |
 | CLI Utils | btop, neofetch, bat, eza, zoxide, fzf |
 | AI Tools | OpenCode, Claude Code, Mistral Vibe, Ollama, LM Studio |
 
@@ -38,6 +38,9 @@ Bundled script collections with install/uninstall options:
 - **LiteZsh** - Zsh counterpart to LiteBash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
 - **Terminal - foot** - Wayland terminal with curated themes (Catppuccin Mocha, Tokyo Night, HackTheBox). Shell-agnostic.
 - **Terminal - alacritty** - X11/Wayland terminal with the same themes. Shell-agnostic.
+- **Terminal - ghostty** - X11/Wayland terminal with the same themes. Shell-agnostic.
+- **Terminal - kitty** - X11/Wayland terminal with the same themes. Shell-agnostic.
+- **Spicetify Theme** - Spotify theming with StarryNight or text themes. Native Spotify installs only.
 - **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
 
 ### System Setup
@@ -67,6 +70,7 @@ The installer tries each method in order and stops at the first success. Custom 
 | App | Fallback Method |
 |-----|-----------------|
 | Brave | Official install script |
+| Docker Compose | GitHub binary release |
 | VSCode | Microsoft apt repo |
 | Spotify | Spotify apt repo |
 | LazyDocker | GitHub binary release |
