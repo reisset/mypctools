@@ -1,0 +1,41 @@
+# Ghostty config: HackTheBox theme
+
+font-family = IosevkaTerm Nerd Font
+font-size = 15
+
+window-padding-x = 10
+window-padding-y = 10
+
+scrollback-limit = 10000
+
+cursor-style = block
+cursor-style-blink = true
+
+mouse-hide-while-typing = true
+
+# HackTheBox colors
+background = #141d2b
+foreground = #a4b1cd
+
+selection-background = #9fef00
+selection-foreground = #141d2b
+
+# Normal colors
+palette = 0=#141d2b
+palette = 1=#ff3e3e
+palette = 2=#9fef00
+palette = 3=#ffaf00
+palette = 4=#2b6cb0
+palette = 5=#9f7aea
+palette = 6=#0bc5ea
+palette = 7=#a4b1cd
+
+# Bright colors
+palette = 8=#1a2332
+palette = 9=#ff3e3e
+palette = 10=#9fef00
+palette = 11=#ffaf00
+palette = 12=#63b3ed
+palette = 13=#b794f4
+palette = 14=#0bc5ea
+palette = 15=#ffffff
