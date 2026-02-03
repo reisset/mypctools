@@ -11,7 +11,7 @@ detect_distro() {
         [[ -n "$_saved_logo" ]] && LOGO="$_saved_logo"
 
         case "$ID" in
-            arch|manjaro|endeavouros|garuda|artix)
+            arch|manjaro|endeavouros|garuda|artix|cachyos)
                 DISTRO_TYPE="arch"
                 DISTRO_NAME="$NAME"
                 ;;
