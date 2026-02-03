@@ -11,6 +11,20 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.7.0] - 2026-02-03
+
+#### Added
+- **Screensaver script bundle** (`scripts/screensaver/`) — Omarchy-style terminal screensaver using tte (Terminal Text Effects)
+- Launches fullscreen Alacritty on all Hyprland monitors with random tte effects over ASCII art
+- Two ASCII art files (LINUX GANG block letters, Tux penguin) randomly alternated each cycle
+- Installer auto-configures: pipx + tte, hypridle, Hyprland window rules, hypridle idle listener (5 min default)
+- Uninstaller uses marker-based sed cleanup for hyprland.conf and hypridle.conf
+- Multi-monitor support: screensaver spawns on every connected monitor
+- Dismiss via keypress or focus change; all instances exit together
+- Menu entry "Screensaver" added to My Scripts in launcher.sh
+
+---
+
 ### [0.6.0] - 2026-02-01
 
 #### Added
@@ -597,4 +611,19 @@ All notable changes to mypctools and its bundled scripts.
 - Themes: Catppuccin Mocha (default), Tokyo Night, HackTheBox
 - Iosevka Nerd Font installation
 - Desktop-aware default terminal setup (GNOME, COSMIC, Hyprland/Sway/X11)
+
+---
+
+## scripts/screensaver
+
+### [1.0.0] - 2026-02-03
+- Initial release
+- Omarchy-style terminal screensaver using tte (Terminal Text Effects)
+- Alacritty fullscreen on all Hyprland monitors via window rules
+- Random tte effects over two ASCII art files (LINUX GANG, Tux)
+- Hyprland 0.53+ windowrule syntax (`fullscreen on`, `no_anim on`, `border_size 0`)
+- hypridle integration for idle auto-trigger (300s default)
+- Multi-monitor: spawns on every monitor, all instances exit together on keypress/focus loss
+- Installs pipx + terminaltexteffects, hypridle (if missing)
+- Marker-based config injection for clean uninstall (`>>> mypctools-screensaver >>>`)
 

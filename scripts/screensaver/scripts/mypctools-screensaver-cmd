@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# mypctools-screensaver-cmd
+# Runs tte effects on ASCII art inside the screensaver terminal
+# Exits on keypress or when screensaver windows are closed
+
+SCREENSAVER_CLASS="mypctools.screensaver"
+ASSETS_DIR="$HOME/.local/share/mypctools-screensaver"
+
+ART_FILES=("$ASSETS_DIR/linux-gang.txt" "$ASSETS_DIR/tux.txt")
+
+screensaver_in_focus() {
+    hyprctl activewindow -j 2>/dev/null | jq -e '.class == "'"$SCREENSAVER_CLASS"'"' &>/dev/null
+}
+
+exit_screensaver() {
+    # Show terminal cursor
+    printf '\033[?25h'
+    # Restore Hyprland cursor visibility
+    hyprctl keyword cursor:invisible false &>/dev/null || true
+    # Kill tte and all screensaver instances
+    pkill -x tte 2>/dev/null
+    pkill -f "$SCREENSAVER_CLASS" 2>/dev/null
+    exit 0
+}
+
+trap exit_screensaver SIGINT SIGTERM SIGHUP SIGQUIT
+
+# Set black background and clear screen
+printf '\033]11;rgb:00/00/00\007'
+printf '\033[2J\033[H'
+printf '\033[?25l'
+
+# Hide Hyprland cursor
+hyprctl keyword cursor:invisible true &>/dev/null || true
+
+while true; do
+    # Pick random art file
+    art_file="${ART_FILES[$((RANDOM % ${#ART_FILES[@]}))]}"
+
+    # Run tte with random effect
+    tte -i "$art_file" \
+        --frame-rate 120 --canvas-width 0 --canvas-height 0 \
+        --reuse-canvas --anchor-canvas c --anchor-text c \
+        --random-effect --exclude-effects dev_worm \
+        --no-eol --no-restore-cursor &
+
+    TTE_PID=$!
+
+    # Monitor for input or focus loss
+    while kill -0 "$TTE_PID" 2>/dev/null; do
+        if read -rsn1 -t 1 2>/dev/null; then
+            kill "$TTE_PID" 2>/dev/null
+            exit_screensaver
+        fi
+
+        if ! screensaver_in_focus; then
+            kill "$TTE_PID" 2>/dev/null
+            exit_screensaver
+        fi
+    done
+
+    sleep 2
+    printf '\033[2J\033[H'
+done
