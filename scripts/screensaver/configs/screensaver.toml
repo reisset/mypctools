@@ -1,0 +1,45 @@
+# Alacritty config for screensaver mode
+# Black background, no decorations, no scrollback
+
+[font]
+normal = { family = "IosevkaTerm Nerd Font", style = "Regular" }
+size = 16.0
+
+[window]
+padding = { x = 0, y = 0 }
+dynamic_padding = false
+decorations = "None"
+startup_mode = "Fullscreen"
+
+[scrolling]
+history = 0
+
+[cursor]
+style = { shape = "Block", blinking = "Off" }
+
+[mouse]
+hide_when_typing = true
+
+[colors.primary]
+background = "#000000"
+foreground = "#00ff00"
+
+[colors.normal]
+black   = "#000000"
+red     = "#ff0000"
+green   = "#00ff00"
+yellow  = "#ffff00"
+blue    = "#0000ff"
+magenta = "#ff00ff"
+cyan    = "#00ffff"
+white   = "#ffffff"
+
+[colors.bright]
+black   = "#555555"
+red     = "#ff5555"
+green   = "#55ff55"
+yellow  = "#ffff55"
+blue    = "#5555ff"
+magenta = "#ff55ff"
+cyan    = "#55ffff"
+white   = "#ffffff"

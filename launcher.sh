@@ -123,6 +123,7 @@ show_scripts_menu() {
             "Terminal - alacritty" \
             "Terminal - ghostty" \
             "Terminal - kitty" \
+            "Screensaver" \
             "Back")
 
         case "$choice" in
@@ -379,6 +380,39 @@ show_scripts_menu() {
                         "Uninstall")
                             if [[ -f "$MYPCTOOLS_ROOT/scripts/kitty/uninstall.sh" ]]; then
                                 bash "$MYPCTOOLS_ROOT/scripts/kitty/uninstall.sh"
+                            else
+                                print_warning "Uninstall script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Back"|"")
+                            break
+                            ;;
+                    esac
+                done
+                ;;
+            "Screensaver")
+                while true; do
+                    clear
+                    show_subheader "Screensaver"
+                    local action
+                    action=$(themed_choose "" \
+                        "Install" \
+                        "Uninstall" \
+                        "Back")
+
+                    case "$action" in
+                        "Install")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensaver/install.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/screensaver/install.sh"
+                            else
+                                print_warning "Install script not found."
+                            fi
+                            read -rp "Press Enter to continue..."
+                            ;;
+                        "Uninstall")
+                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensaver/uninstall.sh" ]]; then
+                                bash "$MYPCTOOLS_ROOT/scripts/screensaver/uninstall.sh"
                             else
                                 print_warning "Uninstall script not found."
                             fi

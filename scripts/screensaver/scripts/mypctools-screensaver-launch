@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# mypctools-screensaver-launch
+# Launches screensaver on all Hyprland monitors using Alacritty + tte
+
+SCREENSAVER_CLASS="mypctools.screensaver"
+SCREENSAVER_CONFIG="$HOME/.config/alacritty/screensaver.toml"
+SCREENSAVER_CMD="mypctools-screensaver-cmd"
+
+# Check dependencies
+if ! command -v tte &>/dev/null; then
+    notify-send "Screensaver" "tte not installed. Run mypctools > My Scripts > Screensaver > Install" 2>/dev/null
+    exit 1
+fi
+
+if ! command -v alacritty &>/dev/null; then
+    exit 1
+fi
+
+if ! command -v hyprctl &>/dev/null; then
+    exit 1
+fi
+
+# Don't launch if already running
+if hyprctl clients -j 2>/dev/null | jq -e '.[] | select(.class == "'"$SCREENSAVER_CLASS"'")' &>/dev/null; then
+    exit 0
+fi
+
+# Remember focused monitor
+focused=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
+
+# Launch screensaver on each monitor
+for monitor in $(hyprctl monitors -j | jq -r '.[].name'); do
+    hyprctl dispatch focusmonitor "$monitor" &>/dev/null
+
+    alacritty \
+        --class "$SCREENSAVER_CLASS" \
+        --config-file "$SCREENSAVER_CONFIG" \
+        -e "$SCREENSAVER_CMD" &
+
+    sleep 0.3
+done
+
+# Restore focus to original monitor
+if [[ -n "$focused" ]]; then
+    sleep 0.5
+    hyprctl dispatch focusmonitor "$focused" &>/dev/null
+fi
