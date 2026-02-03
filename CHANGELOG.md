@@ -324,6 +324,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/litebash
 
+### [2.0.0] - 2026-02-03
+
+#### Fixed
+- `install.sh`: Detects conflicting `.bashrc` configs (oh-my-bash, bash-it, distro frameworks) and replaces with clean config (backup saved as `~/.bashrc.pre-litebash`)
+
+---
+
 ### [1.9.0] - 2026-01-30
 
 #### Fixed
@@ -437,6 +444,14 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/litezsh
+
+### [1.7.0] - 2026-02-03
+
+#### Fixed
+- `install.sh`: Detects conflicting `.zshrc` configs (oh-my-zsh, Powerlevel10k, CachyOS/distro frameworks) and replaces with clean config (backup saved as `~/.zshrc.pre-litezsh`)
+- `litezsh.zsh`: Now explicitly disables `CORRECT` and `CORRECT_ALL` options to override distro defaults
+
+---
 
 ### [1.6.0] - 2026-01-30
 

@@ -179,8 +179,30 @@ main() {
         ln -sf "$(readlink -f "$SCRIPT_DIR/../shared/prompt/starship.toml")" "$HOME/.config/starship.toml"
     fi
 
-    # Add to bashrc (idempotent)
-    if ! grep -q "litebash/litebash.sh" "$HOME/.bashrc" 2>/dev/null; then
+    # Set up .bashrc BEFORE changing shell
+    # If .bashrc has conflicting configs (oh-my-bash, bash-it, distro frameworks),
+    # back it up and write a clean one. Otherwise just append.
+    local needs_clean_bashrc=false
+    if [[ -f "$HOME/.bashrc" ]]; then
+        if grep -qE '(oh-my-bash|bash-it|OSH_THEME|BASH_IT|cachyos-config|powerline-shell)' "$HOME/.bashrc" 2>/dev/null; then
+            needs_clean_bashrc=true
+        fi
+    fi
+
+    if [[ "$needs_clean_bashrc" == "true" ]]; then
+        print_warning "Existing .bashrc has conflicting configs (oh-my-bash/bash-it/distro)"
+        print_status "Backing up to ~/.bashrc.pre-litebash"
+        cp "$HOME/.bashrc" "$HOME/.bashrc.pre-litebash"
+
+        print_status "Writing clean .bashrc..."
+        cat > "$HOME/.bashrc" << 'BASHRC'
+export PATH="$HOME/.local/bin:$PATH"
+
+# LiteBash
+[ -f ~/.local/share/litebash/litebash.sh ] && source ~/.local/share/litebash/litebash.sh
+BASHRC
+        print_success "Clean .bashrc created (backup: ~/.bashrc.pre-litebash)"
+    elif ! grep -q "litebash/litebash.sh" "$HOME/.bashrc" 2>/dev/null; then
         print_status "Adding LiteBash to ~/.bashrc..."
         echo '' >> "$HOME/.bashrc"
         echo '# LiteBash' >> "$HOME/.bashrc"

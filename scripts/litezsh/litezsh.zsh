@@ -7,6 +7,9 @@
 # Config directory
 LITEZSH_DIR="$HOME/.local/share/litezsh"
 
+# Disable options that may have been set by distro/framework configs
+unsetopt CORRECT CORRECT_ALL 2>/dev/null
+
 # Source config files
 [[ -f "$LITEZSH_DIR/aliases.sh" ]] && source "$LITEZSH_DIR/aliases.sh"
 [[ -f "$LITEZSH_DIR/functions.zsh" ]] && source "$LITEZSH_DIR/functions.zsh"

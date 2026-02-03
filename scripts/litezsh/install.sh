@@ -259,10 +259,32 @@ main() {
         ln -sf "$(readlink -f "$SCRIPT_DIR/../shared/prompt/starship.toml")" "$HOME/.config/starship.toml"
     fi
 
-    # Add to .zshrc BEFORE changing shell (prevents zsh newuser wizard)
-    if ! grep -q "litezsh/litezsh.zsh" "$HOME/.zshrc" 2>/dev/null; then
+    # Set up .zshrc BEFORE changing shell (prevents zsh newuser wizard)
+    # If .zshrc exists and has conflicting configs (oh-my-zsh, p10k, distro configs),
+    # back it up and write a clean one. Otherwise just append.
+    local needs_clean_zshrc=false
+    if [[ -f "$HOME/.zshrc" ]]; then
+        if grep -qE '(oh-my-zsh|powerlevel10k|p10k|cachyos-config|ENABLE_CORRECTION)' "$HOME/.zshrc" 2>/dev/null; then
+            needs_clean_zshrc=true
+        fi
+    fi
+
+    if [[ "$needs_clean_zshrc" == "true" ]]; then
+        print_warning "Existing .zshrc has conflicting configs (oh-my-zsh/p10k/distro)"
+        print_status "Backing up to ~/.zshrc.pre-litezsh"
+        cp "$HOME/.zshrc" "$HOME/.zshrc.pre-litezsh"
+
+        # Preserve any user PATH/alias lines that aren't part of the conflicting framework
+        print_status "Writing clean .zshrc..."
+        cat > "$HOME/.zshrc" << 'ZSHRC'
+export PATH="$HOME/.local/bin:$PATH"
+
+# LiteZsh
+[[ -f ~/.local/share/litezsh/litezsh.zsh ]] && source ~/.local/share/litezsh/litezsh.zsh
+ZSHRC
+        print_success "Clean .zshrc created (backup: ~/.zshrc.pre-litezsh)"
+    elif ! grep -q "litezsh/litezsh.zsh" "$HOME/.zshrc" 2>/dev/null; then
         print_status "Adding LiteZsh to ~/.zshrc..."
-        # Create .zshrc if it doesn't exist
         touch "$HOME/.zshrc"
         echo '' >> "$HOME/.zshrc"
         echo '# LiteZsh' >> "$HOME/.zshrc"
