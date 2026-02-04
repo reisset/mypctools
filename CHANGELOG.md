@@ -27,6 +27,7 @@ All notable changes to mypctools and its bundled scripts.
 - `lib/distro-detect.sh` now exports `PKG_MGR`, `PKG_INSTALL`, `PKG_UPDATE` alongside `DISTRO_TYPE`/`DISTRO_NAME`
 
 #### Changed
+- **Full System Update now shows live output** — replaced hidden spinner with streamed package manager output (mirrors, progress, errors visible in real time) with error tracking and styled dividers
 - **Major code consolidation** — 22 files changed, net -255 lines removed
 - Print functions standardized to `print_status`/`print_success`/`print_warning`/`print_error` across entire project
 - `install.sh` / `uninstall.sh` renamed from `print_step`/`print_ok`/`print_warn`/`print_fail`
