@@ -52,15 +52,13 @@ check_for_updates() {
     fi
 }
 
-# ASCII logo with version
+# ASCII logo
 show_logo() {
     sleep 0.5  # Wait for background update check
     gum style --foreground "$THEME_PRIMARY" --align center "$LOGO"
-    local version_line="v$VERSION"
     if [[ -n "$UPDATE_AVAILABLE" ]]; then
-        version_line="v$VERSION  •  ⬆ Update available ($UPDATE_AVAILABLE new)"
+        gum style --foreground "$THEME_MUTED" --align center "⬆ Update available ($UPDATE_AVAILABLE new)"
     fi
-    gum style --foreground "$THEME_MUTED" --align center "$version_line"
     local sys_line="$DISTRO_NAME · $(uname -r) · $(basename "$SHELL")"
     gum style --foreground "$THEME_MUTED" --align center "$sys_line"
     echo
