@@ -616,6 +616,14 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/screensaver
 
+### [1.0.1] - 2026-02-04
+
+#### Fixed
+- hypridle `on-timeout` now uses full path (`$HOME/.local/bin/mypctools-screensaver-launch`) — hypridle's PATH doesn't include `~/.local/bin`, so the bare command name was silently failing
+- Both screensaver scripts now prepend `~/.local/bin` to PATH so `tte` and `mypctools-screensaver-cmd` are findable regardless of inherited environment
+
+---
+
 ### [1.0.0] - 2026-02-03
 - Initial release
 - Omarchy-style terminal screensaver using tte (Terminal Text Effects)

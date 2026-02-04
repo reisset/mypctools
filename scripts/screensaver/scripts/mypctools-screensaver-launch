@@ -6,6 +6,9 @@ SCREENSAVER_CLASS="mypctools.screensaver"
 SCREENSAVER_CONFIG="$HOME/.config/alacritty/screensaver.toml"
 SCREENSAVER_CMD="mypctools-screensaver-cmd"
 
+# Ensure ~/.local/bin is in PATH (hypridle doesn't inherit user PATH)
+export PATH="$HOME/.local/bin:$PATH"
+
 # Check dependencies
 if ! command -v tte &>/dev/null; then
     notify-send "Screensaver" "tte not installed. Run mypctools > My Scripts > Screensaver > Install" 2>/dev/null

@@ -6,6 +6,9 @@
 SCREENSAVER_CLASS="mypctools.screensaver"
 ASSETS_DIR="$HOME/.local/share/mypctools-screensaver"
 
+# Ensure ~/.local/bin is in PATH (tte is installed here via pipx)
+export PATH="$HOME/.local/bin:$PATH"
+
 ART_FILES=("$ASSETS_DIR/linux-gang.txt" "$ASSETS_DIR/tux.txt")
 
 screensaver_in_focus() {
