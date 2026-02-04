@@ -91,6 +91,19 @@ is_installed() {
     return 1
 }
 
+# Build a display label with ✓ badge if already installed
+# Usage: app_label "Display Name" "pacman_pkg" "apt_pkg" "flatpak_id" ["command_name"]
+app_label() {
+    local name="$1" pacman_pkg="$2" apt_pkg="$3" flatpak_id="$4" cmd_name="$5"
+    if is_installed "$pacman_pkg" "$apt_pkg" "$flatpak_id"; then
+        echo "$name  ✓"
+    elif [[ -n "$cmd_name" ]] && command -v "$cmd_name" &>/dev/null; then
+        echo "$name  ✓"
+    else
+        echo "$name"
+    fi
+}
+
 # =============================================================================
 # Fallback install functions for packages needing special handling
 # =============================================================================

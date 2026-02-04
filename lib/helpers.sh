@@ -45,6 +45,33 @@ ensure_sudo() {
     fi
 }
 
+# Check if a script bundle is installed
+is_script_installed() {
+    case "$1" in
+        litebash)    [[ -f "$HOME/.local/share/litebash/litebash.sh" ]] ;;
+        litezsh)     [[ -f "$HOME/.local/share/litezsh/litezsh.zsh" ]] ;;
+        terminal)    [[ -f "$HOME/.config/foot/foot.ini" ]] ;;
+        alacritty)   [[ -f "$HOME/.config/alacritty/alacritty.toml" ]] ;;
+        ghostty)     [[ -f "$HOME/.config/ghostty/config" ]] ;;
+        kitty)       [[ -f "$HOME/.config/kitty/kitty.conf" ]] ;;
+        fastfetch)   [[ -f "$HOME/.config/fastfetch/config.jsonc" ]] ;;
+        screensaver) [[ -f "$HOME/.local/bin/mypctools-screensaver-launch" ]] ;;
+        claude)      [[ -f "$HOME/.claude/statusline.sh" ]] ;;
+        spicetify)   [[ -f "$HOME/.spicetify/spicetify" ]] ;;
+        *)           return 1 ;;
+    esac
+}
+
+# Build a display label with ✓ badge if script bundle is installed
+script_label() {
+    local name="$1" bundle_id="$2"
+    if is_script_installed "$bundle_id"; then
+        echo "$name  ✓"
+    else
+        echo "$name"
+    fi
+}
+
 # Desktop notification after long operations (no-op if notify-send unavailable)
 notify_done() {
     local title="${1:-mypctools}"
