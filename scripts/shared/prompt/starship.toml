@@ -29,6 +29,7 @@ Pop = " "
 Raspbian = " "
 Ubuntu = " "
 Unknown = " "
+CachyOS = " "
 
 [username]
 show_always = true
