@@ -199,23 +199,42 @@ show_system_setup_menu() {
         case "$choice" in
             "Full System Update")
                 ensure_sudo || continue
-                print_info "Running system update..."
+                local update_failed=0
+                echo ""
+                gum style --foreground "$THEME_MUTED" "─────────────────────────────────────────"
+                echo ""
                 case "$DISTRO_TYPE" in
                     debian)
-                        themed_spin "$SPINNER_UPDATE" "Updating package lists..." sudo apt update
-                        themed_spin "$SPINNER_UPDATE" "Upgrading packages..." sudo apt upgrade -y
+                        print_info "Updating package lists..."
+                        if sudo apt update; then
+                            echo ""
+                            print_info "Upgrading packages..."
+                            sudo apt upgrade -y || update_failed=1
+                        else
+                            update_failed=1
+                        fi
                         ;;
                     arch)
-                        themed_spin "$SPINNER_UPDATE" "Syncing and upgrading..." sudo pacman -Syu --noconfirm
+                        print_info "Syncing and upgrading packages..."
+                        sudo pacman -Syu --noconfirm || update_failed=1
                         ;;
                     fedora)
-                        themed_spin "$SPINNER_UPDATE" "Upgrading packages..." sudo dnf upgrade -y
+                        print_info "Upgrading packages..."
+                        sudo dnf upgrade -y || update_failed=1
                         ;;
                     *)
                         print_error "Unsupported distro type: $DISTRO_TYPE"
+                        update_failed=1
                         ;;
                 esac
-                print_success "System update complete"
+                echo ""
+                gum style --foreground "$THEME_MUTED" "─────────────────────────────────────────"
+                echo ""
+                if [[ "$update_failed" -eq 1 ]]; then
+                    print_error "System update finished with errors (see output above)"
+                else
+                    print_success "System update complete"
+                fi
                 echo ""
                 themed_pause
                 clear
