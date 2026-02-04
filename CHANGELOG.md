@@ -11,6 +11,27 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.13.0] - 2026-02-04
+
+#### Added
+- **Go/Bubble Tea TUI rewrite scaffolding** — Phase 1 of a parallel TUI implementation in `tui/` directory
+  - Binary: `tui/mypctools-tui` (4.9MB standalone, no runtime deps)
+  - Core architecture: screen stack with push/pop navigation, root model delegates Update/View to active screen
+  - Theme system: 3 presets (DefaultCyan, CatppuccinMocha, TokyoNight) matching bash version, Lip Gloss styles
+  - Nerd Font detection with ASCII fallback icons (matches bash `lib/theme.sh`)
+  - Distro detection mirroring `lib/distro-detect.sh` logic
+  - Main menu screen with logo, system info line, update badge, j/k navigation
+  - CLI flags: `--help`, `--version`
+  - Background git update check (same `fetch origin main` + `rev-list --count` pattern)
+
+#### Notes
+- Go TUI and bash TUI coexist — the Go version does not replace `launcher.sh` yet
+- Phase 2–6 will add: script bundles, app installation, system setup, service manager, polish
+- Dependencies: `github.com/charmbracelet/bubbletea`, `lipgloss`, `bubbles`
+- Issue during initial setup: `go mod tidy` hung in the default shell environment; resolved by running Go commands in a clean `env -i` subshell
+
+---
+
 ### [0.12.0] - 2026-02-04
 
 #### Added
