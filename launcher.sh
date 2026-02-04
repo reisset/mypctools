@@ -117,7 +117,7 @@ show_script_submenu() {
 
     while true; do
         clear
-        show_subheader "$subheader_text"
+        show_subheader "$subheader_text" "My Scripts >"
         local action
         action=$(themed_choose "" \
             "Install" \
@@ -131,7 +131,7 @@ show_script_submenu() {
                 else
                     print_warning "Install script not found."
                 fi
-                read -rp "Press Enter to continue..."
+                themed_pause
                 ;;
             "Uninstall")
                 if [[ -f "$MYPCTOOLS_ROOT/scripts/$script_dir/uninstall.sh" ]]; then
@@ -139,7 +139,7 @@ show_script_submenu() {
                 else
                     print_warning "Uninstall script not found."
                 fi
-                read -rp "Press Enter to continue..."
+                themed_pause
                 ;;
             "Back"|"")
                 break
@@ -217,7 +217,7 @@ show_system_setup_menu() {
                 esac
                 print_success "System update complete"
                 echo ""
-                read -rp "Press Enter to continue..."
+                themed_pause
                 clear
                 ;;
             "System Cleanup")
@@ -234,7 +234,7 @@ show_system_setup_menu() {
                         if [[ -n "$orphans" ]]; then
                             echo "$orphans"
                             if themed_confirm "Remove these orphan packages?"; then
-                                themed_spin "$SPINNER_CLEANUP" "Removing orphans..." bash -c "echo '$orphans' | sudo pacman -Rns --noconfirm -"
+                                themed_spin "$SPINNER_CLEANUP" "Removing orphans..." bash -c 'echo "$1" | sudo pacman -Rns --noconfirm -' _ "$orphans"
                             fi
                         fi
                         if command_exists paccache; then
@@ -252,9 +252,11 @@ show_system_setup_menu() {
                         ;;
                 esac
                 # User caches (all distros)
-                themed_spin "$SPINNER_CLEANUP" "Clearing user caches..." bash -c 'rm -rf "$HOME/.cache/thumbnails"/* 2>/dev/null; rm -rf "$HOME/.local/share/Trash"/* 2>/dev/null'
+                if themed_confirm "Clear user caches (thumbnails, trash)?"; then
+                    themed_spin "$SPINNER_CLEANUP" "Clearing user caches..." bash -c 'rm -rf "$HOME/.cache/thumbnails"/* 2>/dev/null; rm -rf "$HOME/.local/share/Trash"/* 2>/dev/null'
+                fi
                 print_success "Cleanup complete"
-                read -rp "Press Enter to continue..."
+                themed_pause
                 clear
                 ;;
             "Service Manager")
@@ -263,7 +265,7 @@ show_system_setup_menu() {
                 ;;
             "System Info")
                 clear
-                show_subheader "System Information"
+                show_subheader "System Information" "System Setup >"
 
                 # Build info lines
                 local info_lines=""
@@ -332,7 +334,7 @@ show_system_setup_menu() {
                     "$info_lines"
 
                 echo ""
-                read -rp "Press Enter to continue..."
+                themed_pause
                 ;;
             "Back"|"")
                 break
@@ -369,14 +371,14 @@ main_menu() {
                 ;;
             "⬆ Pull Updates")
                 clear
-                show_subheader "Pull Updates"
+                show_subheader "Pull Updates" "System Setup >"
                 if git -C "$MYPCTOOLS_ROOT" pull origin main; then
                     print_success "Updated! Restart mypctools to use new version."
                 else
                     print_error "Failed to pull updates"
                 fi
                 UPDATE_AVAILABLE=""
-                read -rp "Press Enter to continue..."
+                themed_pause
                 ;;
             "Exit"|"")
                 print_success "Goodbye!"

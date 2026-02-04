@@ -11,6 +11,43 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.9.0] - 2026-02-04
+
+#### Added
+- **`lib/print.sh`** — shared print functions (zero gum dependency), sourced by 12+ scripts instead of copy-pasting
+- **`lib/symlink.sh`** — single canonical `safe_symlink` implementation with path resolution, backup, and idempotency
+- **`lib/shell-setup.sh`** — parametric `set_default_shell <path>` shared by litebash and litezsh
+- **`init_sudo()`** in `lib/print.sh` — sudo prompt + background keepalive for long-running installers
+- **`themed_pause()`** in `lib/theme.sh` — styled replacement for raw `read -rp "Press Enter..."`
+- **`show_install_summary()`** in `lib/theme.sh` — displays succeeded/failed counts after batch installs
+- **Breadcrumb navigation** — all submenus now show parent context (e.g., "Install Apps > AI Tools")
+- **Batch progress indicators** — app menus now show `[1/5] Installing...` during multi-package installs
+- **Colored service indicators** — service-manager status symbols are now green (active), yellow (enabled/stopped), gray (stopped)
+- **`gum choose` for theme selection** — terminal installers use themed menu when gum is available (with `read -rp` fallback)
+- `lib/distro-detect.sh` now exports `PKG_MGR`, `PKG_INSTALL`, `PKG_UPDATE` alongside `DISTRO_TYPE`/`DISTRO_NAME`
+
+#### Changed
+- **Major code consolidation** — 22 files changed, net -255 lines removed
+- Print functions standardized to `print_status`/`print_success`/`print_warning`/`print_error` across entire project
+- `install.sh` / `uninstall.sh` renamed from `print_step`/`print_ok`/`print_warn`/`print_fail`
+- All app menus (`apps/*.sh`) now show install summary instead of generic "Done!"
+- All `read -rp "Press Enter..."` in `launcher.sh` replaced with `themed_pause`
+
+#### Fixed
+- **Unquoted `$orphans` variable** in `launcher.sh` — was interpolated inside single quotes in `bash -c`, variable never expanded; now passed as positional arg
+- **Trash/thumbnail deletion without confirmation** — `launcher.sh` System Cleanup now asks before clearing `~/.cache/thumbnails` and `~/.local/share/Trash`
+- **`readlink -f` empty path** in `lib/terminal-install.sh` — added explicit empty-string check for better error message
+- **`which` replaced with `command -v`** in litebash/litezsh installers — more portable, with empty-result guard
+
+#### Removed
+- Duplicate `detect_distro()` from `lib/terminal-install.sh`, `scripts/litebash/install.sh`, `scripts/litezsh/install.sh` (now source `lib/distro-detect.sh`)
+- Duplicate `safe_symlink()` from `lib/tools-install.sh` and `lib/terminal-install.sh` (now source `lib/symlink.sh`)
+- Duplicate `init_sudo()` from `lib/terminal-install.sh` (now in `lib/print.sh`)
+- Duplicate `set_default_shell()` from litebash and litezsh installers (now in `lib/shell-setup.sh`)
+- Inline color definitions + print functions from 12 files (now source `lib/print.sh`)
+
+---
+
 ### [0.8.0] - 2026-02-04
 
 #### Added

@@ -11,47 +11,11 @@ LITEZSH_DIR="$HOME/.local/share/litezsh"
 LOCAL_BIN="$HOME/.local/bin"
 ARCH=$(uname -m)
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+source "$SCRIPT_DIR/../../lib/print.sh"
 
-print_status() { echo -e "${BLUE}[*]${NC} $1"; }
-print_success() { echo -e "${GREEN}[✓]${NC} $1"; }
-print_warning() { echo -e "${YELLOW}[!]${NC} $1"; }
-print_error() { echo -e "${RED}[✗]${NC} $1"; }
+init_sudo
 
-# Sudo check
-echo "This installer requires sudo privileges to function properly."
-echo "Read the entire script if you do not trust the author."
-echo ""
-sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
-
-# Keep sudo alive
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
-# Detect package manager
-detect_distro() {
-    if command -v pacman &>/dev/null; then
-        PKG_MGR="pacman"
-        PKG_INSTALL="sudo pacman -S --noconfirm --needed"
-        PKG_UPDATE="sudo pacman -Sy"
-    elif command -v apt &>/dev/null; then
-        PKG_MGR="apt"
-        PKG_INSTALL="sudo apt install -y"
-        PKG_UPDATE="sudo apt update"
-    elif command -v dnf &>/dev/null; then
-        PKG_MGR="dnf"
-        PKG_INSTALL="sudo dnf install -y"
-        PKG_UPDATE="sudo dnf check-update || true"
-    else
-        print_error "No supported package manager found (pacman/apt/dnf)"
-        exit 1
-    fi
-    print_status "Detected package manager: $PKG_MGR"
-}
+source "$SCRIPT_DIR/../../lib/distro-detect.sh"
 
 # Install zsh
 install_zsh() {
@@ -75,59 +39,7 @@ install_zsh() {
     fi
 }
 
-# Set zsh as default shell
-set_default_shell() {
-    local zsh_path
-    zsh_path=$(which zsh)
-
-    # Check /etc/passwd directly (more reliable than $SHELL)
-    local current_shell
-    current_shell=$(getent passwd "$USER" | cut -d: -f7)
-
-    if [[ "$current_shell" == "$zsh_path" ]]; then
-        print_success "zsh is already the default shell"
-        return 0
-    fi
-
-    # Refresh sudo credentials (may have expired during long install)
-    print_status "Requesting sudo for shell change..."
-    if ! sudo -v; then
-        print_error "Could not get sudo access for shell change"
-        print_status "Please run manually: chsh -s $zsh_path"
-        return 1
-    fi
-
-    # Ensure zsh is in /etc/shells
-    if ! grep -q "^${zsh_path}$" /etc/shells 2>/dev/null; then
-        print_status "Adding zsh to /etc/shells..."
-        echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
-    fi
-
-    print_status "Setting zsh as default shell..."
-
-    # Try chsh first, then usermod as fallback
-    local changed=false
-    if sudo chsh -s "$zsh_path" "$USER" 2>/dev/null; then
-        changed=true
-    elif sudo usermod -s "$zsh_path" "$USER" 2>/dev/null; then
-        changed=true
-    fi
-
-    if [[ "$changed" == "true" ]]; then
-        # Verify the change took effect
-        local new_shell
-        new_shell=$(getent passwd "$USER" | cut -d: -f7)
-        if [[ "$new_shell" == "$zsh_path" ]]; then
-            print_success "Set zsh as default shell"
-            return 0
-        fi
-    fi
-
-    # If we get here, both methods failed
-    print_error "Failed to change default shell automatically"
-    print_status "Please run manually: chsh -s $zsh_path"
-    return 1
-}
+source "$SCRIPT_DIR/../../lib/shell-setup.sh"
 
 # Install zsh plugins via git
 install_plugins() {
@@ -183,7 +95,7 @@ pkg_install() {
 
 # Main installation
 main() {
-    detect_distro
+    print_status "Detected package manager: $PKG_MGR"
 
     # Source shared tool installation lib
     source "$SCRIPT_DIR/../../lib/tools-install.sh"
@@ -294,7 +206,7 @@ ZSHRC
     fi
 
     # Set zsh as default shell (after .zshrc is set up)
-    set_default_shell
+    set_default_shell "$(command -v zsh)"
 
     echo ""
     print_success "Installation complete!"

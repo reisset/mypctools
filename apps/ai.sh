@@ -10,7 +10,7 @@ source "$_AI_DIR/../lib/package-manager.sh"
 
 show_ai_menu() {
     clear
-    show_subheader "AI Tools"
+    show_subheader "AI Tools" "Install Apps >"
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
@@ -33,7 +33,10 @@ show_ai_menu() {
     echo ""
 
     if themed_confirm "Proceed with installation?"; then
+        local total=${#preview_items[@]} current=0 succeeded=0 failed=0
         while read -r choice; do
+            ((current++))
+            print_info "[$current/$total] $choice"
             case "$choice" in
                 "OpenCode")
                     install_package "OpenCode" "" "opencode-bin" "" "install_opencode_fallback"
@@ -51,9 +54,10 @@ show_ai_menu() {
                     install_package "LM Studio" "" "" "" "install_lmstudio_fallback"
                     ;;
             esac
+            [[ $? -eq 0 ]] && ((succeeded++)) || ((failed++))
         done <<< "$choices"
-        print_success "Done!"
-        read -rp "Press Enter to continue..."
+        show_install_summary $succeeded $failed $total
+        themed_pause
     fi
 }
 

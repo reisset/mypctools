@@ -10,7 +10,7 @@ source "$_DEV_TOOLS_DIR/../lib/package-manager.sh"
 
 show_dev_tools_menu() {
     clear
-    show_subheader "Developer Tools"
+    show_subheader "Developer Tools" "Install Apps >"
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
@@ -36,7 +36,10 @@ show_dev_tools_menu() {
     echo ""
 
     if themed_confirm "Proceed with installation?"; then
+        local total=${#preview_items[@]} current=0 succeeded=0 failed=0
         while read -r choice; do
+            ((current++))
+            print_info "[$current/$total] $choice"
             case "$choice" in
                 "Docker")
                     install_package "Docker" "docker.io" "docker" "" ""
@@ -63,9 +66,10 @@ show_dev_tools_menu() {
                     install_package "Python" "python3" "python" "" ""
                     ;;
             esac
+            [[ $? -eq 0 ]] && ((succeeded++)) || ((failed++))
         done <<< "$choices"
-        print_success "Done!"
-        read -rp "Press Enter to continue..."
+        show_install_summary $succeeded $failed $total
+        themed_pause
     fi
 }
 
