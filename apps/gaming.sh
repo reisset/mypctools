@@ -14,18 +14,19 @@ show_gaming_menu() {
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
-        "Steam" \
-        "Lutris" \
-        "ProtonUp-Qt" \
-        "Heroic Games Launcher")
+        "$(app_label "Steam" "steam" "steam" "com.valvesoftware.Steam")" \
+        "$(app_label "Lutris" "lutris" "lutris" "net.lutris.Lutris")" \
+        "$(app_label "ProtonUp-Qt" "protonup-qt" "" "net.davidotek.pupgui2")" \
+        "$(app_label "Heroic Games Launcher" "heroic-games-launcher-bin" "" "com.heroicgameslauncher.hgl")")
 
     if [[ -z "$choices" ]]; then
         return
     fi
 
-    # Build preview list
+    # Build preview list (strip badge for display and matching)
     local preview_items=()
     while read -r choice; do
+        choice="${choice%  ✓}"
         preview_items+=("$choice")
     done <<< "$choices"
     show_preview_box "Selected for installation:" "${preview_items[@]}"
@@ -34,6 +35,7 @@ show_gaming_menu() {
     if themed_confirm "Proceed with installation?"; then
         local total=${#preview_items[@]} current=0 succeeded=0 failed=0
         while read -r choice; do
+            choice="${choice%  ✓}"
             ((current++))
             print_info "[$current/$total] $choice"
             case "$choice" in

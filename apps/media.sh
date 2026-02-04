@@ -14,18 +14,19 @@ show_media_menu() {
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
-        "Discord" \
-        "Spotify" \
-        "VLC" \
-        "MPV")
+        "$(app_label "Discord" "discord" "" "com.discordapp.Discord")" \
+        "$(app_label "Spotify" "spotify" "spotify-client" "com.spotify.Client")" \
+        "$(app_label "VLC" "vlc" "vlc" "org.videolan.VLC")" \
+        "$(app_label "MPV" "mpv" "mpv" "io.mpv.Mpv")")
 
     if [[ -z "$choices" ]]; then
         return
     fi
 
-    # Build preview list
+    # Build preview list (strip badge for display and matching)
     local preview_items=()
     while read -r choice; do
+        choice="${choice%  ✓}"
         preview_items+=("$choice")
     done <<< "$choices"
     show_preview_box "Selected for installation:" "${preview_items[@]}"
@@ -34,6 +35,7 @@ show_media_menu() {
     if themed_confirm "Proceed with installation?"; then
         local total=${#preview_items[@]} current=0 succeeded=0 failed=0
         while read -r choice; do
+            choice="${choice%  ✓}"
             ((current++))
             print_info "[$current/$total] $choice"
             case "$choice" in

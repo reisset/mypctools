@@ -14,19 +14,20 @@ show_ai_menu() {
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
-        "OpenCode" \
-        "Claude Code" \
-        "Mistral Vibe CLI" \
-        "Ollama" \
-        "LM Studio")
+        "$(app_label "OpenCode" "opencode-bin" "" "" "opencode")" \
+        "$(app_label "Claude Code" "" "" "" "claude")" \
+        "$(app_label "Mistral Vibe CLI" "" "" "" "mistral-vibe")" \
+        "$(app_label "Ollama" "ollama" "" "" "ollama")" \
+        "$(app_label "LM Studio" "" "" "" "lmstudio")")
 
     if [[ -z "$choices" ]]; then
         return
     fi
 
-    # Build preview list
+    # Build preview list (strip badge for display and matching)
     local preview_items=()
     while read -r choice; do
+        choice="${choice%  ✓}"
         preview_items+=("$choice")
     done <<< "$choices"
     show_preview_box "Selected for installation:" "${preview_items[@]}"
@@ -35,6 +36,7 @@ show_ai_menu() {
     if themed_confirm "Proceed with installation?"; then
         local total=${#preview_items[@]} current=0 succeeded=0 failed=0
         while read -r choice; do
+            choice="${choice%  ✓}"
             ((current++))
             print_info "[$current/$total] $choice"
             case "$choice" in

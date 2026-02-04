@@ -91,6 +91,7 @@ ICON_INFO=$'\uf05a'        # nf-fa-info_circle
 ICON_EXIT=$'\uf2f5'        # nf-fa-sign_out
 ICON_BACK=$'\uf060'        # nf-fa-arrow_left
 ICON_THEME=$'\uf53f'       # nf-fa-palette
+ICON_FLATPAK=$'\uf187'    # nf-fa-archive
 
 # --- Spinner Types ---
 
@@ -172,6 +173,32 @@ themed_pause() {
     echo ""
     gum style --foreground "$THEME_MUTED" "Press Enter to continue..."
     read -r
+}
+
+# Render color swatches for a theme preset
+show_theme_preview() {
+    local theme_name="$1"
+    local p s m g w e a
+    case "$theme_name" in
+        catppuccin)
+            p="#89b4fa" s="#74c7ec" m="#6c7086" g="#a6e3a1" w="#fab387" e="#f38ba8" a="#cba6f7" ;;
+        tokyo-night)
+            p="#7aa2f7" s="#7dcfff" m="#565f89" g="#9ece6a" w="#ff9e64" e="#f7768e" a="#bb9af7" ;;
+        *)
+            p="#00ffff" s="#0087ff" m="#6c6c6c" g="#5fff00" w="#ffaf00" e="#ff0000" a="#af87ff" ;;
+    esac
+
+    local row1 row2
+    row1=$(gum join --horizontal \
+        "$(gum style --background "$p" --foreground "#000" " Primary ")" \
+        "$(gum style --background "$s" --foreground "#000" " Secondary ")" \
+        "$(gum style --background "$a" --foreground "#000" " Accent ")" \
+        "$(gum style --background "$g" --foreground "#000" " Success ")")
+    row2=$(gum join --horizontal \
+        "$(gum style --background "$w" --foreground "#000" " Warning ")" \
+        "$(gum style --background "$e" --foreground "#000" " Error ")" \
+        "$(gum style --background "$m" --foreground "#fff" " Muted ")")
+    gum join --vertical "$row1" "$row2"
 }
 
 # Install summary after batch operations

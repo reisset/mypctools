@@ -125,11 +125,11 @@ show_service_actions() {
     done
 }
 
-# Main service manager menu
-show_service_manager() {
+# Browse known services via gum table
+browse_services() {
     while true; do
         clear
-        show_subheader "Service Manager" "System Setup >"
+        show_subheader "Browse Services" "Service Manager >"
 
         local csv_data
         csv_data=$(build_service_csv)
@@ -154,6 +154,58 @@ show_service_manager() {
         fi
 
         show_service_actions "$choice"
+    done
+}
+
+# Enter a custom service name via gum input
+enter_custom_service() {
+    clear
+    show_subheader "Custom Service" "Service Manager >"
+
+    local service_name
+    service_name=$(gum input \
+        --placeholder "e.g., nginx, postgresql..." \
+        --prompt "> " --prompt.foreground "$THEME_PRIMARY" \
+        --header "Enter service name:" --header.foreground "$THEME_MUTED")
+
+    if [[ -z "$service_name" ]]; then
+        return
+    fi
+
+    # Validate that the service exists
+    if ! systemctl list-unit-files "${service_name}.service" &>/dev/null; then
+        print_error "Service '${service_name}' not found"
+        print_info "Check the name with: systemctl list-unit-files '*${service_name}*'"
+        themed_pause
+        return
+    fi
+
+    show_service_actions "$service_name"
+}
+
+# Main service manager menu
+show_service_manager() {
+    while true; do
+        clear
+        show_subheader "Service Manager" "System Setup >"
+
+        local choice
+        choice=$(themed_choose "" \
+            "$ICON_SERVICE  Browse Services" \
+            "Enter Custom Service" \
+            "$ICON_BACK  Back")
+
+        case "$choice" in
+            *"Browse Services")
+                browse_services
+                ;;
+            "Enter Custom Service")
+                enter_custom_service
+                ;;
+            *"Back"|"")
+                break
+                ;;
+        esac
     done
 }
 

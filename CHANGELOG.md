@@ -11,6 +11,22 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.11.0] - 2026-02-04
+
+#### Added
+- **Installed status badges** — `✓` next to already-installed apps in all multi-select menus (AI, Browsers, Gaming, Media, Dev Tools). Uses `app_label()` in `lib/package-manager.sh`
+- **Script bundle status badges** — `✓` next to installed bundles in My Scripts menu. Uses `is_script_installed()` and `script_label()` in `lib/helpers.sh`
+- **Theme preview with color swatches** — visual preview of all 7 colors for each theme preset shown above the theme selector. Uses `show_theme_preview()` in `lib/theme.sh`
+- **Custom service entry** — "Enter Custom Service" option in Service Manager using `gum input`, with validation against `systemctl list-unit-files`
+- **Flatpak Manager** — new section under System Setup with List Installed Apps (`gum table`), Update All (live output), and Clean Unused Runtimes (confirm dialog). Graceful skip if flatpak missing
+- `ICON_FLATPAK` in `lib/theme.sh`
+
+#### Changed
+- Service Manager now has sub-menu: Browse Services / Enter Custom Service / Back
+- All app menus strip `✓` badge before matching case statements
+
+---
+
 ### [0.10.0] - 2026-02-04
 
 #### Added

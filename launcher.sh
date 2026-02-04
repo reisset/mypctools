@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # mypctools/launcher.sh
 # Main TUI launcher for mypctools
-# v0.10.0
+# v0.11.0
 
 MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.10.0"
+VERSION="0.11.0"
 UPDATE_AVAILABLE=""
 
 read -r -d '' LOGO <<'LOGOEOF'
@@ -152,18 +152,19 @@ show_scripts_menu() {
         show_subheader "My Scripts"
         local choice
         choice=$(themed_choose "" \
-            "Claude Setup" \
-            "Spicetify Theme" \
-            "LiteBash" \
-            "LiteZsh" \
-            "Terminal - foot" \
-            "Terminal - alacritty" \
-            "Terminal - ghostty" \
-            "Terminal - kitty" \
-            "Fastfetch" \
-            "Screensaver" \
+            "$(script_label "Claude Setup" "claude")" \
+            "$(script_label "Spicetify Theme" "spicetify")" \
+            "$(script_label "LiteBash" "litebash")" \
+            "$(script_label "LiteZsh" "litezsh")" \
+            "$(script_label "Terminal - foot" "terminal")" \
+            "$(script_label "Terminal - alacritty" "alacritty")" \
+            "$(script_label "Terminal - ghostty" "ghostty")" \
+            "$(script_label "Terminal - kitty" "kitty")" \
+            "$(script_label "Fastfetch" "fastfetch")" \
+            "$(script_label "Screensaver" "screensaver")" \
             "$ICON_BACK  Back")
 
+        choice="${choice%  ✓}"
         case "$choice" in
             "Claude Setup")       show_script_submenu "claude" "Claude Setup" ;;
             "Spicetify Theme")    show_script_submenu "spicetify" "Spicetify Theme" ;;
@@ -191,6 +192,7 @@ show_system_setup_menu() {
             "$ICON_UPDATE  Full System Update" \
             "$ICON_CLEANUP  System Cleanup" \
             "$ICON_SERVICE  Service Manager" \
+            "$ICON_FLATPAK  Flatpak Manager" \
             "$ICON_INFO  System Info" \
             "$ICON_THEME  Theme" \
             "$ICON_BACK  Back")
@@ -284,6 +286,10 @@ show_system_setup_menu() {
                 source "$MYPCTOOLS_ROOT/apps/service-manager.sh"
                 show_service_manager
                 ;;
+            *"Flatpak Manager")
+                source "$MYPCTOOLS_ROOT/apps/flatpak-manager.sh"
+                show_flatpak_manager
+                ;;
             *"System Info")
                 clear
                 show_subheader "System Information" "System Setup >"
@@ -361,6 +367,15 @@ show_system_setup_menu() {
                 local current_theme
                 current_theme=$(cat "$HOME/.config/mypctools/theme" 2>/dev/null || echo "default")
                 print_info "Current: $current_theme"
+                echo ""
+                gum style --foreground "$THEME_MUTED" "Default (Cyan)"
+                show_theme_preview "default"
+                echo ""
+                gum style --foreground "$THEME_MUTED" "Catppuccin Mocha"
+                show_theme_preview "catppuccin"
+                echo ""
+                gum style --foreground "$THEME_MUTED" "Tokyo Night"
+                show_theme_preview "tokyo-night"
                 echo ""
                 local theme_choice
                 theme_choice=$(themed_choose "Select theme:" \
