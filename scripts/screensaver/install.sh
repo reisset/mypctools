@@ -9,14 +9,12 @@ MYPCTOOLS_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-SCREENSAVER_CLASS="mypctools.screensaver"
 ASSETS_DIR="$HOME/.local/share/mypctools-screensaver"
 HYPR_CONF="$HOME/.config/hypr/hyprland.conf"
 HYPRIDLE_CONF="$HOME/.config/hypr/hypridle.conf"
 SCREENSAVER_ALACRITTY_CONF="$HOME/.config/alacritty/screensaver.toml"
 
 MARKER_START="# >>> mypctools-screensaver >>>"
-MARKER_END="# <<< mypctools-screensaver <<<"
 
 print_header "Screensaver Installer"
 echo ""

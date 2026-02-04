@@ -28,23 +28,8 @@ print_info() {
     gum style --foreground "$THEME_SECONDARY" "→ $1"
 }
 
-# Logging
-log_info() {
-    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - $1"
-}
-
-log_error() {
-    echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1" >&2
-}
-
 # Check if running as root
-check_root() {
-    if [[ $EUID -eq 0 ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
+check_root() { [[ $EUID -eq 0 ]]; }
 
 # Check if a command exists
 command_exists() {

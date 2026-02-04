@@ -12,12 +12,6 @@ NC='\033[0m'
 log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 
-confirm() {
-    echo -ne "${YELLOW}[?] $1 (y/N) ${NC}"
-    read -r response
-    [[ "$response" =~ ^[Yy]$ ]]
-}
-
 echo "Uninstalling Claude Code config..."
 echo ""
 
