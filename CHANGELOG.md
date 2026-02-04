@@ -11,6 +11,23 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.12.0] - 2026-02-04
+
+#### Added
+- **All Services browser** — Service Manager now has "All Services" option that dynamically scans all system services via `systemctl list-unit-files` and presents them with `gum filter` for fuzzy search
+- **Operation logging** — `log_action()` in `lib/helpers.sh` appends timestamped entries to `~/.local/share/mypctools/mypctools.log` for package installs, system update/cleanup, and service actions
+- **Nerd Font detection** — `_has_nerd_font()` in `lib/theme.sh` checks for Nerd Fonts via `fc-list`; falls back to ASCII icons (`>>`, `<>`, `::`, etc.) when no Nerd Font is installed
+
+#### Changed
+- Service Manager: "Browse Services" renamed to "Common Services", "Enter Custom Service" replaced with "All Services"
+- Removed redundant `clear` after `themed_pause` in system update, cleanup, and service action handlers (loop already clears at top)
+
+#### Removed
+- **Flatpak Manager** — removed `apps/flatpak-manager.sh` and menu entry from System Setup (flatpak installs still work as fallback in package-manager)
+- `ICON_FLATPAK` from `lib/theme.sh`
+
+---
+
 ### [0.11.0] - 2026-02-04
 
 #### Added

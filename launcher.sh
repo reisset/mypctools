@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # mypctools/launcher.sh
 # Main TUI launcher for mypctools
-# v0.11.0
+# v0.12.0
 
 MYPCTOOLS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 source "$MYPCTOOLS_ROOT/lib/helpers.sh"
 source "$MYPCTOOLS_ROOT/lib/theme.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
-VERSION="0.11.0"
+VERSION="0.12.0"
 UPDATE_AVAILABLE=""
 
 read -r -d '' LOGO <<'LOGOEOF'
@@ -192,7 +192,6 @@ show_system_setup_menu() {
             "$ICON_UPDATE  Full System Update" \
             "$ICON_CLEANUP  System Cleanup" \
             "$ICON_SERVICE  Service Manager" \
-            "$ICON_FLATPAK  Flatpak Manager" \
             "$ICON_INFO  System Info" \
             "$ICON_THEME  Theme" \
             "$ICON_BACK  Back")
@@ -234,13 +233,14 @@ show_system_setup_menu() {
                 if [[ "$update_failed" -eq 1 ]]; then
                     print_error "System update finished with errors (see output above)"
                     notify_done "mypctools" "System update finished with errors"
+                    log_action "system update: failed"
                 else
                     print_success "System update complete"
                     notify_done "mypctools" "System update complete"
+                    log_action "system update: success"
                 fi
                 echo ""
                 themed_pause
-                clear
                 ;;
             *"System Cleanup")
                 ensure_sudo || continue
@@ -279,16 +279,12 @@ show_system_setup_menu() {
                 fi
                 print_success "Cleanup complete"
                 notify_done "mypctools" "System cleanup complete"
+                log_action "system cleanup: complete"
                 themed_pause
-                clear
                 ;;
             *"Service Manager")
                 source "$MYPCTOOLS_ROOT/apps/service-manager.sh"
                 show_service_manager
-                ;;
-            *"Flatpak Manager")
-                source "$MYPCTOOLS_ROOT/apps/flatpak-manager.sh"
-                show_flatpak_manager
                 ;;
             *"System Info")
                 clear

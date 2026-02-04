@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mypctools/apps/service-manager.sh
 # TUI for managing systemd services
-# v0.5.0
+# v0.12.0
 
 _SERVICE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_SERVICE_DIR/../lib/helpers.sh"
@@ -66,57 +66,61 @@ show_service_actions() {
                 ensure_sudo || continue
                 if sudo systemctl start "$service"; then
                     print_success "Started $service"
+                    log_action "service start $service: success"
                 else
                     print_error "Failed to start $service"
+                    log_action "service start $service: failed"
                 fi
                 themed_pause
-                clear
                 ;;
             "Stop")
                 ensure_sudo || continue
                 if sudo systemctl stop "$service"; then
                     print_success "Stopped $service"
+                    log_action "service stop $service: success"
                 else
                     print_error "Failed to stop $service"
+                    log_action "service stop $service: failed"
                 fi
                 themed_pause
-                clear
                 ;;
             "Restart")
                 ensure_sudo || continue
                 if sudo systemctl restart "$service"; then
                     print_success "Restarted $service"
+                    log_action "service restart $service: success"
                 else
                     print_error "Failed to restart $service"
+                    log_action "service restart $service: failed"
                 fi
                 themed_pause
-                clear
                 ;;
             "Enable")
                 ensure_sudo || continue
                 if sudo systemctl enable "$service"; then
                     print_success "Enabled $service"
+                    log_action "service enable $service: success"
                 else
                     print_error "Failed to enable $service"
+                    log_action "service enable $service: failed"
                 fi
                 themed_pause
-                clear
                 ;;
             "Disable")
                 ensure_sudo || continue
                 if sudo systemctl disable "$service"; then
                     print_success "Disabled $service"
+                    log_action "service disable $service: success"
                 else
                     print_error "Failed to disable $service"
+                    log_action "service disable $service: failed"
                 fi
                 themed_pause
-                clear
                 ;;
             "View Status")
                 clear
                 show_subheader "Service Status: $service" "Service Manager >"
                 systemctl status "$service" --no-pager 2>&1 | themed_pager
-                clear
                 ;;
             "Back"|"")
                 break
@@ -125,11 +129,11 @@ show_service_actions() {
     done
 }
 
-# Browse known services via gum table
-browse_services() {
+# Browse common services via gum table
+browse_common_services() {
     while true; do
         clear
-        show_subheader "Browse Services" "Service Manager >"
+        show_subheader "Common Services" "Service Manager >"
 
         local csv_data
         csv_data=$(build_service_csv)
@@ -157,30 +161,31 @@ browse_services() {
     done
 }
 
-# Enter a custom service name via gum input
-enter_custom_service() {
-    clear
-    show_subheader "Custom Service" "Service Manager >"
+# Browse all system services via gum filter
+browse_all_services() {
+    while true; do
+        clear
+        show_subheader "All Services" "Service Manager >"
 
-    local service_name
-    service_name=$(gum input \
-        --placeholder "e.g., nginx, postgresql..." \
-        --prompt "> " --prompt.foreground "$THEME_PRIMARY" \
-        --header "Enter service name:" --header.foreground "$THEME_MUTED")
+        local services
+        services=$(systemctl list-unit-files --type=service --no-pager --no-legend \
+            | awk '{print $1}' | sed 's/\.service$//' | sort)
 
-    if [[ -z "$service_name" ]]; then
-        return
-    fi
+        if [[ -z "$services" ]]; then
+            print_warning "No services found."
+            themed_pause
+            return
+        fi
 
-    # Validate that the service exists
-    if ! systemctl list-unit-files "${service_name}.service" &>/dev/null; then
-        print_error "Service '${service_name}' not found"
-        print_info "Check the name with: systemctl list-unit-files '*${service_name}*'"
-        themed_pause
-        return
-    fi
+        local choice
+        choice=$(echo "$services" | gum filter --placeholder "Search services...")
 
-    show_service_actions "$service_name"
+        if [[ -z "$choice" ]]; then
+            break
+        fi
+
+        show_service_actions "$choice"
+    done
 }
 
 # Main service manager menu
@@ -191,16 +196,16 @@ show_service_manager() {
 
         local choice
         choice=$(themed_choose "" \
-            "$ICON_SERVICE  Browse Services" \
-            "Enter Custom Service" \
+            "$ICON_SERVICE  Common Services" \
+            "All Services" \
             "$ICON_BACK  Back")
 
         case "$choice" in
-            *"Browse Services")
-                browse_services
+            *"Common Services")
+                browse_common_services
                 ;;
-            "Enter Custom Service")
-                enter_custom_service
+            "All Services")
+                browse_all_services
                 ;;
             *"Back"|"")
                 break

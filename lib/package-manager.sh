@@ -369,6 +369,7 @@ install_package() {
     # Check if already installed
     if is_installed "$pacman_pkg" "$apt_pkg" "$flatpak_id"; then
         print_success "$display_name is already installed"
+        log_action "install $display_name: already installed"
         return 0
     fi
 
@@ -379,6 +380,7 @@ install_package() {
                 ensure_sudo || return 1
                 if run_with_spinner "Installing $display_name..." sudo apt install -y "$apt_pkg"; then
                     print_success "$display_name installed successfully"
+                    log_action "install $display_name: success (apt)"
                     return 0
                 fi
                 print_warning "apt install failed, trying fallback..."
@@ -389,6 +391,7 @@ install_package() {
                 ensure_sudo || return 1
                 if run_with_spinner "Installing $display_name..." sudo pacman -S --noconfirm "$pacman_pkg"; then
                     print_success "$display_name installed successfully"
+                    log_action "install $display_name: success (pacman)"
                     return 0
                 fi
                 print_warning "pacman install failed, trying fallback..."
@@ -400,12 +403,14 @@ install_package() {
             if [[ -n "$apt_pkg" ]]; then
                 if run_with_spinner "Installing $display_name..." sudo dnf install -y "$apt_pkg"; then
                     print_success "$display_name installed successfully"
+                    log_action "install $display_name: success (dnf)"
                     return 0
                 fi
             fi
             if [[ -n "$pacman_pkg" && "$pacman_pkg" != "$apt_pkg" ]]; then
                 if run_with_spinner "Installing $display_name..." sudo dnf install -y "$pacman_pkg"; then
                     print_success "$display_name installed successfully"
+                    log_action "install $display_name: success (dnf)"
                     return 0
                 fi
             fi
@@ -417,6 +422,7 @@ install_package() {
     if [[ -n "$flatpak_id" ]] && has_flatpak; then
         if run_with_spinner "Installing $display_name (Flatpak)..." flatpak install -y flathub "$flatpak_id"; then
             print_success "$display_name installed via Flatpak"
+            log_action "install $display_name: success (flatpak)"
             return 0
         fi
         print_warning "Flatpak install failed..."
@@ -427,11 +433,13 @@ install_package() {
         print_info "Installing $display_name (custom)..."
         if "$fallback_fn"; then
             print_success "$display_name installed via fallback"
+            log_action "install $display_name: success (fallback)"
             return 0
         fi
     fi
 
     print_error "No installation method available for $display_name"
+    log_action "install $display_name: failed (no method available)"
     return 1
 }
 

@@ -72,6 +72,14 @@ script_label() {
     fi
 }
 
+# Append a timestamped line to the operation log
+log_action() {
+    local log_dir="$HOME/.local/share/mypctools"
+    local log_file="$log_dir/mypctools.log"
+    mkdir -p "$log_dir"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') | $1" >> "$log_file"
+}
+
 # Desktop notification after long operations (no-op if notify-send unavailable)
 notify_done() {
     local title="${1:-mypctools}"
