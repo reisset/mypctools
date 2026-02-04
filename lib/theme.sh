@@ -74,24 +74,47 @@ _export_gum_env() {
 
 _export_gum_env
 
-# --- Menu Icons (Nerd Font) ---
+# --- Nerd Font Detection ---
 
-ICON_APPS=$'\uf019'        # nf-fa-download
-ICON_SCRIPTS=$'\uf121'     # nf-fa-code
-ICON_SYSTEM=$'\uf013'      # nf-fa-cog
-ICON_AI=$'\uf0eb'          # nf-fa-lightbulb_o
-ICON_BROWSER=$'\uf0ac'     # nf-fa-globe
-ICON_GAMING=$'\uf11b'      # nf-fa-gamepad
-ICON_MEDIA=$'\uf001'       # nf-fa-music
-ICON_DEV=$'\uf120'         # nf-fa-terminal
-ICON_UPDATE=$'\uf021'      # nf-fa-refresh
-ICON_CLEANUP=$'\uf1b8'     # nf-fa-trash
-ICON_SERVICE=$'\uf233'     # nf-fa-server
-ICON_INFO=$'\uf05a'        # nf-fa-info_circle
-ICON_EXIT=$'\uf2f5'        # nf-fa-sign_out
-ICON_BACK=$'\uf060'        # nf-fa-arrow_left
-ICON_THEME=$'\uf53f'       # nf-fa-palette
-ICON_FLATPAK=$'\uf187'    # nf-fa-archive
+_has_nerd_font() {
+    fc-list : family 2>/dev/null | grep -qi "nerd"
+}
+
+# --- Menu Icons (Nerd Font with ASCII fallback) ---
+
+if _has_nerd_font; then
+    ICON_APPS=$'\uf019'        # nf-fa-download
+    ICON_SCRIPTS=$'\uf121'     # nf-fa-code
+    ICON_SYSTEM=$'\uf013'      # nf-fa-cog
+    ICON_AI=$'\uf0eb'          # nf-fa-lightbulb_o
+    ICON_BROWSER=$'\uf0ac'     # nf-fa-globe
+    ICON_GAMING=$'\uf11b'      # nf-fa-gamepad
+    ICON_MEDIA=$'\uf001'       # nf-fa-music
+    ICON_DEV=$'\uf120'         # nf-fa-terminal
+    ICON_UPDATE=$'\uf021'      # nf-fa-refresh
+    ICON_CLEANUP=$'\uf1b8'     # nf-fa-trash
+    ICON_SERVICE=$'\uf233'     # nf-fa-server
+    ICON_INFO=$'\uf05a'        # nf-fa-info_circle
+    ICON_EXIT=$'\uf2f5'        # nf-fa-sign_out
+    ICON_BACK=$'\uf060'        # nf-fa-arrow_left
+    ICON_THEME=$'\uf53f'       # nf-fa-palette
+else
+    ICON_APPS=">>"
+    ICON_SCRIPTS="<>"
+    ICON_SYSTEM="::"
+    ICON_AI="**"
+    ICON_BROWSER="@@"
+    ICON_GAMING="><"
+    ICON_MEDIA="~>"
+    ICON_DEV="$>"
+    ICON_UPDATE="^^"
+    ICON_CLEANUP="--"
+    ICON_SERVICE="[]"
+    ICON_INFO="(i)"
+    ICON_EXIT="=>"
+    ICON_BACK="<-"
+    ICON_THEME="##"
+fi
 
 # --- Spinner Types ---
 
