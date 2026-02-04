@@ -564,9 +564,19 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/fastfetch
 
+### [1.1.0] - 2026-02-04
+
+#### Changed
+- **Layout reworked**: replaced half-box borders with tree-style connectors and colored section headers
+- Section headers: `╭─ System`, `├─ Desktop`, `├─ Hardware` with per-section colors (yellow/blue/green)
+- Tree connectors: `├` on all items, `╰` closing on last item (Disk)
+- Removed box-drawing borders (`┌──┐`, `├──┤`, `└──┘`) that only closed on separator lines
+
+---
+
 ### [1.0.0] - 2026-02-04
 - Initial release
-- Custom fastfetch config with boxed layout and nerd font icons
+- Custom fastfetch config with nerd font icons
 - Color-coded sections: yellow (system), blue (desktop), green (hardware)
 - Small distro ASCII logo, color palette strip
 - Installer uses shared `lib/terminal-install.sh` for `safe_symlink`

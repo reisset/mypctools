@@ -13,85 +13,81 @@
     "modules": [
         {
             "type": "custom",
-            "format": "┌──────────────────────────────────┐"
+            "format": "{#yellow}╭─ System ─────────────────────────{#}"
         },
         {
             "type": "os",
-            "key": "│ {icon}  OS",
+            "key": "├ {icon}  OS",
             "keyColor": "yellow"
         },
         {
             "type": "kernel",
-            "key": "│   Kernel",
+            "key": "├   Kernel",
             "keyColor": "yellow"
         },
         {
             "type": "packages",
-            "key": "│ 󰏖  Packages",
+            "key": "├ 󰏖  Packages",
             "keyColor": "yellow"
         },
         {
             "type": "shell",
-            "key": "│   Shell",
+            "key": "├   Shell",
             "keyColor": "yellow"
         },
         {
             "type": "uptime",
-            "key": "│ 󰅐  Uptime",
+            "key": "├ 󰅐  Uptime",
             "keyColor": "yellow"
         },
         {
             "type": "custom",
-            "format": "├──────────────────────────────────┤"
+            "format": "{#blue}├─ Desktop ────────────────────────{#}"
         },
         {
             "type": "wm",
-            "key": "│   WM",
+            "key": "├   WM",
             "keyColor": "blue"
         },
         {
             "type": "terminal",
-            "key": "│   Terminal",
+            "key": "├   Terminal",
             "keyColor": "blue"
         },
         {
             "type": "display",
-            "key": "│ 󰍹  Display",
+            "key": "├ 󰍹  Display",
             "keyColor": "blue"
         },
         {
             "type": "custom",
-            "format": "├──────────────────────────────────┤"
+            "format": "{#green}├─ Hardware ───────────────────────{#}"
         },
         {
             "type": "host",
-            "key": "│ 󰌢  Host",
+            "key": "├ 󰌢  Host",
             "keyColor": "green"
         },
         {
             "type": "cpu",
-            "key": "│ 󰻠  CPU",
+            "key": "├ 󰻠  CPU",
             "keyColor": "green"
         },
         {
             "type": "gpu",
-            "key": "│ 󰍛  GPU",
+            "key": "├ 󰍛  GPU",
             "keyColor": "green"
         },
         {
             "type": "memory",
-            "key": "│ 󰑭  Memory",
+            "key": "├ 󰑭  Memory",
             "keyColor": "green"
         },
         {
             "type": "disk",
-            "key": "│   Disk (/)",
+            "key": "╰   Disk (/)",
             "keyColor": "green",
             "folders": "/"
-        },
-        {
-            "type": "custom",
-            "format": "└──────────────────────────────────┘"
         },
         "break",
         {
