@@ -1,27 +1,107 @@
 #!/usr/bin/env bash
 # mypctools/lib/theme.sh
-# Theme colors and styled component functions
-# v0.2.0
+# Theme colors, presets, icons, and styled component functions
+# v0.3.0
 
-# Theme Colors (ANSI 256)
-THEME_PRIMARY=51       # Cyan/teal - headers, accents, cursor
-THEME_SECONDARY=33     # Soft blue - borders, secondary elements
-THEME_MUTED=242        # Gray - help text, dimmed info
+# --- Theme Presets ---
 
-# State Colors (ANSI 256)
-THEME_SUCCESS=82       # Green - success messages
-THEME_WARNING=214      # Orange - warnings
-THEME_ERROR=196        # Red - errors
-THEME_ACCENT=141       # Purple - highlights/accents
+_apply_theme_default() {
+    THEME_PRIMARY="#00ffff"
+    THEME_SECONDARY="#0087ff"
+    THEME_MUTED="#6c6c6c"
+    THEME_SUCCESS="#5fff00"
+    THEME_WARNING="#ffaf00"
+    THEME_ERROR="#ff0000"
+    THEME_ACCENT="#af87ff"
+}
 
-# Spinner Types
-SPINNER_INSTALL="dot"      # Package installs
-SPINNER_UPDATE="globe"     # System updates
-SPINNER_CLEANUP="pulse"    # Cleanup operations
-SPINNER_DOWNLOAD="moon"    # Downloads
+_apply_theme_catppuccin() {
+    THEME_PRIMARY="#89b4fa"    # Blue
+    THEME_SECONDARY="#74c7ec"  # Sapphire
+    THEME_MUTED="#6c7086"      # Overlay0
+    THEME_SUCCESS="#a6e3a1"    # Green
+    THEME_WARNING="#fab387"    # Peach
+    THEME_ERROR="#f38ba8"      # Red
+    THEME_ACCENT="#cba6f7"     # Mauve
+}
+
+_apply_theme_tokyo_night() {
+    THEME_PRIMARY="#7aa2f7"    # Blue
+    THEME_SECONDARY="#7dcfff"  # Cyan
+    THEME_MUTED="#565f89"      # Comment
+    THEME_SUCCESS="#9ece6a"    # Green
+    THEME_WARNING="#ff9e64"    # Orange
+    THEME_ERROR="#f7768e"      # Red
+    THEME_ACCENT="#bb9af7"     # Purple
+}
+
+# Load theme from config or default
+_load_theme() {
+    local theme_file="$HOME/.config/mypctools/theme"
+    local theme_name="default"
+    if [[ -f "$theme_file" ]]; then
+        theme_name=$(cat "$theme_file" 2>/dev/null)
+    fi
+    case "$theme_name" in
+        catppuccin)   _apply_theme_catppuccin ;;
+        tokyo-night)  _apply_theme_tokyo_night ;;
+        *)            _apply_theme_default ;;
+    esac
+}
+
+_load_theme
+
+# --- GUM Environment Variables ---
+
+_export_gum_env() {
+    export GUM_CHOOSE_CURSOR_FOREGROUND="$THEME_PRIMARY"
+    export GUM_CHOOSE_SELECTED_FOREGROUND="$THEME_PRIMARY"
+    export GUM_CHOOSE_HEADER_FOREGROUND="$THEME_MUTED"
+    export GUM_CHOOSE_CURSOR_PREFIX="> "
+    export GUM_CHOOSE_PADDING="0 1"
+    export GUM_CONFIRM_PROMPT_FOREGROUND="$THEME_PRIMARY"
+    export GUM_CONFIRM_SELECTED_BACKGROUND="$THEME_PRIMARY"
+    export GUM_FILTER_INDICATOR_FOREGROUND="$THEME_PRIMARY"
+    export GUM_FILTER_MATCH_FOREGROUND="$THEME_ACCENT"
+    export GUM_FILTER_PROMPT_FOREGROUND="$THEME_MUTED"
+    export GUM_FILTER_PADDING="0 1"
+    export GUM_SPIN_SPINNER_FOREGROUND="$THEME_PRIMARY"
+    export GUM_SPIN_TITLE_FOREGROUND="$THEME_MUTED"
+    export GUM_TABLE_BORDER_FOREGROUND="$THEME_SECONDARY"
+    export GUM_TABLE_HEADER_FOREGROUND="$THEME_MUTED"
+    export GUM_TABLE_SELECTED_FOREGROUND="$THEME_PRIMARY"
+}
+
+_export_gum_env
+
+# --- Menu Icons (Nerd Font) ---
+
+ICON_APPS=$'\uf019'        # nf-fa-download
+ICON_SCRIPTS=$'\uf121'     # nf-fa-code
+ICON_SYSTEM=$'\uf013'      # nf-fa-cog
+ICON_AI=$'\uf0eb'          # nf-fa-lightbulb_o
+ICON_BROWSER=$'\uf0ac'     # nf-fa-globe
+ICON_GAMING=$'\uf11b'      # nf-fa-gamepad
+ICON_MEDIA=$'\uf001'       # nf-fa-music
+ICON_DEV=$'\uf120'         # nf-fa-terminal
+ICON_UPDATE=$'\uf021'      # nf-fa-refresh
+ICON_CLEANUP=$'\uf1b8'     # nf-fa-trash
+ICON_SERVICE=$'\uf233'     # nf-fa-server
+ICON_INFO=$'\uf05a'        # nf-fa-info_circle
+ICON_EXIT=$'\uf2f5'        # nf-fa-sign_out
+ICON_BACK=$'\uf060'        # nf-fa-arrow_left
+ICON_THEME=$'\uf53f'       # nf-fa-palette
+
+# --- Spinner Types ---
+
+SPINNER_INSTALL="dot"
+SPINNER_UPDATE="globe"
+SPINNER_CLEANUP="pulse"
+SPINNER_DOWNLOAD="moon"
+
+# --- Styled Components ---
 
 # Styled section header with box
-# Usage: show_subheader "Title" ["Parent > Context"]
 show_subheader() {
     local title="$1"
     local breadcrumb="$2"
@@ -37,33 +117,29 @@ show_subheader() {
         "$title"
 }
 
+# Themed horizontal divider (auto-sizes to terminal width)
+show_divider() {
+    local width="${COLUMNS:-$(tput cols 2>/dev/null || echo 40)}"
+    local line
+    line=$(printf '─%.0s' $(seq 1 "$width"))
+    gum style --foreground "$THEME_MUTED" "$line"
+}
+
 # Themed single-select menu
-# Usage: themed_choose "Header text" "Option 1" "Option 2" ...
 themed_choose() {
     local header="$1"
     shift
-    gum choose \
-        --cursor "> " \
-        --cursor.foreground "$THEME_PRIMARY" \
-        --selected.foreground "$THEME_PRIMARY" \
-        --header.foreground "$THEME_MUTED" \
-        --header "$header" \
-        "$@"
+    gum choose --header "$header" "$@"
 }
 
 # Themed multi-select menu
-# Usage: themed_choose_multi "Header text" "Option 1" "Option 2" ...
 themed_choose_multi() {
     local header="$1"
     shift
     gum choose --no-limit \
-        --cursor "> " \
-        --cursor.foreground "$THEME_PRIMARY" \
-        --selected.foreground "$THEME_PRIMARY" \
         --cursor-prefix "[ ] " \
         --selected-prefix "[✓] " \
         --unselected-prefix "[ ] " \
-        --header.foreground "$THEME_MUTED" \
         --header "$header" \
         "$@"
 }
@@ -76,52 +152,50 @@ themed_confirm() {
         "$1"
 }
 
-# Themed single-select from stdin (for dynamic lists)
-# Usage: echo -e "opt1\nopt2" | themed_choose_stdin "Header"
+# Themed single-select from stdin
 themed_choose_stdin() {
     local header="$1"
-    gum choose \
-        --cursor "> " \
-        --cursor.foreground "$THEME_PRIMARY" \
-        --selected.foreground "$THEME_PRIMARY" \
-        --header.foreground "$THEME_MUTED" \
-        --header "$header"
+    gum choose --header "$header"
 }
 
 # Themed filter (fuzzy search from stdin)
-# Usage: echo -e "opt1\nopt2" | themed_filter "Placeholder"
 themed_filter() {
     local placeholder="${1:-Type to filter...}"
     gum filter \
         --placeholder "$placeholder" \
-        --indicator "> " \
-        --indicator.foreground "$THEME_PRIMARY" \
-        --match.foreground "$THEME_ACCENT" \
-        --prompt.foreground "$THEME_MUTED"
+        --indicator "> "
 }
 
 # Themed spinner
-# Usage: themed_spin "install" "Installing..." command args
 themed_spin() {
     local spinner_type="${1:-dot}"
     local title="$2"
     shift 2
     gum spin \
         --spinner "$spinner_type" \
-        --spinner.foreground "$THEME_PRIMARY" \
-        --title.foreground "$THEME_MUTED" \
         --show-error \
         --title "$title" \
         -- "$@" < /dev/null
 }
 
+# Themed spinner with live stdout output
+themed_spin_live() {
+    local spinner_type="${1:-dot}"
+    local title="$2"
+    shift 2
+    gum spin \
+        --spinner "$spinner_type" \
+        --show-output \
+        --title "$title" \
+        -- "$@" < /dev/null
+}
+
 # Themed pager for long output
-# Usage: command | themed_pager
 themed_pager() {
     gum pager --soft-wrap
 }
 
-# Themed pause — replaces raw "read -rp"
+# Themed pause
 themed_pause() {
     echo ""
     gum style --foreground "$THEME_MUTED" "Press Enter to continue..."
@@ -129,7 +203,6 @@ themed_pause() {
 }
 
 # Install summary after batch operations
-# Usage: show_install_summary <succeeded> <failed> <total>
 show_install_summary() {
     local succeeded="$1" failed="$2" total="$3"
     echo ""
@@ -142,7 +215,6 @@ show_install_summary() {
 }
 
 # Styled preview box for selections
-# Usage: show_preview_box "Title" "item1" "item2" ...
 show_preview_box() {
     local title="$1"
     shift
@@ -150,7 +222,7 @@ show_preview_box() {
     for item in "$@"; do
         content+="  → $item"$'\n'
     done
-    content="${content%$'\n'}"  # Remove trailing newline
+    content="${content%$'\n'}"
     echo ""
     gum style \
         --border rounded \

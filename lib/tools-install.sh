@@ -224,13 +224,31 @@ _tools_install_starship() {
 
 # Install all GitHub-release tools + Debian symlinks
 install_all_tools() {
+    local _step=0 _total=8
+    _show_step() { ((_step++)); print_status "[$_step/$_total] $1"; }
+
+    _show_step "Installing zoxide..."
     _tools_install_from_github "ajeetdsouza/zoxide" "zoxide" "${ARCH}.*linux.*musl"
+
+    _show_step "Installing lazygit..."
     _tools_install_from_github "jesseduffield/lazygit" "lazygit" "linux_${ARCH}\.tar\.gz"
+
+    _show_step "Installing tldr..."
     _tools_install_from_github "tealdeer-rs/tealdeer" "tldr" "linux-${ARCH}-musl$"
+
+    _show_step "Installing glow..."
     _tools_install_from_github "charmbracelet/glow" "glow" "Linux_${ARCH}\.tar\.gz"
+
+    _show_step "Installing dysk..."
     _tools_install_dysk
+
+    _show_step "Installing dust..."
     _tools_install_dust
+
+    _show_step "Installing yazi..."
     _tools_install_from_github "sxyazi/yazi" "yazi" "${ARCH}-unknown-linux-musl\.zip"
+
+    _show_step "Installing starship..."
     _tools_install_starship
 }
 
