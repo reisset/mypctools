@@ -95,9 +95,7 @@ ICON_THEME=$'\uf53f'       # nf-fa-palette
 # --- Spinner Types ---
 
 SPINNER_INSTALL="dot"
-SPINNER_UPDATE="globe"
 SPINNER_CLEANUP="pulse"
-SPINNER_DOWNLOAD="moon"
 
 # --- Styled Components ---
 
@@ -152,20 +150,6 @@ themed_confirm() {
         "$1"
 }
 
-# Themed single-select from stdin
-themed_choose_stdin() {
-    local header="$1"
-    gum choose --header "$header"
-}
-
-# Themed filter (fuzzy search from stdin)
-themed_filter() {
-    local placeholder="${1:-Type to filter...}"
-    gum filter \
-        --placeholder "$placeholder" \
-        --indicator "> "
-}
-
 # Themed spinner
 themed_spin() {
     local spinner_type="${1:-dot}"
@@ -174,18 +158,6 @@ themed_spin() {
     gum spin \
         --spinner "$spinner_type" \
         --show-error \
-        --title "$title" \
-        -- "$@" < /dev/null
-}
-
-# Themed spinner with live stdout output
-themed_spin_live() {
-    local spinner_type="${1:-dot}"
-    local title="$2"
-    shift 2
-    gum spin \
-        --spinner "$spinner_type" \
-        --show-output \
         --title "$title" \
         -- "$@" < /dev/null
 }

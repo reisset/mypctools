@@ -17,7 +17,6 @@ All notable changes to mypctools and its bundled scripts.
 - **Theme system** — 3 color presets: Default (Cyan), Catppuccin Mocha, Tokyo Night. Saved to `~/.config/mypctools/theme`, selectable from System Setup > Theme
 - **Nerd Font icons** — 15 icon variables in `lib/theme.sh`, used across main menu, Install Apps, System Setup, and Back buttons
 - **`gum table`** for Service Manager — proper columnar layout with Service/Status/Enabled columns, replaces fuzzy filter
-- **`themed_spin_live()`** — spinner with live stdout via `gum spin --show-output`
 - **`show_divider()`** — auto-sizing horizontal separator (replaces hardcoded strings)
 - **`notify_done()`** — desktop notifications via `notify-send` after system update, cleanup, and batch installs
 - **Side-by-side System Info** — `gum join --horizontal` layout on wide terminals (>= 90 cols), falls back to single column on narrow
@@ -25,10 +24,19 @@ All notable changes to mypctools and its bundled scripts.
 
 #### Changed
 - **`lib/theme.sh` rewritten** — theme presets with hex colors, GUM_* env vars auto-exported (simplifies all themed_* wrappers), `--padding "0 1"` on choose/filter
-- All `themed_choose`, `themed_filter`, `themed_spin` wrappers simplified — styling now inherited from GUM_* env vars
+- All `themed_choose`, `themed_spin` wrappers simplified — styling now inherited from GUM_* env vars
 - All case statements use glob matching (`*"Back"`) to handle icon-prefixed menu items
 - Service Manager: 6 raw `read -rp` calls replaced with `themed_pause`
 - Version bumped to 0.10.0 (launcher was stuck at 0.6.0)
+
+#### Removed
+- Dead functions from `lib/theme.sh`: `themed_choose_stdin()`, `themed_filter()`, `themed_spin_live()` (never called)
+- Unused spinner constants from `lib/theme.sh`: `SPINNER_UPDATE`, `SPINNER_DOWNLOAD`
+- Unused `log_info()` and `log_error()` from `lib/helpers.sh`
+- Unused `confirm()` from `scripts/claude/uninstall.sh`
+- Unused variables from `scripts/screensaver/install.sh`: `SCREENSAVER_CLASS`, `MARKER_END`
+- Unnecessary sudo prompt from `scripts/terminal/uninstall.sh` (sudo was never used)
+- Redundant case branches in `scripts/litezsh/install.sh` `install_zsh()` (all branches were identical)
 
 ---
 
@@ -88,7 +96,7 @@ All notable changes to mypctools and its bundled scripts.
 
 #### Added
 - **TUI Visual Refresh** — state colors, spinner types, boxed section headers, fuzzy search
-- Theme functions: `themed_choose_stdin()`, `themed_filter()`, `themed_spin()`, `themed_pager()`, `show_preview_box()`
+- Theme functions: `themed_spin()`, `themed_pager()`, `show_preview_box()`
 - Service Manager now uses `gum filter` for fuzzy-searchable service list
 - Installation preview boxes in all app menus
 

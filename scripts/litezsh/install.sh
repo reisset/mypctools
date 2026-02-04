@@ -25,11 +25,7 @@ install_zsh() {
     fi
 
     print_status "Installing zsh..."
-    case "$PKG_MGR" in
-        pacman) $PKG_INSTALL zsh || { print_error "Failed to install zsh"; return 1; } ;;
-        apt) $PKG_INSTALL zsh || { print_error "Failed to install zsh"; return 1; } ;;
-        dnf) $PKG_INSTALL zsh || { print_error "Failed to install zsh"; return 1; } ;;
-    esac
+    $PKG_INSTALL zsh || { print_error "Failed to install zsh"; return 1; }
 
     if command -v zsh &>/dev/null; then
         print_success "Installed zsh"

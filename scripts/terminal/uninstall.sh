@@ -8,11 +8,6 @@ FOOT_DIR="$HOME/.config/foot"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../lib/print.sh"
 
-# Sudo check (for potential future cleanup)
-echo "This uninstaller requires sudo privileges to function properly."
-echo ""
-sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
-
 # Remove foot config (including broken symlinks)
 if [ -f "$FOOT_CONFIG" ] || [ -L "$FOOT_CONFIG" ]; then
     # Check if there are other files in the foot config dir (exclude our config from count)
