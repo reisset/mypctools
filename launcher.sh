@@ -111,6 +111,43 @@ show_install_apps_menu() {
     done
 }
 
+show_script_submenu() {
+    local script_dir="$1"
+    local subheader_text="$2"
+
+    while true; do
+        clear
+        show_subheader "$subheader_text"
+        local action
+        action=$(themed_choose "" \
+            "Install" \
+            "Uninstall" \
+            "Back")
+
+        case "$action" in
+            "Install")
+                if [[ -f "$MYPCTOOLS_ROOT/scripts/$script_dir/install.sh" ]]; then
+                    bash "$MYPCTOOLS_ROOT/scripts/$script_dir/install.sh"
+                else
+                    print_warning "Install script not found."
+                fi
+                read -rp "Press Enter to continue..."
+                ;;
+            "Uninstall")
+                if [[ -f "$MYPCTOOLS_ROOT/scripts/$script_dir/uninstall.sh" ]]; then
+                    bash "$MYPCTOOLS_ROOT/scripts/$script_dir/uninstall.sh"
+                else
+                    print_warning "Uninstall script not found."
+                fi
+                read -rp "Press Enter to continue..."
+                ;;
+            "Back"|"")
+                break
+                ;;
+        esac
+    done
+}
+
 show_scripts_menu() {
     while true; do
         clear
@@ -125,307 +162,21 @@ show_scripts_menu() {
             "Terminal - alacritty" \
             "Terminal - ghostty" \
             "Terminal - kitty" \
+            "Fastfetch" \
             "Screensaver" \
             "Back")
 
         case "$choice" in
-            "Claude Setup")
-                while true; do
-                    clear
-                    show_subheader "Claude Setup"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/claude/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/claude/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "Spicetify Theme")
-                while true; do
-                    clear
-                    show_subheader "Spicetify Theme"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/spicetify/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/spicetify/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/spicetify/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/spicetify/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "LiteBash")
-                while true; do
-                    clear
-                    show_subheader "LiteBash"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/litebash/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/litebash/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/litebash/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/litebash/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "LiteZsh")
-                while true; do
-                    clear
-                    show_subheader "LiteZsh"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/litezsh/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/litezsh/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/litezsh/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/litezsh/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "Terminal - foot")
-                while true; do
-                    clear
-                    show_subheader "Terminal - foot (Wayland)"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/terminal/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/terminal/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/terminal/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/terminal/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "Terminal - alacritty")
-                while true; do
-                    clear
-                    show_subheader "Terminal - alacritty"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/alacritty/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/alacritty/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/alacritty/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/alacritty/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "Terminal - ghostty")
-                while true; do
-                    clear
-                    show_subheader "Terminal - ghostty"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/ghostty/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/ghostty/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/ghostty/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/ghostty/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "Terminal - kitty")
-                while true; do
-                    clear
-                    show_subheader "Terminal - kitty"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/kitty/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/kitty/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/kitty/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/kitty/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
-            "Screensaver")
-                while true; do
-                    clear
-                    show_subheader "Screensaver"
-                    local action
-                    action=$(themed_choose "" \
-                        "Install" \
-                        "Uninstall" \
-                        "Back")
-
-                    case "$action" in
-                        "Install")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensaver/install.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/screensaver/install.sh"
-                            else
-                                print_warning "Install script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Uninstall")
-                            if [[ -f "$MYPCTOOLS_ROOT/scripts/screensaver/uninstall.sh" ]]; then
-                                bash "$MYPCTOOLS_ROOT/scripts/screensaver/uninstall.sh"
-                            else
-                                print_warning "Uninstall script not found."
-                            fi
-                            read -rp "Press Enter to continue..."
-                            ;;
-                        "Back"|"")
-                            break
-                            ;;
-                    esac
-                done
-                ;;
+            "Claude Setup")       show_script_submenu "claude" "Claude Setup" ;;
+            "Spicetify Theme")    show_script_submenu "spicetify" "Spicetify Theme" ;;
+            "LiteBash")           show_script_submenu "litebash" "LiteBash" ;;
+            "LiteZsh")            show_script_submenu "litezsh" "LiteZsh" ;;
+            "Terminal - foot")    show_script_submenu "terminal" "Terminal - foot (Wayland)" ;;
+            "Terminal - alacritty") show_script_submenu "alacritty" "Terminal - alacritty" ;;
+            "Terminal - ghostty") show_script_submenu "ghostty" "Terminal - ghostty" ;;
+            "Terminal - kitty")   show_script_submenu "kitty" "Terminal - kitty" ;;
+            "Fastfetch")          show_script_submenu "fastfetch" "Fastfetch" ;;
+            "Screensaver")        show_script_submenu "screensaver" "Screensaver" ;;
             "Back"|"")
                 break
                 ;;
