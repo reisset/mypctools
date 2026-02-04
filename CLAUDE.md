@@ -16,11 +16,15 @@ mypctools/
 ├── install.sh           # Bootstrap: installs gum, creates ~/.local/bin/mypctools symlink
 ├── uninstall.sh         # Removes symlink and cleans up
 ├── lib/
-│   ├── helpers.sh       # Print functions, logging, utility checks
+│   ├── helpers.sh       # Gum-styled print functions, logging, utility checks (TUI context)
+│   ├── print.sh         # Zero-dependency print functions (pure ANSI, standalone installers)
 │   ├── theme.sh         # Gum theming: themed_choose, themed_confirm, colors
-│   ├── distro-detect.sh # Sets DISTRO_TYPE (arch/debian/fedora) and DISTRO_NAME
+│   ├── distro-detect.sh # Sets DISTRO_TYPE, DISTRO_NAME, PKG_MGR, PKG_INSTALL, PKG_UPDATE
 │   ├── package-manager.sh # install_package() with apt/pacman/flatpak fallback chain
-│   └── tools-install.sh # Shared CLI tool install/uninstall for litebash & litezsh
+│   ├── tools-install.sh # Shared CLI tool install/uninstall for litebash & litezsh
+│   ├── shell-setup.sh   # Parametric set_default_shell shared by litebash & litezsh
+│   ├── symlink.sh       # safe_symlink() with path resolution, backup, idempotency
+│   └── terminal-install.sh # Shared lib for terminal emulator installers
 ├── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
 │   └── service-manager.sh # TUI for systemctl services
 └── scripts/             # Personal script bundles with install/uninstall.sh each
@@ -31,6 +35,10 @@ mypctools/
     ├── litezsh/         # Speed-focused zsh (syntax highlighting, autosuggestions)
     ├── terminal/        # foot terminal config (shell-agnostic, Wayland only)
     ├── alacritty/       # alacritty terminal config (shell-agnostic, X11 + Wayland)
+    ├── ghostty/         # ghostty terminal config (shell-agnostic, X11 + Wayland)
+    ├── kitty/           # kitty terminal config (shell-agnostic, X11 + Wayland)
+    ├── fastfetch/       # Custom fastfetch config with tree-style layout
+    ├── screensaver/     # Terminal screensaver via hypridle + tte (Hyprland only)
     ├── claude/          # Claude Code skills and statusline
     └── spicetify/       # Spotify theming
 ```
@@ -82,8 +90,12 @@ All sudo operations use `ensure_sudo` to pre-authenticate before running.
 
 - `scripts/litebash/` - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, lazygit, yazi, starship). Shell config only.
 - `scripts/litezsh/` - Zsh counterpart to litebash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
-- `scripts/terminal/` - foot terminal config (Wayland only). Shell-agnostic — works with bash, zsh, or any shell. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox.
-- `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Same themes as foot.
+- `scripts/terminal/` - foot terminal config (Wayland only). Shell-agnostic. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox.
+- `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
+- `scripts/ghostty/` - ghostty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
+- `scripts/kitty/` - kitty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
+- `scripts/fastfetch/` - Custom fastfetch config with tree-style layout, nerd font icons, color-coded sections, small distro logo.
+- `scripts/screensaver/` - Omarchy-style terminal screensaver using tte (Terminal Text Effects) with hypridle integration. Hyprland only.
 - `scripts/claude/` - Claude Code skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
 - `scripts/spicetify/` - Spicetify + StarryNight theme for native Spotify installs
 
@@ -97,7 +109,8 @@ Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial.
 - Simple bash over clever one-liners
 - Comments only where code isn't self-explanatory
 - On failure, return to menu — don't exit the entire app
-- Use `lib/helpers.sh` print functions for consistent output
+- Use `lib/helpers.sh` for gum-styled output in TUI context (launcher, app menus)
+- Use `lib/print.sh` for zero-dependency output in standalone installers
 
 ## Gum Quick Reference
 

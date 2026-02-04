@@ -2,7 +2,7 @@
 
 A personal TUI for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum).
 
-**v0.5.4**
+**v0.6.0**
 
 ## Quick Start
 
@@ -27,8 +27,9 @@ One menu to install apps across distros. Uses native package managers first, fal
 | Gaming | Steam, Lutris, Heroic, ProtonUp-Qt |
 | Media | Spotify, VLC, OBS, Discord |
 | Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK 10, Python |
-| CLI Utils | btop, neofetch, bat, eza, zoxide, fzf |
 | AI Tools | OpenCode, Claude Code, Mistral Vibe, Ollama, LM Studio |
+
+CLI tools (btop, bat, eza, zoxide, fzf, ripgrep, fd, etc.) are included in the LiteBash and LiteZsh script bundles.
 
 ### My Scripts
 
