@@ -45,6 +45,43 @@ detect_distro() {
     export DISTRO_TYPE
     export DISTRO_NAME
 
+    # Set package manager commands based on distro type (with fallback)
+    case "$DISTRO_TYPE" in
+        arch)
+            PKG_MGR="pacman"
+            PKG_INSTALL="sudo pacman -S --noconfirm --needed"
+            PKG_UPDATE="sudo pacman -Sy"
+            ;;
+        debian)
+            PKG_MGR="apt"
+            PKG_INSTALL="sudo apt install -y"
+            PKG_UPDATE="sudo apt update"
+            ;;
+        fedora)
+            PKG_MGR="dnf"
+            PKG_INSTALL="sudo dnf install -y"
+            PKG_UPDATE="sudo dnf check-update || true"
+            ;;
+        *)
+            # Fallback: detect by available commands
+            if command -v pacman &>/dev/null; then
+                PKG_MGR="pacman"
+                PKG_INSTALL="sudo pacman -S --noconfirm --needed"
+                PKG_UPDATE="sudo pacman -Sy"
+            elif command -v apt &>/dev/null; then
+                PKG_MGR="apt"
+                PKG_INSTALL="sudo apt install -y"
+                PKG_UPDATE="sudo apt update"
+            elif command -v dnf &>/dev/null; then
+                PKG_MGR="dnf"
+                PKG_INSTALL="sudo dnf install -y"
+                PKG_UPDATE="sudo dnf check-update || true"
+            fi
+            ;;
+    esac
+
+    export PKG_MGR PKG_INSTALL PKG_UPDATE
+
     if [[ "$DISTRO_TYPE" == "unknown" ]]; then
         echo -e "\033[33mWarning: Unrecognized distro '$DISTRO_NAME'. Package installation may not work.\033[0m" >&2
     fi

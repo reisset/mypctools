@@ -10,7 +10,7 @@ source "$_GAMING_DIR/../lib/package-manager.sh"
 
 show_gaming_menu() {
     clear
-    show_subheader "Gaming"
+    show_subheader "Gaming" "Install Apps >"
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
@@ -32,7 +32,10 @@ show_gaming_menu() {
     echo ""
 
     if themed_confirm "Proceed with installation?"; then
+        local total=${#preview_items[@]} current=0 succeeded=0 failed=0
         while read -r choice; do
+            ((current++))
+            print_info "[$current/$total] $choice"
             case "$choice" in
                 "Steam")
                     install_package "Steam" "steam" "steam" "com.valvesoftware.Steam" ""
@@ -47,9 +50,10 @@ show_gaming_menu() {
                     install_package "Heroic Games Launcher" "" "heroic-games-launcher-bin" "com.heroicgameslauncher.hgl" ""
                     ;;
             esac
+            [[ $? -eq 0 ]] && ((succeeded++)) || ((failed++))
         done <<< "$choices"
-        print_success "Done!"
-        read -rp "Press Enter to continue..."
+        show_install_summary $succeeded $failed $total
+        themed_pause
     fi
 }
 

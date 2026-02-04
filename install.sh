@@ -6,17 +6,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/distro-detect.sh"
 
-# Colors (inline since helpers.sh needs gum check)
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-print_step() { echo -e "${BLUE}==>${NC} $1"; }
-print_ok() { echo -e "${GREEN}✓${NC} $1"; }
-print_warn() { echo -e "${YELLOW}!${NC} $1"; }
-print_fail() { echo -e "${RED}✗${NC} $1"; }
+source "$SCRIPT_DIR/lib/print.sh"
 
 echo ""
 echo "╔═══════════════════════════════════════╗"
@@ -24,11 +14,11 @@ echo "║       mypctools installer v0.1        ║"
 echo "╚═══════════════════════════════════════╝"
 echo ""
 
-print_step "Detected: $DISTRO_NAME ($DISTRO_TYPE)"
+print_status "Detected: $DISTRO_NAME ($DISTRO_TYPE)"
 
 # Install gum if not present
 install_gum() {
-    print_step "Installing gum..."
+    print_status "Installing gum..."
 
     case "$DISTRO_TYPE" in
         debian)
@@ -37,7 +27,7 @@ install_gum() {
             local gpg_key
             gpg_key=$(mktemp)
             if ! curl -fsSL --retry 3 --connect-timeout 10 https://repo.charm.sh/apt/gpg.key -o "$gpg_key"; then
-                print_fail "Failed to download Charm GPG key"
+                print_error "Failed to download Charm GPG key"
                 rm -f "$gpg_key"
                 exit 1
             fi
@@ -50,8 +40,8 @@ install_gum() {
             sudo pacman -S --noconfirm gum
             ;;
         *)
-            print_fail "Unsupported distro for automatic gum install."
-            print_warn "Please install gum manually: https://github.com/charmbracelet/gum#installation"
+            print_error "Unsupported distro for automatic gum install."
+            print_warning "Please install gum manually: https://github.com/charmbracelet/gum#installation"
             exit 1
             ;;
     esac
@@ -59,27 +49,27 @@ install_gum() {
 
 # Check for gum
 if command -v gum &>/dev/null; then
-    print_ok "gum is already installed"
+    print_success "gum is already installed"
 else
-    print_warn "gum not found"
+    print_warning "gum not found"
     read -rp "Install gum now? [Y/n] " response
     response=${response:-Y}
     if [[ "$response" =~ ^[Yy] ]]; then
         install_gum
-        print_ok "gum installed"
+        print_success "gum installed"
     else
-        print_fail "gum is required. Exiting."
+        print_error "gum is required. Exiting."
         exit 1
     fi
 fi
 
 # Make all scripts executable
-print_step "Making scripts executable..."
+print_status "Making scripts executable..."
 find "$SCRIPT_DIR" -name "*.sh" -exec chmod +x {} \;
-print_ok "Scripts are now executable"
+print_success "Scripts are now executable"
 
 # Setup PATH symlink
-print_step "Setting up PATH..."
+print_status "Setting up PATH..."
 mkdir -p "$HOME/.local/bin"
 
 SYMLINK_PATH="$HOME/.local/bin/mypctools"
@@ -91,18 +81,18 @@ if [[ -e "$SYMLINK_PATH" || -L "$SYMLINK_PATH" ]]; then
     our_resolved=$(readlink -f "$OUR_TARGET" 2>/dev/null)
 
     if [[ "$current_target" == "$our_resolved" ]]; then
-        print_ok "Symlink already configured"
+        print_success "Symlink already configured"
     else
         # Backup existing file/symlink before replacing
         backup_path="$SYMLINK_PATH.backup.$(date +%Y%m%d_%H%M%S)"
         mv "$SYMLINK_PATH" "$backup_path"
-        print_warn "Backed up existing mypctools to: $backup_path"
+        print_warning "Backed up existing mypctools to: $backup_path"
         ln -s "$OUR_TARGET" "$SYMLINK_PATH"
-        print_ok "Symlink created: $SYMLINK_PATH"
+        print_success "Symlink created: $SYMLINK_PATH"
     fi
 else
     ln -s "$OUR_TARGET" "$SYMLINK_PATH"
-    print_ok "Symlink created: $SYMLINK_PATH"
+    print_success "Symlink created: $SYMLINK_PATH"
 fi
 
 # Add ~/.local/bin to PATH in shell configs if not present
@@ -115,7 +105,7 @@ add_path_to_shell() {
             echo "" >> "$shell_rc"
             echo "# Added by mypctools" >> "$shell_rc"
             echo "$path_line" >> "$shell_rc"
-            print_ok "Added ~/.local/bin to PATH in $(basename "$shell_rc")"
+            print_success "Added ~/.local/bin to PATH in $(basename "$shell_rc")"
             return 0
         fi
     fi
@@ -123,7 +113,7 @@ add_path_to_shell() {
 }
 
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-    print_warn "~/.local/bin is not in your PATH"
+    print_warning "~/.local/bin is not in your PATH"
 
     # Add to current shell's rc file
     added=false
@@ -135,9 +125,9 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     fi
 
     if [[ "$added" == "true" ]]; then
-        print_warn "Restart your shell or run: source ~/.bashrc (or ~/.zshrc)"
+        print_warning "Restart your shell or run: source ~/.bashrc (or ~/.zshrc)"
     else
-        print_warn "Could not add PATH automatically. Add this to your shell config:"
+        print_warning "Could not add PATH automatically. Add this to your shell config:"
         echo ""
         echo '    export PATH="$HOME/.local/bin:$PATH"'
         echo ""
@@ -149,5 +139,5 @@ echo "╔═══════════════════════�
 echo "║          Installation complete!       ║"
 echo "╚═══════════════════════════════════════╝"
 echo ""
-print_ok "Run 'mypctools' from anywhere, or './launcher.sh' from this directory"
+print_success "Run 'mypctools' from anywhere, or './launcher.sh' from this directory"
 echo ""

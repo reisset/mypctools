@@ -21,14 +21,20 @@ SPINNER_CLEANUP="pulse"    # Cleanup operations
 SPINNER_DOWNLOAD="moon"    # Downloads
 
 # Styled section header with box
+# Usage: show_subheader "Title" ["Parent > Context"]
 show_subheader() {
+    local title="$1"
+    local breadcrumb="$2"
+    if [[ -n "$breadcrumb" ]]; then
+        gum style --foreground "$THEME_MUTED" --margin "0 0 0 1" "$breadcrumb"
+    fi
     gum style \
         --foreground "$THEME_PRIMARY" \
         --border rounded \
         --border-foreground "$THEME_SECONDARY" \
         --padding "0 2" \
         --margin "0 0 1 0" \
-        "$1"
+        "$title"
 }
 
 # Themed single-select menu
@@ -113,6 +119,26 @@ themed_spin() {
 # Usage: command | themed_pager
 themed_pager() {
     gum pager --soft-wrap
+}
+
+# Themed pause — replaces raw "read -rp"
+themed_pause() {
+    echo ""
+    gum style --foreground "$THEME_MUTED" "Press Enter to continue..."
+    read -r
+}
+
+# Install summary after batch operations
+# Usage: show_install_summary <succeeded> <failed> <total>
+show_install_summary() {
+    local succeeded="$1" failed="$2" total="$3"
+    echo ""
+    if [[ "$failed" -eq 0 ]]; then
+        gum style --foreground "$THEME_SUCCESS" "All $total package(s) processed successfully"
+    else
+        gum style --foreground "$THEME_WARNING" \
+            "Completed: $succeeded/$total succeeded, $failed failed"
+    fi
 }
 
 # Styled preview box for selections

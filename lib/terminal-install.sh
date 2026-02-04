@@ -4,90 +4,41 @@
 
 FONT_DIR="$HOME/.local/share/fonts"
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+_TERMINAL_INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_TERMINAL_INSTALL_DIR/print.sh"
 
-print_status() { echo -e "${BLUE}[*]${NC} $1"; }
-print_success() { echo -e "${GREEN}[✓]${NC} $1"; }
-print_warning() { echo -e "${YELLOW}[!]${NC} $1"; }
-print_error() { echo -e "${RED}[✗]${NC} $1"; }
+source "$_TERMINAL_INSTALL_DIR/symlink.sh"
 
-# Safe symlink with validation and backup
-safe_symlink() {
-    local source="$1"
-    local target="$2"
-    local name="${3:-$(basename "$target")}"
-
-    local resolved_source
-    resolved_source=$(readlink -f "$source" 2>/dev/null)
-
-    if [[ ! -f "$resolved_source" ]]; then
-        print_warning "Source file not found: $source"
-        return 1
-    fi
-
-    if [[ -L "$target" ]]; then
-        local current_target
-        current_target=$(readlink -f "$target" 2>/dev/null)
-        if [[ "$current_target" == "$resolved_source" ]]; then
-            print_success "$name already configured"
-            return 0
-        fi
-    fi
-
-    if [[ -e "$target" || -L "$target" ]]; then
-        local backup="$target.backup.$(date +%Y%m%d_%H%M%S)"
-        mv "$target" "$backup"
-        print_status "Backed up existing $name"
-    fi
-
-    ln -sf "$resolved_source" "$target" && print_success "Linked $name" || { print_warning "Failed to link $name"; return 1; }
-}
-
-# Sudo prompt and keepalive
-init_sudo() {
-    echo "This installer requires sudo privileges to function properly."
-    echo "Read the entire script if you do not trust the author."
-    echo ""
-    sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
-
-    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-}
-
-# Detect package manager
-detect_distro() {
-    if command -v pacman &>/dev/null; then
-        PKG_MGR="pacman"
-        PKG_INSTALL="sudo pacman -S --noconfirm --needed"
-    elif command -v apt &>/dev/null; then
-        PKG_MGR="apt"
-        PKG_INSTALL="sudo apt install -y"
-    elif command -v dnf &>/dev/null; then
-        PKG_MGR="dnf"
-        PKG_INSTALL="sudo dnf install -y"
-    else
-        print_error "No supported package manager found (pacman/apt/dnf)"
-        exit 1
-    fi
-    print_status "Detected package manager: $PKG_MGR"
-}
+source "$_TERMINAL_INSTALL_DIR/distro-detect.sh"
 
 # Theme selection
 select_theme() {
-    echo ""
-    echo "Select theme:"
-    echo "  1) Catppuccin Mocha (default)"
-    echo "  2) Tokyo Night"
-    echo "  3) HackTheBox"
-    echo ""
-    read -rp "[1/2/3]: " theme_choice
-    case "$theme_choice" in
-        2) THEME="tokyo-night" ;;
-        3) THEME="hackthebox" ;;
+    local theme_display
+    if command -v gum &>/dev/null; then
+        source "$_TERMINAL_INSTALL_DIR/theme.sh"
+        echo ""
+        theme_display=$(themed_choose "Select theme:" \
+            "Catppuccin Mocha" \
+            "Tokyo Night" \
+            "HackTheBox")
+    else
+        echo ""
+        echo "Select theme:"
+        echo "  1) Catppuccin Mocha (default)"
+        echo "  2) Tokyo Night"
+        echo "  3) HackTheBox"
+        echo ""
+        read -rp "[1/2/3]: " theme_choice
+        case "$theme_choice" in
+            2) theme_display="Tokyo Night" ;;
+            3) theme_display="HackTheBox" ;;
+            *) theme_display="Catppuccin Mocha" ;;
+        esac
+    fi
+
+    case "$theme_display" in
+        "Tokyo Night") THEME="tokyo-night" ;;
+        "HackTheBox") THEME="hackthebox" ;;
         *) THEME="catppuccin-mocha" ;;
     esac
     print_status "Selected theme: $THEME"

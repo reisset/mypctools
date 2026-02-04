@@ -5,17 +5,8 @@
 FOOT_CONFIG="$HOME/.config/foot/foot.ini"
 FOOT_DIR="$HOME/.config/foot"
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-print_status() { echo -e "${BLUE}[*]${NC} $1"; }
-print_success() { echo -e "${GREEN}[✓]${NC} $1"; }
-print_warning() { echo -e "${YELLOW}[!]${NC} $1"; }
-print_error() { echo -e "${RED}[✗]${NC} $1"; }
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../lib/print.sh"
 
 # Sudo check (for potential future cleanup)
 echo "This uninstaller requires sudo privileges to function properly."

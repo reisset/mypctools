@@ -10,7 +10,7 @@ source "$_BROWSERS_DIR/../lib/package-manager.sh"
 
 show_browsers_menu() {
     clear
-    show_subheader "Browsers"
+    show_subheader "Browsers" "Install Apps >"
 
     local choices
     choices=$(themed_choose_multi "Space=select, Enter=confirm, Empty=back" \
@@ -30,7 +30,10 @@ show_browsers_menu() {
     echo ""
 
     if themed_confirm "Proceed with installation?"; then
+        local total=${#preview_items[@]} current=0 succeeded=0 failed=0
         while read -r choice; do
+            ((current++))
+            print_info "[$current/$total] $choice"
             case "$choice" in
                 "Brave Browser")
                     install_package "Brave Browser" "brave-browser" "brave-bin" "" "install_brave_fallback"
@@ -39,9 +42,10 @@ show_browsers_menu() {
                     install_package "Firefox" "firefox" "firefox" "org.mozilla.firefox" ""
                     ;;
             esac
+            [[ $? -eq 0 ]] && ((succeeded++)) || ((failed++))
         done <<< "$choices"
-        print_success "Done!"
-        read -rp "Press Enter to continue..."
+        show_install_summary $succeeded $failed $total
+        themed_pause
     fi
 }
 

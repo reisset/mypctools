@@ -31,11 +31,11 @@ get_service_status() {
     is_enabled=$(systemctl is-enabled "$service" 2>/dev/null)
 
     if [[ "$is_active" == "active" ]]; then
-        echo "●"  # Running
+        echo -e "\033[32m●\033[0m"  # Green - Running
     elif [[ "$is_enabled" == "enabled" ]]; then
-        echo "◐"  # Enabled but not running
+        echo -e "\033[33m◐\033[0m"  # Yellow - Enabled but not running
     else
-        echo "○"  # Stopped/disabled
+        echo -e "\033[90m○\033[0m"  # Gray - Stopped/disabled
     fi
 }
 
@@ -58,7 +58,7 @@ show_service_actions() {
 
     while true; do
         clear
-        show_subheader "Service: $service"
+        show_subheader "Service: $service" "Service Manager >"
 
         local is_active is_enabled
         is_active=$(systemctl is-active "$service" 2>/dev/null)
@@ -131,7 +131,7 @@ show_service_actions() {
                 ;;
             "View Status")
                 clear
-                show_subheader "Service Status: $service"
+                show_subheader "Service Status: $service" "Service Manager >"
                 systemctl status "$service" --no-pager 2>&1 | themed_pager
                 clear
                 ;;
@@ -146,7 +146,7 @@ show_service_actions() {
 show_service_manager() {
     while true; do
         clear
-        show_subheader "Service Manager"
+        show_subheader "Service Manager" "System Setup >"
         print_info "● running  ◐ enabled/stopped  ○ stopped"
         echo ""
 
