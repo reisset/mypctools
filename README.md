@@ -40,6 +40,8 @@ Bundled script collections with install/uninstall options:
 - **Terminal - alacritty** - X11/Wayland terminal with the same themes. Shell-agnostic.
 - **Terminal - ghostty** - X11/Wayland terminal with the same themes. Shell-agnostic.
 - **Terminal - kitty** - X11/Wayland terminal with the same themes. Shell-agnostic.
+- **Fastfetch** - Custom fastfetch config with boxed layout, nerd font icons, and compact distro logo.
+- **Screensaver** - Terminal screensaver via hypridle + Terminal Text Effects. Hyprland only.
 - **Spicetify Theme** - Spotify theming with StarryNight or text themes. Native Spotify installs only.
 - **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
 

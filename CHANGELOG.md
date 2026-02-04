@@ -11,6 +11,23 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.8.0] - 2026-02-04
+
+#### Added
+- **Fastfetch script bundle** (`scripts/fastfetch/`) — custom config with boxed layout, nerd font icons, color-coded sections (system/desktop/hardware), small distro logo, and color palette strip
+- **`lib/terminal-install.sh`** — shared lib for terminal emulator installers (`safe_symlink`, `detect_distro`, `select_theme`, `install_font`, `set_default_terminal`)
+- `show_script_submenu()` in `launcher.sh` — generic handler for all script bundle Install/Uninstall/Back menus
+
+#### Changed
+- **Script menu consolidated**: 9 identical 30-line menu blocks replaced with single-line calls to `show_script_submenu()` (launcher.sh: 669 → 419 lines)
+- **Terminal installers refactored**: all 4 bundles (foot, alacritty, ghostty, kitty) now source `lib/terminal-install.sh` instead of duplicating shared functions (~1130 → ~490 total lines)
+- `README.md` updated with Fastfetch and Screensaver bundle entries
+
+#### Removed
+- Unused `show_keyhints()` from `lib/theme.sh`
+
+---
+
 ### [0.7.0] - 2026-02-03
 
 #### Added
@@ -545,7 +562,25 @@ All notable changes to mypctools and its bundled scripts.
 
 ---
 
+## scripts/fastfetch
+
+### [1.0.0] - 2026-02-04
+- Initial release
+- Custom fastfetch config with boxed layout and nerd font icons
+- Color-coded sections: yellow (system), blue (desktop), green (hardware)
+- Small distro ASCII logo, color palette strip
+- Installer uses shared `lib/terminal-install.sh` for `safe_symlink`
+
+---
+
 ## scripts/terminal
+
+### [1.2.0] - 2026-02-04
+
+#### Changed
+- Refactored to use shared `lib/terminal-install.sh` (was 287 lines, now 69)
+
+---
 
 ### [1.1.0] - 2026-01-29
 
@@ -565,6 +600,13 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/alacritty
+
+### [1.3.0] - 2026-02-04
+
+#### Changed
+- Refactored to use shared `lib/terminal-install.sh` (was 275 lines, now 61)
+
+---
 
 ### [1.2.0] - 2026-01-29
 
@@ -592,6 +634,13 @@ All notable changes to mypctools and its bundled scripts.
 
 ## scripts/ghostty
 
+### [1.1.0] - 2026-02-04
+
+#### Changed
+- Refactored to use shared `lib/terminal-install.sh` (was 293 lines, now 79)
+
+---
+
 ### [1.0.0] - 2026-02-01
 - Initial release
 - Shell-agnostic: works with bash, zsh, fish, or any shell
@@ -603,6 +652,13 @@ All notable changes to mypctools and its bundled scripts.
 ---
 
 ## scripts/kitty
+
+### [1.1.0] - 2026-02-04
+
+#### Changed
+- Refactored to use shared `lib/terminal-install.sh` (was 275 lines, now 61)
+
+---
 
 ### [1.0.0] - 2026-02-01
 - Initial release

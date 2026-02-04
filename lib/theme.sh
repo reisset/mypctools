@@ -115,15 +115,6 @@ themed_pager() {
     gum pager --soft-wrap
 }
 
-# Show keyboard hints
-show_keyhints() {
-    local hints="${1:-↑/↓ Navigate  •  Enter Select  •  Esc Back}"
-    gum style \
-        --foreground "$THEME_MUTED" \
-        --margin "1 0 0 0" \
-        "$hints"
-}
-
 # Styled preview box for selections
 # Usage: show_preview_box "Title" "item1" "item2" ...
 show_preview_box() {
