@@ -45,6 +45,7 @@ show_browsers_menu() {
             [[ $? -eq 0 ]] && ((succeeded++)) || ((failed++))
         done <<< "$choices"
         show_install_summary $succeeded $failed $total
+        notify_done "mypctools" "$succeeded/$total browsers installed"
         themed_pause
     fi
 }

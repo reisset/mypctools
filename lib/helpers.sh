@@ -59,3 +59,10 @@ ensure_sudo() {
         return 1
     fi
 }
+
+# Desktop notification after long operations (no-op if notify-send unavailable)
+notify_done() {
+    local title="${1:-mypctools}"
+    local message="${2:-Operation complete}"
+    command -v notify-send &>/dev/null && notify-send "$title" "$message" 2>/dev/null || true
+}

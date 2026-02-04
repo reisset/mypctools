@@ -11,6 +11,27 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.10.0] - 2026-02-04
+
+#### Added
+- **Theme system** — 3 color presets: Default (Cyan), Catppuccin Mocha, Tokyo Night. Saved to `~/.config/mypctools/theme`, selectable from System Setup > Theme
+- **Nerd Font icons** — 15 icon variables in `lib/theme.sh`, used across main menu, Install Apps, System Setup, and Back buttons
+- **`gum table`** for Service Manager — proper columnar layout with Service/Status/Enabled columns, replaces fuzzy filter
+- **`themed_spin_live()`** — spinner with live stdout via `gum spin --show-output`
+- **`show_divider()`** — auto-sizing horizontal separator (replaces hardcoded strings)
+- **`notify_done()`** — desktop notifications via `notify-send` after system update, cleanup, and batch installs
+- **Side-by-side System Info** — `gum join --horizontal` layout on wide terminals (>= 90 cols), falls back to single column on narrow
+- **Step counter** in `install_all_tools()` — `[1/8]` through `[8/8]` progress during tool installation
+
+#### Changed
+- **`lib/theme.sh` rewritten** — theme presets with hex colors, GUM_* env vars auto-exported (simplifies all themed_* wrappers), `--padding "0 1"` on choose/filter
+- All `themed_choose`, `themed_filter`, `themed_spin` wrappers simplified — styling now inherited from GUM_* env vars
+- All case statements use glob matching (`*"Back"`) to handle icon-prefixed menu items
+- Service Manager: 6 raw `read -rp` calls replaced with `themed_pause`
+- Version bumped to 0.10.0 (launcher was stuck at 0.6.0)
+
+---
+
 ### [0.9.0] - 2026-02-04
 
 #### Added
