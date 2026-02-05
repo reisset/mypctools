@@ -44,7 +44,7 @@ Bundled script collections with install/uninstall options:
 - **Fastfetch** - Custom fastfetch config with boxed layout, nerd font icons, and compact distro logo.
 - **Screensaver** - Terminal screensaver via hypridle + Terminal Text Effects. Hyprland only.
 - **Spicetify Theme** - Spotify theming with StarryNight or text themes. Native Spotify installs only.
-- **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
+- **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline
 
 ### System Setup
 
