@@ -10,6 +10,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/cmd"
 	"github.com/reisset/mypctools/tui/internal/config"
 	"github.com/reisset/mypctools/tui/internal/screen/mainmenu"
+	"github.com/reisset/mypctools/tui/internal/selfupdate"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
@@ -23,7 +24,10 @@ func main() {
 			fmt.Println("A personal TUI for managing scripts and apps")
 			fmt.Println("Built with Bubble Tea by Charm")
 			fmt.Println()
-			fmt.Println("Usage: mypctools-tui [option]")
+			fmt.Println("Usage: mypctools [command] [option]")
+			fmt.Println()
+			fmt.Println("Commands:")
+			fmt.Println("  update           Update binary and scripts to latest version")
 			fmt.Println()
 			fmt.Println("Options:")
 			fmt.Println("  --help, -h       Show this help message")
@@ -32,8 +36,17 @@ func main() {
 		case "--version", "-v":
 			fmt.Printf("mypctools v%s\n", config.Version)
 			os.Exit(0)
+		case "update":
+			scriptsDir := findRootDir()
+			fmt.Println("Updating mypctools...")
+			if err := selfupdate.Update(scriptsDir); err != nil {
+				fmt.Fprintf(os.Stderr, "Update failed: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Println("\nUpdate complete! Run 'mypctools' to start.")
+			os.Exit(0)
 		default:
-			fmt.Fprintf(os.Stderr, "Unknown option: %s\nRun 'mypctools-tui --help' for usage.\n", os.Args[1])
+			fmt.Fprintf(os.Stderr, "Unknown option: %s\nRun 'mypctools --help' for usage.\n", os.Args[1])
 			os.Exit(1)
 		}
 	}
