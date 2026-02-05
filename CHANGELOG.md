@@ -11,6 +11,24 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.16.0] - 2026-02-04
+
+#### Added
+- **Go TUI Phase 4: System Setup** — "System Setup" menu now functional
+  - System package (`tui/internal/system/`) with distro-aware commands for update, cleanup, service management, and system info gathering
+  - System Setup menu screen with 4 options: Full System Update, System Cleanup, Service Manager, System Info
+  - Full System Update runs `apt update && apt upgrade` / `pacman -Syu` / `dnf upgrade` via `tea.ExecProcess()`
+  - System Cleanup runs package cleanup, then prompts for user cache (thumbnails, trash) clearing
+  - Service Manager with Common Services (table view with Status/Enabled columns) and All Services browser
+  - Service detail screen with Start/Stop/Restart/Enable/Disable/View Status actions
+  - System Info display with two-column lipgloss layout (system info + hardware info)
+
+#### Known Issues
+- Same jarring TUI suspend behavior during sudo operations (see 0.14.0)
+- All Services list has no viewport scrolling — cursor disappears when navigating beyond visible terminal bounds (list too long for fixed-height view)
+
+---
+
 ### [0.15.0] - 2026-02-04
 
 #### Added
