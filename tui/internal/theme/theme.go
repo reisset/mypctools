@@ -63,11 +63,12 @@ func themeFilePath() string {
 	return filepath.Join(home, ".config", "mypctools", "theme")
 }
 
-// Load reads the theme file and sets Current.
+// Load reads the theme file and sets Current, then rebuilds cached styles.
 func Load() {
 	data, err := os.ReadFile(themeFilePath())
 	if err != nil {
 		Current = DefaultCyan
+		RebuildStyles()
 		return
 	}
 	name := strings.TrimSpace(string(data))
@@ -79,6 +80,7 @@ func Load() {
 	default:
 		Current = DefaultCyan
 	}
+	RebuildStyles()
 }
 
 // Save writes the theme name to disk.

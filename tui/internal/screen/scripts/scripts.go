@@ -63,17 +63,7 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Title
-	title := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Bold(true).
-		Render("My Scripts")
-
-	titleBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(title)
-
+	// Subtitle
 	subtitle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(theme.Current.Muted)).
 		Width(width).
@@ -107,7 +97,6 @@ func (m Model) View() string {
 		Render(menu)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
-		titleBlock,
 		subtitle,
 		"",
 		menuBlock,

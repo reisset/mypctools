@@ -96,18 +96,6 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Title
-	categoryName := pkg.CategoryDisplayName(m.category)
-	title := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Bold(true).
-		Render(categoryName)
-
-	titleBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(title)
-
 	// Selection count
 	selectedCount := len(m.getSelectedApps())
 	var subtitle string
@@ -163,7 +151,6 @@ func (m Model) View() string {
 		Render(list)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
-		titleBlock,
 		subtitleBlock,
 		"",
 		listBlock,

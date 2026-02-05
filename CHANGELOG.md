@@ -11,6 +11,20 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.19.0] - 2026-02-05
+
+#### Fixed
+- **Duplicate titles removed** — Sub-screens no longer render their own title since breadcrumb already shows it
+- **Breadcrumb centering** — Breadcrumb and boxed title now center properly on all screen widths
+- **Vertical centering threshold** — Only center content if less than 70% of screen height (scrolling lists stay at top)
+
+#### Performance
+- **Flatpak cache** — Cache `flatpak list` results for 30s to avoid repeated shell calls when checking installed apps
+- **Menu items cache** — Main menu only rebuilds items when update count changes
+- **Style caching** — Pre-build all lipgloss styles once instead of recreating on every render
+
+---
+
 ### [0.18.0] - 2026-02-04
 
 #### Added
