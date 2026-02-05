@@ -18,7 +18,6 @@ type UpdateCountMsg struct {
 func CheckForUpdates(rootDir string) tea.Cmd {
 	return func() tea.Msg {
 		ctx := exec.Command("git", "-C", rootDir, "fetch", "origin", "main")
-		ctx.Env = append(ctx.Environ())
 
 		done := make(chan error, 1)
 		go func() { done <- ctx.Run() }()
