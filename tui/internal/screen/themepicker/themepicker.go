@@ -8,6 +8,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 // Model is the theme picker screen.
@@ -68,40 +69,34 @@ func (m Model) View() string {
 	}
 
 	// Title
-	title := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Bold(true).
-		Render("Choose Theme")
-
+	title := theme.SubheaderStyle().Render("Choose Theme")
 	titleBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
 		Render(title)
 
-	// Theme options with color swatches
-	var lines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Build list items with color swatches
+	items := make([]ui.ListItem, len(theme.Presets))
 	for i, p := range theme.Presets {
-		// Build color swatch - show all 7 colors
-		swatch := renderSwatch(p)
-
-		// Theme name with friendly display
 		name := themeDisplayName(p.Name)
+		var suffix string
 		if p.Name == theme.Current.Name {
-			name += " (current)"
+			suffix = theme.MutedStyle().Render(" (current)")
 		}
+		suffix += "  " + renderSwatch(p)
 
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(name) + "  " + swatch
-			lines = append(lines, line)
-		} else {
-			lines = append(lines, "  "+normal.Render(name)+"  "+swatch)
+		items[i] = ui.ListItem{
+			Icon:   theme.Icons.Theme,
+			Label:  name,
+			Suffix: suffix,
 		}
 	}
-	menu := strings.Join(lines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).

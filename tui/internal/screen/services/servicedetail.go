@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,6 +10,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 type detailAction int
@@ -26,6 +26,7 @@ const (
 )
 
 type actionItem struct {
+	icon   string
 	label  string
 	action detailAction
 }
@@ -55,13 +56,13 @@ type ServiceDetailModel struct {
 // NewServiceDetail creates a new service detail screen.
 func NewServiceDetail(shared *state.Shared, serviceName string) ServiceDetailModel {
 	items := []actionItem{
-		{label: "Start", action: actionStart},
-		{label: "Stop", action: actionStop},
-		{label: "Restart", action: actionRestart},
-		{label: "Enable", action: actionEnable},
-		{label: "Disable", action: actionDisable},
-		{label: "View Status", action: actionViewStatus},
-		{label: theme.Icons.Back + "  Back", action: actionBack},
+		{icon: theme.Icons.Update, label: "Start", action: actionStart},
+		{icon: theme.Icons.Cleanup, label: "Stop", action: actionStop},
+		{icon: theme.Icons.Update, label: "Restart", action: actionRestart},
+		{icon: theme.Icons.Check, label: "Enable", action: actionEnable},
+		{icon: theme.Icons.Cleanup, label: "Disable", action: actionDisable},
+		{icon: theme.Icons.Info, label: "View Status", action: actionViewStatus},
+		{icon: theme.Icons.Back, label: "Back", action: actionBack},
 	}
 
 	return ServiceDetailModel{
@@ -186,33 +187,17 @@ func (m ServiceDetailModel) View() string {
 	}
 
 	// Title
-	title := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Bold(true).
-		Render("Service: " + m.serviceName)
-
+	title := theme.SubheaderStyle().Render("Service: " + m.serviceName)
 	titleBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
 		Render(title)
 
-	// Status info
-	statusColor := theme.Current.Muted
-	if m.status.Active == "active" {
-		statusColor = theme.Current.Success
-	} else if m.status.Active == "failed" {
-		statusColor = theme.Current.Error
-	}
+	// Status info with badges
+	statusBadge := ui.StatusBadge(m.status.Active)
+	enabledBadge := ui.EnabledBadge(m.status.Enabled)
 
-	enabledColor := theme.Current.Muted
-	if m.status.Enabled == "enabled" {
-		enabledColor = theme.Current.Success
-	}
-
-	statusLine := fmt.Sprintf("Status: %s   Enabled: %s",
-		lipgloss.NewStyle().Foreground(lipgloss.Color(statusColor)).Render(m.status.Active),
-		lipgloss.NewStyle().Foreground(lipgloss.Color(enabledColor)).Render(m.status.Enabled),
-	)
+	statusLine := fmt.Sprintf("Status: %s   Enabled: %s", statusBadge, enabledBadge)
 
 	statusBlock := lipgloss.NewStyle().
 		Width(width).
@@ -226,7 +211,7 @@ func (m ServiceDetailModel) View() string {
 		if m.actionErr != nil {
 			resultLine = theme.ErrorStyle().Render(fmt.Sprintf("Error: %v", m.actionErr))
 		} else {
-			resultLine = theme.SuccessStyle().Render("Action completed successfully")
+			resultLine = theme.SuccessStyle().Render(theme.Icons.Check + " Action completed successfully")
 		}
 		prompt := theme.MutedStyle().Render("Press any key to continue...")
 		resultBlock = lipgloss.NewStyle().
@@ -235,21 +220,20 @@ func (m ServiceDetailModel) View() string {
 			Render(resultLine+"\n"+prompt) + "\n"
 	}
 
-	// Menu items
-	var menuLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Build list items
+	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(item.label)
-			menuLines = append(menuLines, line)
-		} else {
-			menuLines = append(menuLines, "  "+normal.Render(item.label))
+		items[i] = ui.ListItem{
+			Icon:  item.icon,
+			Label: item.label,
 		}
 	}
-	menu := strings.Join(menuLines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).

@@ -1,7 +1,7 @@
 package apps
 
 import (
-	"strings"
+	"strconv"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -10,6 +10,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/screen/applist"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 type menuItem struct {
@@ -87,27 +88,25 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render("Select a category")
 
-	// Menu items
-	var menuLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-	muted := theme.MutedStyle()
-
+	// Build list items
+	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
-		label := item.icon + "  " + item.label
+		var suffix string
 		if item.count > 0 {
-			label += muted.Render(" (" + itoa(item.count) + ")")
+			suffix = theme.MutedStyle().Render(" (" + strconv.Itoa(item.count) + ")")
 		}
-
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(label)
-			menuLines = append(menuLines, line)
-		} else {
-			menuLines = append(menuLines, "  "+normal.Render(label))
+		items[i] = ui.ListItem{
+			Icon:   item.icon,
+			Label:  item.label,
+			Suffix: suffix,
 		}
 	}
-	menu := strings.Join(menuLines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
@@ -127,17 +126,4 @@ func (m Model) Title() string {
 
 func (m Model) ShortHelp() []string {
 	return []string{"j/k navigate", "enter select"}
-}
-
-// itoa converts int to string without importing strconv
-func itoa(n int) string {
-	if n == 0 {
-		return "0"
-	}
-	var digits []byte
-	for n > 0 {
-		digits = append([]byte{byte('0' + n%10)}, digits...)
-		n /= 10
-	}
-	return string(digits)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 type phase int
@@ -152,7 +153,7 @@ func (m Model) View() string {
 		if m.pkgErr != nil {
 			pkgStatus = theme.WarningStyle().Render(fmt.Sprintf("Package cleanup had issues: %v", m.pkgErr))
 		} else {
-			pkgStatus = theme.SuccessStyle().Render("Package cleanup completed")
+			pkgStatus = theme.SuccessStyle().Render(theme.Icons.Check + " Package cleanup completed")
 		}
 
 		pkgStatusBlock := lipgloss.NewStyle().
@@ -161,30 +162,32 @@ func (m Model) View() string {
 			Render(pkgStatus)
 
 		// Question
-		question := theme.PrimaryStyle().Bold(true).Render("Clear user caches (thumbnails, trash)?")
+		question := theme.SubheaderStyle().Render("Clear user caches (thumbnails, trash)?")
 		questionBlock := lipgloss.NewStyle().
 			Width(width).
 			Align(lipgloss.Center).
 			Render(question)
 
-		// Action buttons
-		var yesBtn, noBtn string
-		cursor := theme.MenuCursorStyle()
-		normal := theme.MenuItemStyle()
-		selected := theme.MenuSelectedStyle()
-
-		if m.cursor == actionYes {
-			yesBtn = cursor.Render("> ") + selected.Render("Yes")
-			noBtn = "  " + normal.Render("No")
-		} else {
-			yesBtn = "  " + normal.Render("Yes")
-			noBtn = cursor.Render("> ") + selected.Render("No")
+		// Action buttons using list component
+		items := []ui.ListItem{
+			{Icon: theme.Icons.Check, Label: "Yes"},
+			{Icon: theme.Icons.Back, Label: "No"},
 		}
+		cursor := 0
+		if m.cursor == actionNo {
+			cursor = 1
+		}
+
+		buttons := ui.RenderList(items, cursor, ui.ListConfig{
+			Width:         width,
+			ShowCursor:    true,
+			HighlightFull: true,
+		})
 
 		buttonsBlock := lipgloss.NewStyle().
 			Width(width).
 			Align(lipgloss.Center).
-			Render(yesBtn + "\n" + noBtn)
+			Render(buttons)
 
 		content = lipgloss.JoinVertical(lipgloss.Left,
 			pkgStatusBlock,
@@ -204,7 +207,7 @@ func (m Model) View() string {
 		if m.pkgErr != nil {
 			lines = append(lines, theme.WarningStyle().Render(fmt.Sprintf("Package cleanup: had issues (%v)", m.pkgErr)))
 		} else {
-			lines = append(lines, theme.SuccessStyle().Render("Package cleanup: completed"))
+			lines = append(lines, theme.SuccessStyle().Render(theme.Icons.Check+" Package cleanup: completed"))
 		}
 
 		// Cache cleanup result
@@ -212,7 +215,7 @@ func (m Model) View() string {
 			if m.cacheErr != nil {
 				lines = append(lines, theme.WarningStyle().Render(fmt.Sprintf("User caches: had issues (%v)", m.cacheErr)))
 			} else {
-				lines = append(lines, theme.SuccessStyle().Render("User caches: cleared"))
+				lines = append(lines, theme.SuccessStyle().Render(theme.Icons.Check+" User caches: cleared"))
 			}
 		} else {
 			lines = append(lines, theme.MutedStyle().Render("User caches: skipped"))
@@ -224,11 +227,7 @@ func (m Model) View() string {
 			Align(lipgloss.Center).
 			Render(summary)
 
-		title := lipgloss.NewStyle().
-			Foreground(lipgloss.Color(theme.Current.Primary)).
-			Bold(true).
-			Render("Cleanup Complete")
-
+		title := theme.SubheaderStyle().Render("Cleanup Complete")
 		titleBlock := lipgloss.NewStyle().
 			Width(width).
 			Align(lipgloss.Center).

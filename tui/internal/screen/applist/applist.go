@@ -2,7 +2,6 @@ package applist
 
 import (
 	"fmt"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -118,41 +117,37 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render(subtitle)
 
-	// App list
-	var listLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Build list items with checkboxes and badges
+	items := make([]ui.ListItem, len(m.apps))
 	for i, a := range m.apps {
 		// Build checkbox
-		var checkbox string
-		if m.selected[a.ID] {
-			checkbox = theme.SuccessStyle().Render("[x]")
-		} else {
-			checkbox = theme.MutedStyle().Render("[ ]")
-		}
+		checkbox := ui.Checkbox(m.selected[a.ID])
 
-		// App name with installed badge (uses cached status)
-		label := a.Name
+		// Build suffix with installed badge and method
+		var suffix string
 		if m.installed[a.ID] {
-			label += ui.InstalledBadge()
+			suffix = ui.InstalledBadge()
+		}
+		method := pkg.InstallMethodDescription(&a, m.shared.Distro.Type)
+		if method != "" {
+			if suffix != "" {
+				suffix += "  "
+			}
+			suffix += ui.MethodBadge(method)
 		}
 
-		// Install method hint
-		method := pkg.InstallMethodDescription(&a, m.shared.Distro.Type)
-		methodHint := theme.MutedStyle().Render(" " + method)
-
-		fullLabel := checkbox + " " + label + methodHint
-
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(fullLabel)
-			listLines = append(listLines, line)
-		} else {
-			listLines = append(listLines, "  "+normal.Render(fullLabel))
+		items[i] = ui.ListItem{
+			Icon:   checkbox,
+			Label:  a.Name,
+			Suffix: suffix,
 		}
 	}
-	list := strings.Join(listLines, "\n")
+
+	list := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	listBlock := lipgloss.NewStyle().
 		Width(width).

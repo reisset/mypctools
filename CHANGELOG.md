@@ -11,6 +11,32 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.20.0] - 2026-02-05
+
+#### Added
+- **Go TUI Phase 7: Comprehensive UI/UX Overhaul** — Inspired by lazygit, btop, and Charm apps
+  - **Spacing system** (`internal/theme/spacing.go`) — 4-unit grid constants for consistent layout
+  - **List component** (`internal/ui/list.go`) — Reusable list with full-width highlight bars on selection
+  - **Box component** (`internal/ui/box.go`) — btop-inspired rounded border boxes with optional title
+  - **Checkbox component** (`internal/ui/checkbox.go`) — Nerd font checkboxes ( / ) with ASCII fallback
+  - **New palette colors** — Added Highlight, Surface, Border, BorderDim to all 3 themes
+  - **15+ cached styles** — listHighlight, box, boxActive, tableHeader, tableRowSelected, statusActive, statusError, helpKey, helpDivider
+
+#### Changed
+- **Menu selection** — Arrow cursor + full-width background highlight bar (was just bold text)
+- **Breadcrumb** — Inline `Parent / Current` with muted parents (was boxed current screen)
+- **Footer** — Horizontal divider line + pipe separators `│` (was dot separators `·`)
+- **App list checkboxes** — Nerd font `` / `` (was `[x]` / `[ ]`)
+- **Service status** — Pill-style badges with background colors (was text color only)
+- **System info** — Titled boxes with primary border, key-value alignment
+- **Main menu logo** — Responsive: compact version for terminals <85 cols
+- **Icons** — Added Cursor, Check, CheckBox, CheckBoxOn, Dot, Arrow, Separator
+
+#### Updated Screens (14)
+- mainmenu, apps, applist, scripts, scriptmenu, systemsetup, services, servicedetail, themepicker, sysinfo, cleanup, appconfirm, pullupdate, update
+
+---
+
 ### [0.19.0] - 2026-02-05
 
 #### Fixed

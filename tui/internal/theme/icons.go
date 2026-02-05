@@ -7,57 +7,78 @@ import (
 
 // Icon pairs: nerd font glyph + ASCII fallback.
 type IconSet struct {
-	Apps    string
-	Scripts string
-	System  string
-	AI      string
-	Browser string
-	Gaming  string
-	Media   string
-	Dev     string
-	Update  string
-	Cleanup string
-	Service string
-	Info    string
-	Exit    string
-	Back    string
-	Theme   string
+	Apps       string
+	Scripts    string
+	System     string
+	AI         string
+	Browser    string
+	Gaming     string
+	Media      string
+	Dev        string
+	Update     string
+	Cleanup    string
+	Service    string
+	Info       string
+	Exit       string
+	Back       string
+	Theme      string
+	Cursor     string
+	Check      string
+	CheckBox   string
+	CheckBoxOn string
+	Dot        string
+	Arrow      string
+	Separator  string
 }
 
 var NerdIcons = IconSet{
-	Apps:    "\uf019",  // nf-fa-download
-	Scripts: "\uf121",  // nf-fa-code
-	System:  "\uf013",  // nf-fa-cog
-	AI:      "\uf0eb",  // nf-fa-lightbulb_o
-	Browser: "\uf0ac",  // nf-fa-globe
-	Gaming:  "\uf11b",  // nf-fa-gamepad
-	Media:   "\uf001",  // nf-fa-music
-	Dev:     "\uf120",  // nf-fa-terminal
-	Update:  "\uf021",  // nf-fa-refresh
-	Cleanup: "\uf1b8",  // nf-fa-trash
-	Service: "\uf233",  // nf-fa-server
-	Info:    "\uf05a",  // nf-fa-info_circle
-	Exit:    "\uf2f5",  // nf-fa-sign_out
-	Back:    "\uf060",  // nf-fa-arrow_left
-	Theme:   "\uf53f",  // nf-fa-palette
+	Apps:       "\uf019",  // nf-fa-download
+	Scripts:    "\uf121",  // nf-fa-code
+	System:     "\uf013",  // nf-fa-cog
+	AI:         "\uf0eb",  // nf-fa-lightbulb_o
+	Browser:    "\uf0ac",  // nf-fa-globe
+	Gaming:     "\uf11b",  // nf-fa-gamepad
+	Media:      "\uf001",  // nf-fa-music
+	Dev:        "\uf120",  // nf-fa-terminal
+	Update:     "\uf021",  // nf-fa-refresh
+	Cleanup:    "\uf1b8",  // nf-fa-trash
+	Service:    "\uf233",  // nf-fa-server
+	Info:       "\uf05a",  // nf-fa-info_circle
+	Exit:       "\uf2f5",  // nf-fa-sign_out
+	Back:       "\uf060",  // nf-fa-arrow_left
+	Theme:      "\uf53f",  // nf-fa-palette
+	Cursor:     "\uf061",  // nf-fa-arrow_right (→)
+	Check:      "\uf00c",  // nf-fa-check (✓)
+	CheckBox:   "\uf0c8",  // nf-fa-square ()
+	CheckBoxOn: "\uf14a",  // nf-fa-check_square ()
+	Dot:        "\uf111",  // nf-fa-circle (•)
+	Arrow:      "\uf061",  // nf-fa-arrow_right (→)
+	Separator:  "\ue621",  // nf-custom-folder_config (│)
 }
 
 var ASCIIIcons = IconSet{
-	Apps:    ">>",
-	Scripts: "<>",
-	System:  "::",
-	AI:      "**",
-	Browser: "@@",
-	Gaming:  "><",
-	Media:   "~>",
-	Dev:     "$>",
-	Update:  "^^",
-	Cleanup: "--",
-	Service: "[]",
-	Info:    "(i)",
-	Exit:    "=>",
-	Back:    "<-",
-	Theme:   "##",
+	Apps:       ">>",
+	Scripts:    "<>",
+	System:     "::",
+	AI:         "**",
+	Browser:    "@@",
+	Gaming:     "><",
+	Media:      "~>",
+	Dev:        "$>",
+	Update:     "^^",
+	Cleanup:    "--",
+	Service:    "[]",
+	Info:       "(i)",
+	Exit:       "=>",
+	Back:       "<-",
+	Theme:      "##",
+	Cursor:     ">",
+	Check:      "*",
+	CheckBox:   "[ ]",
+	CheckBoxOn: "[x]",
+	Dot:        "*",
+	Arrow:      "->",
+	Separator:  "|",
 }
 
 // Icons is the active icon set, chosen at init.

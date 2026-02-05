@@ -70,7 +70,7 @@ func (m Model) View() string {
 		if m.err != nil {
 			statusLine = theme.ErrorStyle().Render("Failed to pull updates")
 		} else {
-			statusLine = theme.SuccessStyle().Render("Updated! Restart mypctools to use new version.")
+			statusLine = theme.SuccessStyle().Render(theme.Icons.Check + " Updated! Restart mypctools to use new version.")
 		}
 
 		prompt := theme.MutedStyle().Render("Press any key to continue...")

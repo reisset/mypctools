@@ -15,7 +15,6 @@ type HelpKey struct {
 
 // ParseHelpString splits a help string like "j/k navigate" into key and description.
 func ParseHelpString(s string) HelpKey {
-	// Find the first space to split key from description
 	idx := strings.Index(s, " ")
 	if idx == -1 {
 		return HelpKey{Key: s, Desc: ""}
@@ -26,19 +25,44 @@ func ParseHelpString(s string) HelpKey {
 	}
 }
 
-// Footer renders a help key bar at the bottom.
+// Footer renders a help key bar with a divider above.
+// Format: ─────────────────────────────────
+//
+//	j/k move │ enter select │ q quit
 func Footer(keys []HelpKey, width int) string {
-	muted := theme.MutedStyle()
-	accent := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Current.Secondary))
+	keyStyle := theme.HelpKeyStyle()
+	descStyle := theme.HelpDescStyle()
+	dividerStyle := theme.HelpDividerStyle()
 
+	// Build help text
 	var parts []string
 	for _, k := range keys {
-		parts = append(parts, accent.Render(k.Key)+" "+muted.Render(k.Desc))
+		parts = append(parts, keyStyle.Render(k.Key)+" "+descStyle.Render(k.Desc))
 	}
 
-	bar := strings.Join(parts, muted.Render("  ·  "))
-	return lipgloss.NewStyle().
+	sep := dividerStyle.Render(" │ ")
+	helpText := strings.Join(parts, sep)
+
+	// Create divider line
+	dividerWidth := width - 4
+	if dividerWidth > 60 {
+		dividerWidth = 60
+	}
+	if dividerWidth < 20 {
+		dividerWidth = 20
+	}
+	divider := dividerStyle.Render(strings.Repeat("─", dividerWidth))
+
+	// Center both
+	dividerCentered := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(bar)
+		Render(divider)
+
+	helpCentered := lipgloss.NewStyle().
+		Width(width).
+		Align(lipgloss.Center).
+		Render(helpText)
+
+	return dividerCentered + "\n" + helpCentered
 }
