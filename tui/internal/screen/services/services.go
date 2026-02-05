@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -206,7 +207,7 @@ func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 			m.scrollToCursor()
 			m.viewport.SetContent(m.renderRows())
 		case "enter", " ":
-			if len(m.services) > 0 && m.cursor < len(m.services) {
+			if len(m.services) > 0 && m.cursor >= 0 && m.cursor < len(m.services) {
 				return m, app.Navigate(NewServiceDetail(m.shared, m.services[m.cursor].Name))
 			}
 		}
@@ -337,8 +338,9 @@ func (m ServiceListModel) ShortHelp() []string {
 }
 
 func truncate(s string, max int) string {
-	if len(s) <= max {
+	if utf8.RuneCountInString(s) <= max {
 		return s
 	}
-	return s[:max-1] + "…"
+	runes := []rune(s)
+	return string(runes[:max-1]) + "…"
 }

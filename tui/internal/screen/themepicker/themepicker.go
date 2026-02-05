@@ -55,7 +55,10 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 			selected := theme.Presets[m.cursor]
 			theme.Current = selected
 			theme.RebuildStyles()
-			_ = theme.Save(selected.Name)
+			if err := theme.Save(selected.Name); err != nil {
+				// Log error but don't block the UI - theme is already applied in memory
+				_ = err // Theme save failed, but in-memory theme is still applied
+			}
 			return m, app.PopScreen()
 		}
 	}

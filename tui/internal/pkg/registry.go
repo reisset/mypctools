@@ -265,7 +265,8 @@ func AllApps() []App {
 
 // AppsByCategory returns apps for a given category.
 func AppsByCategory(category string) []App {
-	var result []App
+	// Preallocate with estimated capacity (most categories have 4-8 apps)
+	result := make([]App, 0, 8)
 	for _, a := range apps {
 		if a.Category == category {
 			result = append(result, a)

@@ -49,8 +49,14 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		innerWidth = 50
 	}
 
-	var lines []string
+	// Fixed cursor column width for consistent alignment
+	const cursorWidth = 3
+
+	var sb strings.Builder
 	for i, item := range items {
+		if i > 0 {
+			sb.WriteByte('\n')
+		}
 		isSelected := i == cursor
 
 		// Build the label with icon
@@ -76,32 +82,41 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 				// Full-width highlight bar style
 				highlight := theme.ListHighlightStyle().Width(innerWidth)
 				if cfg.ShowCursor {
-					cursorIcon := theme.MenuCursorStyle().Render(theme.Icons.Cursor + " ")
-					line = cursorIcon + highlight.Render(label)
+					cursorStr := lipgloss.NewStyle().
+						Width(cursorWidth).
+						Foreground(lipgloss.Color(theme.Current.Primary)).
+						Render(theme.Icons.Cursor)
+					line = cursorStr + highlight.Render(label)
 				} else {
-					line = "  " + highlight.Render(label)
+					spacer := strings.Repeat(" ", cursorWidth)
+					line = spacer + highlight.Render(label)
 				}
 			} else {
 				// Simple bold style
 				if cfg.ShowCursor {
-					cursorIcon := theme.MenuCursorStyle().Render("> ")
-					line = cursorIcon + theme.MenuSelectedStyle().Render(label)
+					cursorStr := lipgloss.NewStyle().
+						Width(cursorWidth).
+						Foreground(lipgloss.Color(theme.Current.Primary)).
+						Render(">")
+					line = cursorStr + theme.MenuSelectedStyle().Render(label)
 				} else {
-					line = "  " + theme.MenuSelectedStyle().Render(label)
+					spacer := strings.Repeat(" ", cursorWidth)
+					line = spacer + theme.MenuSelectedStyle().Render(label)
 				}
 			}
 		} else {
+			spacer := strings.Repeat(" ", cursorWidth)
 			if item.Dimmed {
-				line = "   " + theme.ListDimmedStyle().Width(innerWidth).Render(label)
+				line = spacer + theme.ListDimmedStyle().Width(innerWidth).Render(label)
 			} else {
-				line = "   " + theme.ListNormalStyle().Width(innerWidth).Render(label)
+				line = spacer + theme.ListNormalStyle().Width(innerWidth).Render(label)
 			}
 		}
 
-		lines = append(lines, line)
+		sb.WriteString(line)
 	}
 
-	return strings.Join(lines, "\n")
+	return sb.String()
 }
 
 // RenderSimpleList renders a basic list without icons.

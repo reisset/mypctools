@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Claude Code config installer
 # v1.7 - Removed set -e for reliability
 
