@@ -6,7 +6,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/screen/cleanup"
 	"github.com/reisset/mypctools/tui/internal/screen/services"
-	"github.com/reisset/mypctools/tui/internal/screen/sysinfo"
 	"github.com/reisset/mypctools/tui/internal/screen/themepicker"
 	"github.com/reisset/mypctools/tui/internal/screen/update"
 	"github.com/reisset/mypctools/tui/internal/state"
@@ -33,7 +32,6 @@ func New(shared *state.Shared) Model {
 		{icon: theme.Icons.Update, label: "Full System Update", id: "update"},
 		{icon: theme.Icons.Cleanup, label: "System Cleanup", id: "cleanup"},
 		{icon: theme.Icons.Service, label: "Service Manager", id: "services"},
-		{icon: theme.Icons.Info, label: "System Info", id: "sysinfo"},
 		{icon: theme.Icons.Theme, label: "Theme", id: "theme"},
 		{icon: theme.Icons.Back, label: "Back", id: "back"},
 	}
@@ -77,8 +75,6 @@ func (m Model) handleSelection(id string) tea.Cmd {
 		return app.Navigate(cleanup.New(m.shared))
 	case "services":
 		return app.Navigate(services.New(m.shared))
-	case "sysinfo":
-		return app.Navigate(sysinfo.New(m.shared))
 	case "theme":
 		return app.Navigate(themepicker.New(m.shared))
 	case "back":
