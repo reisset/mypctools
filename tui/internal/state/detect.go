@@ -1,6 +1,7 @@
 package state
 
 import (
+	"context"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -17,17 +18,11 @@ type UpdateCountMsg struct {
 // CheckForUpdates runs git fetch + rev-list in the background.
 func CheckForUpdates(rootDir string) tea.Cmd {
 	return func() tea.Msg {
-		ctx := exec.Command("git", "-C", rootDir, "fetch", "origin", "main")
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
 
-		done := make(chan error, 1)
-		go func() { done <- ctx.Run() }()
-
-		select {
-		case err := <-done:
-			if err != nil {
-				return UpdateCountMsg{Count: 0}
-			}
-		case <-time.After(3 * time.Second):
+		cmd := exec.CommandContext(ctx, "git", "-C", rootDir, "fetch", "origin", "main")
+		if err := cmd.Run(); err != nil {
 			return UpdateCountMsg{Count: 0}
 		}
 

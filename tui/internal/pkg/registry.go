@@ -7,6 +7,7 @@ type App struct {
 	Category     string
 	AptPkg       string
 	PacmanPkg    string
+	DnfPkg       string // Fedora package name (if different from AptPkg)
 	FlatpakID    string
 	CommandCheck string // Binary name to check (e.g., "ollama")
 	FallbackCmd  string // Shell command for fallback install
@@ -83,6 +84,7 @@ var apps = []App{
 		Category:     CategoryBrowsers,
 		AptPkg:       "firefox",
 		PacmanPkg:    "firefox",
+		DnfPkg:       "firefox",
 		FlatpakID:    "org.mozilla.firefox",
 		CommandCheck: "firefox",
 	},
@@ -94,6 +96,7 @@ var apps = []App{
 		Category:     CategoryGaming,
 		AptPkg:       "steam",
 		PacmanPkg:    "steam",
+		DnfPkg:       "steam",
 		FlatpakID:    "com.valvesoftware.Steam",
 		CommandCheck: "steam",
 	},
@@ -103,6 +106,7 @@ var apps = []App{
 		Category:     CategoryGaming,
 		AptPkg:       "lutris",
 		PacmanPkg:    "lutris",
+		DnfPkg:       "lutris",
 		FlatpakID:    "net.lutris.Lutris",
 		CommandCheck: "lutris",
 	},
@@ -147,6 +151,7 @@ var apps = []App{
 		Category:     CategoryMedia,
 		AptPkg:       "vlc",
 		PacmanPkg:    "vlc",
+		DnfPkg:       "vlc",
 		FlatpakID:    "org.videolan.VLC",
 		CommandCheck: "vlc",
 	},
@@ -156,6 +161,7 @@ var apps = []App{
 		Category:     CategoryMedia,
 		AptPkg:       "mpv",
 		PacmanPkg:    "mpv",
+		DnfPkg:       "mpv",
 		FlatpakID:    "io.mpv.Mpv",
 		CommandCheck: "mpv",
 	},
@@ -167,6 +173,7 @@ var apps = []App{
 		Category:     CategoryDevTools,
 		AptPkg:       "docker.io",
 		PacmanPkg:    "docker",
+		DnfPkg:       "docker",
 		CommandCheck: "docker",
 	},
 	{
@@ -175,6 +182,7 @@ var apps = []App{
 		Category:     CategoryDevTools,
 		AptPkg:       "docker-compose",
 		PacmanPkg:    "docker-compose",
+		DnfPkg:       "docker-compose",
 		CommandCheck: "docker-compose",
 		FallbackCmd:  `VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -Po '"tag_name": "v\K[^"]*') && mkdir -p ~/.docker/cli-plugins && curl -fsSL -o ~/.docker/cli-plugins/docker-compose "https://github.com/docker/compose/releases/download/v${VERSION}/docker-compose-linux-$(uname -m)" && chmod +x ~/.docker/cli-plugins/docker-compose`,
 	},
@@ -216,6 +224,7 @@ var apps = []App{
 		Category:     CategoryDevTools,
 		AptPkg:       "dotnet-sdk-8.0",
 		PacmanPkg:    "dotnet-sdk",
+		DnfPkg:       "dotnet-sdk-8.0",
 		CommandCheck: "dotnet",
 		FallbackCmd:  "sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0 || (sudo add-apt-repository -y ppa:dotnet/backports && sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0)",
 	},
@@ -225,6 +234,7 @@ var apps = []App{
 		Category:     CategoryDevTools,
 		AptPkg:       "python3",
 		PacmanPkg:    "python",
+		DnfPkg:       "python3",
 		CommandCheck: "python3",
 	},
 }

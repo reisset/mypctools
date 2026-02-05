@@ -4,11 +4,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
+var logMu sync.Mutex
+
 // LogAction appends a timestamped line to ~/.local/share/mypctools/mypctools.log.
 func LogAction(action string) error {
+	logMu.Lock()
+	defer logMu.Unlock()
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return err

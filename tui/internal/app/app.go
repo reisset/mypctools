@@ -100,7 +100,7 @@ func (m Model) View() string {
 	// Build footer: help keys from active screen + global keys
 	helpKeys := []ui.HelpKey{}
 	for _, h := range top.ShortHelp() {
-		helpKeys = append(helpKeys, ui.HelpKey{Key: h, Desc: ""})
+		helpKeys = append(helpKeys, ui.ParseHelpString(h))
 	}
 	if len(m.stack) > 1 {
 		helpKeys = append(helpKeys, ui.HelpKey{Key: "esc", Desc: "back"})

@@ -35,19 +35,29 @@ fi
 }
 
 // ClearUserCaches removes user cache files (thumbnails, trash).
+// Returns an error if any removal fails (other than path not existing).
 func ClearUserCaches() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
 	}
 
+	var errs []error
+
 	// Clear thumbnails
 	thumbnails := filepath.Join(home, ".cache", "thumbnails")
-	os.RemoveAll(thumbnails)
+	if err := os.RemoveAll(thumbnails); err != nil {
+		errs = append(errs, err)
+	}
 
 	// Clear trash
 	trash := filepath.Join(home, ".local", "share", "Trash")
-	os.RemoveAll(trash)
+	if err := os.RemoveAll(trash); err != nil {
+		errs = append(errs, err)
+	}
 
+	if len(errs) > 0 {
+		return errs[0] // Return first error for simplicity
+	}
 	return nil
 }
