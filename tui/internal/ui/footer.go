@@ -13,6 +13,19 @@ type HelpKey struct {
 	Desc string
 }
 
+// ParseHelpString splits a help string like "j/k navigate" into key and description.
+func ParseHelpString(s string) HelpKey {
+	// Find the first space to split key from description
+	idx := strings.Index(s, " ")
+	if idx == -1 {
+		return HelpKey{Key: s, Desc: ""}
+	}
+	return HelpKey{
+		Key:  s[:idx],
+		Desc: s[idx+1:],
+	}
+}
+
 // Footer renders a help key bar at the bottom.
 func Footer(keys []HelpKey, width int) string {
 	muted := theme.MutedStyle()

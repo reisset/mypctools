@@ -53,6 +53,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		case "enter", " ":
 			selected := theme.Presets[m.cursor]
 			theme.Current = selected
+			theme.RebuildStyles()
 			_ = theme.Save(selected.Name)
 			return m, app.PopScreen()
 		}
