@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+	"github.com/reisset/mypctools/tui/internal/screen/scripts"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
@@ -79,7 +80,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 			if m.cursor < 0 {
 				m.cursor = len(items) - 1
 			}
-		case "enter":
+		case "enter", " ":
 			if m.cursor < len(items) {
 				return m, m.handleSelection(items[m.cursor].id)
 			}
@@ -96,8 +97,7 @@ func (m Model) handleSelection(id string) tea.Cmd {
 		// Phase 3: will navigate to app categories
 		return nil
 	case "scripts":
-		// Phase 2: will navigate to script list
-		return nil
+		return app.Navigate(scripts.New(m.shared))
 	case "system":
 		// Phase 4: will navigate to system setup menu
 		return nil

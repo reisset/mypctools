@@ -11,6 +11,26 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.14.0] - 2026-02-04
+
+#### Added
+- **Go TUI Phase 2: Script Bundles** — "My Scripts" menu now functional
+  - Bundle registry (`tui/internal/bundle/`) with all 10 script bundles (litebash, litezsh, terminal, alacritty, ghostty, kitty, fastfetch, screensaver, claude, spicetify)
+  - Installation detection via marker file checks (same paths as bash `is_script_installed()`)
+  - Scripts list screen with j/k navigation and green ✓ badges for installed bundles
+  - Per-bundle submenu: Install / Uninstall / Back
+  - Script execution via `tea.ExecProcess()` — suspends TUI, gives script full terminal control (sudo prompts work), shows success/failure on return
+  - Spacebar as alternative to Enter for menu selection
+
+#### Fixed
+- `go.mod` version changed from 1.25 (nonexistent) to 1.22
+
+#### Known Issues
+- Sudo password prompts cause jarring visual transition (TUI suspends → terminal → TUI resumes) — inherent to `tea.ExecProcess()` design
+- Menu items not perfectly centered — polish deferred to later phase
+
+---
+
 ### [0.13.0] - 2026-02-04
 
 #### Added
