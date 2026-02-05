@@ -9,16 +9,16 @@ curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh |
 mypctools
 ```
 
-Uninstall:
+To uninstall:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh | bash
 ```
 
-## What It Does
+## Features
 
 ### Install Apps
 
-One menu to install apps across distros. Uses native package managers first, falls back to Flatpak or custom installers when needed.
+Install apps across distros from a single menu. The installer tries native package managers first, then Flatpak, then custom installers.
 
 | Category | Apps |
 |----------|------|
@@ -28,46 +28,46 @@ One menu to install apps across distros. Uses native package managers first, fal
 | Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK 10, Python |
 | AI Tools | OpenCode, Claude Code, Mistral Vibe, Ollama, LM Studio |
 
-CLI tools (btop, bat, eza, zoxide, fzf, ripgrep, fd, etc.) are included in the LiteBash and LiteZsh script bundles.
+The LiteBash and LiteZsh bundles include CLI tools: btop, bat, eza, zoxide, fzf, ripgrep, and fd.
 
 ### My Scripts
 
-Bundled script collections with install/uninstall options:
+Bundled script collections you can install or uninstall:
 
 - **LiteBash** - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi).
-- **LiteZsh** - Zsh counterpart to LiteBash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
-- **Terminal - foot** - Wayland terminal with curated themes (Catppuccin Mocha, Tokyo Night, HackTheBox). Shell-agnostic.
-- **Terminal - alacritty** - X11/Wayland terminal with the same themes. Shell-agnostic.
-- **Terminal - ghostty** - X11/Wayland terminal with the same themes. Shell-agnostic.
-- **Terminal - kitty** - X11/Wayland terminal with the same themes. Shell-agnostic.
-- **Fastfetch** - Custom fastfetch config with boxed layout, nerd font icons, and compact distro logo.
-- **Screensaver** - Terminal screensaver via hypridle + Terminal Text Effects. Hyprland only.
-- **Spicetify Theme** - Spotify theming with StarryNight or text themes. Native Spotify installs only.
-- **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline
+- **LiteZsh** - Zsh environment with syntax highlighting, autosuggestions, and arrow-key completion. Sets zsh as default shell.
+- **Terminal - foot** - Wayland terminal with Catppuccin Mocha, Tokyo Night, and HackTheBox themes.
+- **Terminal - alacritty** - X11/Wayland terminal with the same themes.
+- **Terminal - ghostty** - X11/Wayland terminal with the same themes.
+- **Terminal - kitty** - X11/Wayland terminal with the same themes.
+- **Fastfetch** - Custom config with boxed layout, nerd font icons, and compact distro logo.
+- **Screensaver** - Terminal screensaver via hypridle and Terminal Text Effects. Hyprland only.
+- **Spicetify Theme** - Spotify theming with StarryNight or text themes. Native Spotify only.
+- **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline.
 
 ### System Setup
 
-- Full System Update - one-click apt/pacman/dnf upgrade
-- System Cleanup - remove orphans, clear caches, empty trash
-- Service Manager - TUI for systemctl services (common services table + fuzzy search across all services)
-- System Info - fastfetch-style details (OS, kernel, CPU, GPU, memory, disk, packages)
+- **Full System Update** - Run apt, pacman, or dnf upgrade with one click.
+- **System Cleanup** - Remove orphaned packages, clear caches, empty trash.
+- **Service Manager** - Browse common services or search all services with fuzzy matching.
+- **System Info** - View OS, kernel, CPU, GPU, memory, disk, and package details.
 
 ### CLI Flags
 
 ```bash
-mypctools --help      # Usage info
-mypctools --version   # Version number
+mypctools --help      # Show usage
+mypctools --version   # Show version
 ```
 
-Updates are checked automatically on launch.
+The app checks for updates at launch.
 
-## How Package Installation Works
+## Package Installation Order
 
 ```
 Native (apt/pacman/dnf) → Flatpak → Custom fallback
 ```
 
-The installer tries each method in order and stops at the first success. Custom fallbacks handle apps that need special setup:
+The installer stops at the first successful method. Custom fallbacks handle apps requiring special setup:
 
 | App | Fallback Method |
 |-----|-----------------|
@@ -86,10 +86,10 @@ The installer tries each method in order and stops at the first success. Custom 
 ## Requirements
 
 - Linux (Debian/Ubuntu, Arch, or Fedora-based)
-- x86_64 or arm64 architecture
-- Internet connection for installs
+- x86_64 or arm64
+- Internet connection
 
-## Building from Source
+## Build from Source
 
 ```bash
 git clone https://github.com/reisset/mypctools.git
