@@ -92,9 +92,9 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 			}
 		} else {
 			if item.Dimmed {
-				line = "   " + theme.ListDimmedStyle().Render(label)
+				line = "   " + theme.ListDimmedStyle().Width(innerWidth).Render(label)
 			} else {
-				line = "   " + theme.ListNormalStyle().Render(label)
+				line = "   " + theme.ListNormalStyle().Width(innerWidth).Render(label)
 			}
 		}
 

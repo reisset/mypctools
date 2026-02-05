@@ -98,12 +98,12 @@ func (m ServiceDetailModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		}
 
 		switch msg.String() {
-		case "j", "down":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "k", "up":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
@@ -255,8 +255,5 @@ func (m ServiceDetailModel) Title() string {
 }
 
 func (m ServiceDetailModel) ShortHelp() []string {
-	if m.actionDone {
-		return []string{"any key continue"}
-	}
-	return []string{"j/k navigate", "enter select"}
+	return []string{}
 }

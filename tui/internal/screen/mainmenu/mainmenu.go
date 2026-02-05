@@ -84,14 +84,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q":
-			return m, tea.Quit
-		case "j", "down":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "k", "up":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
@@ -173,11 +171,17 @@ func (m Model) View() string {
 		HighlightFull: true,
 	})
 
+	// Wrap menu in a subtle box for visual containment
+	menuBox := theme.BoxStyle().
+		Width(56).
+		Align(lipgloss.Center).
+		Render(menu)
+
 	// Center the menu
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(menu)
+		Render(menuBox)
 
 	parts := []string{renderedLogo}
 	if updateBadge != "" {
@@ -193,7 +197,7 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{"j/k navigate", "enter select"}
+	return []string{}
 }
 
 func buildSysLine(shared *state.Shared) string {

@@ -90,7 +90,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		switch m.phase {
 		case phaseAskUserCache:
 			switch msg.String() {
-			case "j", "down", "k", "up", "tab":
+			case "down", "up", "tab":
 				if m.cursor == actionYes {
 					m.cursor = actionNo
 				} else {
@@ -262,9 +262,7 @@ func (m Model) Title() string {
 func (m Model) ShortHelp() []string {
 	switch m.phase {
 	case phaseAskUserCache:
-		return []string{"j/k navigate", "enter select", "y yes", "n no"}
-	case phaseDone:
-		return []string{"any key continue"}
+		return []string{"y yes", "n no"}
 	default:
 		return []string{}
 	}
