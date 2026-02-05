@@ -11,6 +11,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/screen/apps"
 	"github.com/reisset/mypctools/tui/internal/screen/scripts"
+	"github.com/reisset/mypctools/tui/internal/screen/systemsetup"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
@@ -99,8 +100,7 @@ func (m Model) handleSelection(id string) tea.Cmd {
 	case "scripts":
 		return app.Navigate(scripts.New(m.shared))
 	case "system":
-		// Phase 4: will navigate to system setup menu
-		return nil
+		return app.Navigate(systemsetup.New(m.shared))
 	case "update":
 		// Phase 4: will navigate to pull update screen
 		return nil
