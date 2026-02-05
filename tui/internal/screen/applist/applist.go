@@ -16,22 +16,31 @@ import (
 
 // Model is the multi-select app list screen.
 type Model struct {
-	shared   *state.Shared
-	category string
-	apps     []pkg.App
-	selected map[string]bool // App ID → selected
-	cursor   int
+	shared    *state.Shared
+	category  string
+	apps      []pkg.App
+	selected  map[string]bool // App ID → selected
+	cursor    int
+	installed map[string]bool // Cached installed status (computed once)
 }
 
 // New creates a new app list screen for the given category.
 func New(shared *state.Shared, category string) Model {
 	apps := pkg.AppsByCategory(category)
+
+	// Pre-compute installed status once (avoids shell calls on every render)
+	installed := make(map[string]bool)
+	for _, a := range apps {
+		installed[a.ID] = pkg.IsAppInstalled(&a, shared.Distro.Type)
+	}
+
 	return Model{
-		shared:   shared,
-		category: category,
-		apps:     apps,
-		selected: make(map[string]bool),
-		cursor:   0,
+		shared:    shared,
+		category:  category,
+		apps:      apps,
+		selected:  make(map[string]bool),
+		cursor:    0,
+		installed: installed,
 	}
 }
 
@@ -68,7 +77,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		case "a":
 			// Select all uninstalled apps
 			for _, a := range m.apps {
-				if !pkg.IsAppInstalled(&a, m.shared.Distro.Type) {
+				if !m.installed[a.ID] {
 					m.selected[a.ID] = true
 				}
 			}
@@ -124,9 +133,9 @@ func (m Model) View() string {
 			checkbox = theme.MutedStyle().Render("[ ]")
 		}
 
-		// App name with installed badge
+		// App name with installed badge (uses cached status)
 		label := a.Name
-		if pkg.IsAppInstalled(&a, m.shared.Distro.Type) {
+		if m.installed[a.ID] {
 			label += ui.InstalledBadge()
 		}
 
