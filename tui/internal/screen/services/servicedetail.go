@@ -266,5 +266,8 @@ func (m ServiceDetailModel) Title() string {
 }
 
 func (m ServiceDetailModel) ShortHelp() []string {
-	return []string{}
+	if m.actionDone {
+		return []string{"any key continue"}
+	}
+	return []string{"enter select"}
 }

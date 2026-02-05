@@ -118,7 +118,7 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{}
+	return []string{"enter apply"}
 }
 
 // renderSwatch creates color preview blocks for a palette.

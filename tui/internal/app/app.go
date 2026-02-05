@@ -57,11 +57,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "esc":
-			if len(m.stack) > 1 {
-				m.stack = m.stack[:len(m.stack)-1]
-				return m, m.stack[len(m.stack)-1].Init()
-			}
-			return m, tea.Quit
+			return m, PopScreen()
 		}
 	}
 

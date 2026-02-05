@@ -196,7 +196,7 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{}
+	return []string{"enter select", "q quit"}
 }
 
 func buildSysLine(shared *state.Shared) string {
@@ -208,7 +208,6 @@ func buildSysLine(shared *state.Shared) string {
 	} else {
 		shell = "sh"
 	}
-
 
 	kernel := ""
 	if data, err := os.ReadFile("/proc/version"); err == nil {

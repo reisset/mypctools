@@ -76,7 +76,7 @@ var ASCIIIcons = IconSet{
 	Check:      "*",
 	CheckBox:   "[ ]",
 	CheckBoxOn: "[x]",
-	Dot:        "*",
+	Dot:        ".",
 	Arrow:      "->",
 	Separator:  "|",
 }

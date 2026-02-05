@@ -1,6 +1,8 @@
 package selfupdate
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -28,10 +31,12 @@ func Update(scriptsDir string) error {
 
 	// Download and replace binary
 	arch := runtime.GOARCH
-	url := fmt.Sprintf("%s/mypctools-linux-%s", releaseBaseURL, arch)
+	binaryName := fmt.Sprintf("mypctools-linux-%s", arch)
+	binaryURL := fmt.Sprintf("%s/%s", releaseBaseURL, binaryName)
+	checksumsURL := fmt.Sprintf("%s/checksums.txt", releaseBaseURL)
 
 	fmt.Printf("Downloading latest binary (%s)...\n", arch)
-	if err := downloadAndReplace(url, exePath); err != nil {
+	if err := downloadAndReplace(binaryURL, checksumsURL, binaryName, exePath); err != nil {
 		return fmt.Errorf("failed to update binary: %w", err)
 	}
 	fmt.Println("Binary updated.")
@@ -46,42 +51,91 @@ func Update(scriptsDir string) error {
 	return nil
 }
 
-// downloadAndReplace downloads a file and atomically replaces the destination.
-func downloadAndReplace(url, destPath string) error {
+// downloadAndReplace downloads a file, verifies its checksum, and atomically replaces the destination.
+func downloadAndReplace(binaryURL, checksumsURL, binaryName, destPath string) error {
 	// Create temp file in same directory (for atomic rename)
 	dir := filepath.Dir(destPath)
-	tmpPath := filepath.Join(dir, ".mypctools.tmp")
-
-	// Download to temp file
-	resp, err := http.Get(url)
+	tmpFile, err := os.CreateTemp(dir, ".mypctools-update-*")
 	if err != nil {
+		return fmt.Errorf("failed to create temp file: %w", err)
+	}
+	tmpPath := tmpFile.Name()
+	defer os.Remove(tmpPath) // Clean up on any error path
+
+	// Download binary to temp file
+	resp, err := http.Get(binaryURL)
+	if err != nil {
+		tmpFile.Close()
 		return fmt.Errorf("download failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		tmpFile.Close()
 		return fmt.Errorf("download failed: HTTP %d", resp.StatusCode)
 	}
 
-	tmpFile, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
-	if err != nil {
-		return fmt.Errorf("failed to create temp file: %w", err)
-	}
+	// Write and compute SHA256 simultaneously
+	hasher := sha256.New()
+	writer := io.MultiWriter(tmpFile, hasher)
 
-	_, err = io.Copy(tmpFile, resp.Body)
+	_, err = io.Copy(writer, resp.Body)
 	tmpFile.Close()
 	if err != nil {
-		os.Remove(tmpPath)
 		return fmt.Errorf("failed to write temp file: %w", err)
+	}
+
+	actualHash := hex.EncodeToString(hasher.Sum(nil))
+
+	// Verify checksum if checksums.txt is available
+	expectedHash, err := fetchExpectedChecksum(checksumsURL, binaryName)
+	if err != nil {
+		fmt.Printf("Warning: checksum verification skipped (%v)\n", err)
+	} else if actualHash != expectedHash {
+		return fmt.Errorf("checksum mismatch: expected %s, got %s", expectedHash, actualHash)
+	} else {
+		fmt.Println("Checksum verified.")
+	}
+
+	// Set executable permission
+	if err := os.Chmod(tmpPath, 0755); err != nil {
+		return fmt.Errorf("failed to set permissions: %w", err)
 	}
 
 	// Atomic replace
 	if err := os.Rename(tmpPath, destPath); err != nil {
-		os.Remove(tmpPath)
 		return fmt.Errorf("failed to replace binary: %w", err)
 	}
 
 	return nil
+}
+
+// fetchExpectedChecksum downloads checksums.txt and extracts the hash for the given filename.
+func fetchExpectedChecksum(checksumsURL, filename string) (string, error) {
+	resp, err := http.Get(checksumsURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to download checksums: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("checksums not available: HTTP %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read checksums: %w", err)
+	}
+
+	// Parse checksums.txt format: "<hash>  <filename>" or "<hash> <filename>"
+	for _, line := range strings.Split(string(body), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) == 2 && fields[1] == filename {
+			return fields[0], nil
+		}
+	}
+
+	return "", fmt.Errorf("checksum not found for %s", filename)
 }
 
 // gitPull runs git pull in the specified directory.

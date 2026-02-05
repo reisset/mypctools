@@ -4,6 +4,25 @@ All notable changes to mypctools.
 
 ---
 
+## [0.24.3] - 2026-02-05
+
+### Security
+- **Self-update checksum verification**: Binary downloads now verified against SHA256 checksums from `checksums.txt` in the release. Gracefully skips if checksums file isn't published yet. Uses `os.CreateTemp` instead of predictable temp filename.
+- **Log file permissions**: Changed from 0644 to 0600 (no longer world-readable)
+
+### Fixed
+- **Fedora package names**: Removed incorrect fallback that used Debian apt package names with dnf. Fedora now only uses the explicit `DnfPkg` field for installs and detection.
+- **Package detection TUI bleed**: `pacman -Q`, `dpkg -s`, and `rpm -q` output now redirected to `io.Discard` to prevent error messages from leaking into the TUI.
+- **Esc handler**: Unified to dispatch `PopScreenMsg` instead of duplicating stack manipulation logic.
+- **ASCII icon collision**: `Dot` icon changed from `*` to `.` (was identical to `Check`)
+- **Logging performance**: `os.MkdirAll` now runs once via `sync.Once` instead of on every log write
+
+### Improved
+- **ShortHelp on all screens**: Added contextual footer hints (`enter select`, `enter apply`, etc.) to all menu screens that previously showed no help text
+- **Unit tests**: Added 18 tests for `pkg/install.go` and `pkg/detect.go` covering install command generation, Fedora fix, method descriptions, command detection, and install priority
+
+---
+
 ## [0.24.2] - 2026-02-05
 
 ### Improved
