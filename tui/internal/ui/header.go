@@ -8,32 +8,30 @@ import (
 )
 
 // Breadcrumb renders "Parent > Parent > Current" with muted parents and primary current.
-func Breadcrumb(titles []string) string {
+// Width is used to center the breadcrumb horizontally.
+func Breadcrumb(titles []string, width int) string {
 	if len(titles) == 0 {
 		return ""
 	}
 	if len(titles) == 1 {
-		return theme.SubheaderStyle().Render(titles[0])
+		boxed := theme.SubheaderStyle().Render(titles[0])
+		return lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(boxed)
 	}
 
 	muted := theme.MutedStyle()
 	sep := muted.Render(" > ")
 
-	var parts []string
-	for i, t := range titles {
-		if i < len(titles)-1 {
-			parts = append(parts, muted.Render(t))
-		} else {
-			parts = append(parts, theme.SubheaderStyle().Render(t))
-		}
+	var parentParts []string
+	for i, t := range titles[:len(titles)-1] {
+		_ = i
+		parentParts = append(parentParts, muted.Render(t))
 	}
+	parents := strings.Join(parentParts, sep)
+	current := theme.SubheaderStyle().Render(titles[len(titles)-1])
 
-	// Join parents on one line, then the boxed current title below
-	parents := strings.Join(parts[:len(parts)-1], sep)
-	current := parts[len(parts)-1]
+	// Center both lines
+	centeredParents := lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(parents)
+	centeredCurrent := lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(current)
 
-	return lipgloss.JoinVertical(lipgloss.Left,
-		lipgloss.NewStyle().MarginLeft(1).Render(parents),
-		current,
-	)
+	return lipgloss.JoinVertical(lipgloss.Center, centeredParents, centeredCurrent)
 }

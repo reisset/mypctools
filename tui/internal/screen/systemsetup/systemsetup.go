@@ -94,17 +94,6 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Title
-	title := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Bold(true).
-		Render("System Setup")
-
-	titleBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(title)
-
 	// Menu items
 	var menuLines []string
 	cursor := theme.MenuCursorStyle()
@@ -127,11 +116,7 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render(menu)
 
-	return lipgloss.JoinVertical(lipgloss.Left,
-		titleBlock,
-		"",
-		menuBlock,
-	)
+	return menuBlock
 }
 
 func (m Model) Title() string {

@@ -32,33 +32,40 @@ type menuItem struct {
 
 // Model is the main menu screen.
 type Model struct {
-	shared   *state.Shared
-	items    []menuItem
-	cursor   int
+	shared          *state.Shared
+	items           []menuItem
+	cursor          int
+	lastUpdateCount int
 }
 
 func New(shared *state.Shared) Model {
-	return Model{
-		shared: shared,
-		cursor: 0,
+	m := Model{
+		shared:          shared,
+		cursor:          0,
+		lastUpdateCount: -1, // Force initial build
 	}
+	m.rebuildItemsIfNeeded()
+	return m
 }
 
-func (m Model) buildItems() []menuItem {
-	items := []menuItem{
+func (m *Model) rebuildItemsIfNeeded() {
+	if m.lastUpdateCount == m.shared.UpdateCount {
+		return
+	}
+	m.lastUpdateCount = m.shared.UpdateCount
+	m.items = []menuItem{
 		{icon: theme.Icons.Apps, label: "Install Apps", id: "apps"},
 		{icon: theme.Icons.Scripts, label: "My Scripts", id: "scripts"},
 		{icon: theme.Icons.System, label: "System Setup", id: "system"},
 	}
 	if m.shared.UpdateCount > 0 {
-		items = append(items, menuItem{
+		m.items = append(m.items, menuItem{
 			icon:  theme.Icons.Update,
 			label: fmt.Sprintf("Pull Updates (%d new)", m.shared.UpdateCount),
 			id:    "update",
 		})
 	}
-	items = append(items, menuItem{icon: theme.Icons.Exit, label: "Exit", id: "exit"})
-	return items
+	m.items = append(m.items, menuItem{icon: theme.Icons.Exit, label: "Exit", id: "exit"})
 }
 
 func (m Model) Init() tea.Cmd {
@@ -66,7 +73,7 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
-	items := m.buildItems()
+	m.rebuildItemsIfNeeded()
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -75,17 +82,17 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 			return m, tea.Quit
 		case "j", "down":
 			m.cursor++
-			if m.cursor >= len(items) {
+			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
 		case "k", "up":
 			m.cursor--
 			if m.cursor < 0 {
-				m.cursor = len(items) - 1
+				m.cursor = len(m.items) - 1
 			}
 		case "enter", " ":
-			if m.cursor < len(items) {
-				return m, m.handleSelection(items[m.cursor].id)
+			if m.cursor < len(m.items) {
+				return m, m.handleSelection(m.items[m.cursor].id)
 			}
 		}
 	}
@@ -109,7 +116,6 @@ func (m Model) handleSelection(id string) tea.Cmd {
 }
 
 func (m Model) View() string {
-	items := m.buildItems()
 	width := m.shared.TerminalWidth
 	if width == 0 {
 		width = 80
@@ -146,7 +152,7 @@ func (m Model) View() string {
 	normal := theme.MenuItemStyle()
 	selected := theme.MenuSelectedStyle()
 
-	for i, item := range items {
+	for i, item := range m.items {
 		label := item.icon + "  " + item.label
 		if i == m.cursor {
 			line := cursor.Render("> ") + selected.Render(label)
