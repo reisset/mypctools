@@ -12,3 +12,6 @@ Thumbs.db
 # Logs
 *.log
 mypctools-prd.md
+
+# Go binaries
+tui/mypctools-tui
