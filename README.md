@@ -22,11 +22,11 @@ Install apps across distros from a single menu. The installer tries native packa
 
 | Category | Apps |
 |----------|------|
-| Browsers | Brave, Firefox, Chrome, Zen |
-| Gaming | Steam, Lutris, Heroic, ProtonUp-Qt |
-| Media | Spotify, VLC, OBS, Discord |
-| Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK 10, Python |
 | AI Tools | OpenCode, Claude Code, Mistral Vibe, Ollama, LM Studio |
+| Browsers | Brave, Firefox, Chromium, Zen |
+| Gaming | Steam, Lutris, Heroic, ProtonUp-Qt |
+| Media | Discord, Spotify, VLC, MPV |
+| Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK, Python |
 
 The LiteBash and LiteZsh bundles include CLI tools: btop, bat, eza, zoxide, fzf, ripgrep, and fd.
 
@@ -50,7 +50,7 @@ Bundled script collections you can install or uninstall:
 - **Full System Update** - Run apt, pacman, or dnf upgrade with one click.
 - **System Cleanup** - Remove orphaned packages, clear caches, empty trash.
 - **Service Manager** - Browse common services or search all services with fuzzy matching.
-- **System Info** - View OS, kernel, CPU, GPU, memory, disk, and package details.
+- **Theme** - Switch between DefaultCyan, CatppuccinMocha, and TokyoNight color schemes.
 
 ### CLI Flags
 
@@ -72,16 +72,19 @@ The installer stops at the first successful method. Custom fallbacks handle apps
 | App | Fallback Method |
 |-----|-----------------|
 | Brave | Official install script |
-| Docker Compose | GitHub binary release |
-| VSCode | Microsoft apt repo |
+| Zen | Official install script |
+| Discord | .deb download |
 | Spotify | Spotify apt repo |
+| Docker Compose | GitHub binary release |
 | LazyDocker | GitHub binary release |
 | Lazygit | GitHub binary release |
+| VSCode | Microsoft apt repo |
 | Cursor | AppImage download |
 | OpenCode | Official install script |
 | Claude Code | Official install script |
 | Mistral Vibe | Official install script |
 | Ollama | Official install script |
+| LM Studio | AppImage download |
 
 ## Requirements
 

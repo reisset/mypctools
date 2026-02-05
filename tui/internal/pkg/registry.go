@@ -68,7 +68,7 @@ var apps = []App{
 		FallbackCmd:  "mkdir -p ~/.local/bin && curl -L -o ~/.local/bin/lmstudio.AppImage https://lmstudio.ai/download/latest/linux/x64 && chmod +x ~/.local/bin/lmstudio.AppImage",
 	},
 
-	// Browsers (2)
+	// Browsers (4)
 	{
 		ID:           "brave",
 		Name:         "Brave",
@@ -87,6 +87,25 @@ var apps = []App{
 		DnfPkg:       "firefox",
 		FlatpakID:    "org.mozilla.firefox",
 		CommandCheck: "firefox",
+	},
+	{
+		ID:           "chromium",
+		Name:         "Chromium",
+		Category:     CategoryBrowsers,
+		AptPkg:       "chromium",
+		PacmanPkg:    "chromium",
+		DnfPkg:       "chromium",
+		FlatpakID:    "org.chromium.Chromium",
+		CommandCheck: "chromium",
+	},
+	{
+		ID:           "zen",
+		Name:         "Zen Browser",
+		Category:     CategoryBrowsers,
+		PacmanPkg:    "zen-browser-bin",
+		FlatpakID:    "io.github.zen_browser.zen",
+		CommandCheck: "zen-browser",
+		FallbackCmd:  "curl -fsSL https://github.com/zen-browser/updates-server/raw/refs/heads/main/install.sh | bash",
 	},
 
 	// Gaming (4)
