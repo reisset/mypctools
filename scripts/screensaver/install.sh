@@ -6,7 +6,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MYPCTOOLS_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-source "$MYPCTOOLS_ROOT/lib/helpers.sh"
+source "$MYPCTOOLS_ROOT/lib/print.sh"
 source "$MYPCTOOLS_ROOT/lib/distro-detect.sh"
 
 ASSETS_DIR="$HOME/.local/share/mypctools-screensaver"

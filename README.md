@@ -1,19 +1,18 @@
 # mypctools
 
-A personal TUI for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum).
-
-**v0.12.0**
+A personal TUI for managing scripts and app installations across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/reisset/mypctools.git
-cd mypctools
-./install.sh    # Installs gum, creates symlink
-mypctools       # Run from anywhere
+curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh | bash
+mypctools
 ```
 
-Uninstall: `./uninstall.sh`
+Uninstall:
+```bash
+curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh | bash
+```
 
 ## What It Does
 
@@ -56,7 +55,7 @@ Bundled script collections with install/uninstall options:
 ### CLI Flags
 
 ```bash
-mypctools --help      # Usage info, description, GitHub link
+mypctools --help      # Usage info
 mypctools --version   # Version number
 ```
 
@@ -87,10 +86,17 @@ The installer tries each method in order and stops at the first success. Custom 
 ## Requirements
 
 - Linux (Debian/Ubuntu, Arch, or Fedora-based)
-- Bash
+- x86_64 or arm64 architecture
 - Internet connection for installs
 
-Gum is installed automatically by `./install.sh`.
+## Building from Source
+
+```bash
+git clone https://github.com/reisset/mypctools.git
+cd mypctools/tui
+go build -o mypctools ./main.go
+./mypctools
+```
 
 ## License
 

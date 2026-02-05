@@ -15,8 +15,7 @@
 #   1.2.0 - Removed set -e for reliability
 
 _SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$_SCRIPT_DIR/../../lib/helpers.sh"
-source "$_SCRIPT_DIR/../../lib/theme.sh"
+source "$_SCRIPT_DIR/../../lib/print.sh"
 
 SPICETIFY_DIR="$HOME/.spicetify"
 SPICETIFY_CONFIG="$HOME/.config/spicetify"
@@ -132,7 +131,7 @@ fi
 # Theme selection
 echo ""
 print_header "Select a theme"
-THEME=$(themed_choose "Available themes:" "StarryNight" "text")
+THEME=$(simple_choose "Available themes:" "StarryNight" "text")
 
 if [[ -z "$THEME" ]]; then
     print_warning "No selection - using StarryNight"
@@ -154,24 +153,12 @@ echo ""
 print_header "Select a color scheme"
 
 if [[ "$THEME" == "StarryNight" ]]; then
-    selected=$(themed_choose "StarryNight color schemes:" \
-        "Base" \
-        "Cotton Candy" \
-        "Forest" \
-        "Galaxy" \
-        "Orange" \
-        "Sky" \
-        "Sunrise")
+    selected=$(simple_choose "StarryNight color schemes:" \
+        "Base" "Cotton Candy" "Forest" "Galaxy" "Orange" "Sky" "Sunrise")
     [[ -z "$selected" ]] && selected="Base"
 else
-    selected=$(themed_choose "text color schemes:" \
-        "Spotify" \
-        "Spicetify" \
-        "CatppuccinMocha" \
-        "Dracula" \
-        "Gruvbox" \
-        "Nord" \
-        "TokyoNight")
+    selected=$(simple_choose "text color schemes:" \
+        "Spotify" "Spicetify" "CatppuccinMocha" "Dracula" "Gruvbox" "Nord" "TokyoNight")
     [[ -z "$selected" ]] && selected="Spotify"
 fi
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-mypctools is a personal TUI (Terminal User Interface) for managing scripts and app installations across Linux systems. Built with [Gum](https://github.com/charmbracelet/gum) by Charm.
+mypctools is a personal TUI (Terminal User Interface) for managing scripts and app installations across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
 See README.md for user documentation and quick start.
 
@@ -12,36 +12,48 @@ See README.md for user documentation and quick start.
 
 ```
 mypctools/
-├── launcher.sh          # Main TUI entry point (gum-based menus)
-├── install.sh           # Bootstrap: installs gum, creates ~/.local/bin/mypctools symlink
-├── uninstall.sh         # Removes symlink and cleans up
-├── lib/
-│   ├── helpers.sh       # Gum-styled print functions, logging, utility checks (TUI context)
-│   ├── print.sh         # Zero-dependency print functions (pure ANSI, standalone installers)
-│   ├── theme.sh         # Gum theming: themed_choose, themed_confirm, colors
-│   ├── distro-detect.sh # Sets DISTRO_TYPE, DISTRO_NAME, PKG_MGR, PKG_INSTALL, PKG_UPDATE
-│   ├── package-manager.sh # install_package() with apt/pacman/flatpak fallback chain
-│   ├── tools-install.sh # Shared CLI tool install/uninstall for litebash & litezsh
-│   ├── shell-setup.sh   # Parametric set_default_shell shared by litebash & litezsh
-│   ├── symlink.sh       # safe_symlink() with path resolution, backup, idempotency
-│   └── terminal-install.sh # Shared lib for terminal emulator installers
-├── apps/                # App category menus (browsers.sh, gaming.sh, etc.)
-│   └── service-manager.sh # TUI for systemctl services
-└── scripts/             # Personal script bundles with install/uninstall.sh each
-    ├── shared/          # Shared assets used by multiple bundles
-    │   ├── prompt/      # starship.toml (shared prompt config)
-    │   └── shell/       # aliases.sh, TOOLS.md (shared by litebash & litezsh)
-    ├── litebash/        # Speed-focused bash (shell config only)
-    ├── litezsh/         # Speed-focused zsh (syntax highlighting, autosuggestions)
-    ├── terminal/        # foot terminal config (shell-agnostic, Wayland only)
-    ├── alacritty/       # alacritty terminal config (shell-agnostic, X11 + Wayland)
-    ├── ghostty/         # ghostty terminal config (shell-agnostic, X11 + Wayland)
-    ├── kitty/           # kitty terminal config (shell-agnostic, X11 + Wayland)
-    ├── fastfetch/       # Custom fastfetch config with tree-style layout
-    ├── screensaver/     # Terminal screensaver via hypridle + tte (Hyprland only)
-    ├── claude/          # Claude Code skills and statusline
-    └── spicetify/       # Spotify theming
+├── tui/                        # Go TUI source (Bubble Tea)
+│   ├── main.go
+│   ├── go.mod
+│   └── internal/
+├── scripts/                    # Script bundles with install/uninstall.sh each
+│   ├── shared/                 # Shared assets used by multiple bundles
+│   │   ├── prompt/             # starship.toml (shared prompt config)
+│   │   └── shell/              # aliases.sh, TOOLS.md (shared by litebash & litezsh)
+│   ├── litebash/               # Speed-focused bash (shell config only)
+│   ├── litezsh/                # Speed-focused zsh (syntax highlighting, autosuggestions)
+│   ├── terminal/               # foot terminal config (shell-agnostic, Wayland only)
+│   ├── alacritty/              # alacritty terminal config (shell-agnostic, X11 + Wayland)
+│   ├── ghostty/                # ghostty terminal config (shell-agnostic, X11 + Wayland)
+│   ├── kitty/                  # kitty terminal config (shell-agnostic, X11 + Wayland)
+│   ├── fastfetch/              # Custom fastfetch config with tree-style layout
+│   ├── screensaver/            # Terminal screensaver via hypridle + tte (Hyprland only)
+│   ├── claude/                 # Claude Code skills and statusline
+│   └── spicetify/              # Spotify theming
+├── lib/                        # Bash libraries (for script bundles)
+│   ├── print.sh                # Zero-dependency print functions (pure ANSI)
+│   ├── distro-detect.sh        # Sets DISTRO_TYPE, DISTRO_NAME, PKG_MGR, PKG_INSTALL, PKG_UPDATE
+│   ├── package-manager.sh      # install_package() with apt/pacman/flatpak fallback chain
+│   ├── tools-install.sh        # Shared CLI tool install/uninstall for litebash & litezsh
+│   ├── shell-setup.sh          # Parametric set_default_shell shared by litebash & litezsh
+│   ├── symlink.sh              # safe_symlink() with path resolution, backup, idempotency
+│   └── terminal-install.sh     # Shared lib for terminal emulator installers
+├── .github/workflows/          # CI/CD
+│   └── release.yml             # Binary releases on tag push
+├── install.sh                  # curl|bash installer (downloads binary + clones repo)
+├── uninstall.sh                # Removes binary and ~/.local/share/mypctools
+└── README.md
 ```
+
+## Installation
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh | bash
+```
+
+The installer:
+1. Clones the repo to `~/.local/share/mypctools` (for script bundles)
+2. Downloads the pre-built binary to `~/.local/bin/mypctools`
 
 ## Key Patterns
 
@@ -51,8 +63,6 @@ install_package "Display Name" "apt_pkg" "pacman_pkg" "flatpak_id" "fallback_fn"
 ```
 Order: native package manager → flatpak → custom fallback function.
 
-**Adding a new app category**: Create `apps/<category>.sh` with a `show_<category>_menu()` function, source helpers and package-manager, then add to `launcher.sh` menu.
-
 **Adding a curl-based installer**: Add a fallback function to `lib/package-manager.sh`:
 ```bash
 install_toolname_fallback() {
@@ -61,7 +71,7 @@ install_toolname_fallback() {
 ```
 Then reference it in `install_package` calls: `install_package "Tool" "" "" "" "install_toolname_fallback"`
 
-**Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Add menu entry in `launcher.sh:show_scripts_menu()`.
+**Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Register in `tui/internal/bundle/registry.go`.
 
 **Shared CLI tool installation** uses `lib/tools-install.sh`. Both litebash and litezsh source this lib to avoid duplicating GitHub-release download logic. Key functions:
 - `install_all_tools` - installs zoxide, lazygit, tldr, glow, dysk, dust, yazi, starship
@@ -74,17 +84,6 @@ The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles
 **Shared shell assets** live in `scripts/shared/shell/`:
 - `aliases.sh` - 26 aliases shared by litebash and litezsh
 - `TOOLS.md` - quick reference for all CLI tools (includes zsh features section)
-
-## System Setup Features
-
-The System Setup menu (`show_system_setup_menu()` in `launcher.sh`) provides:
-
-- **Full System Update** - Runs `apt update && apt upgrade`, `pacman -Syu`, or `dnf upgrade` based on distro
-- **System Cleanup** - Removes orphan packages, clears package cache, empties user trash/thumbnails
-- **Service Manager** - TUI for managing systemd services (start/stop/restart/enable/disable)
-- **System Info** - Displays OS, kernel, CPU, GPU, memory, disk, packages, uptime
-
-All sudo operations use `ensure_sudo` to pre-authenticate before running.
 
 ## Included Script Bundles
 
@@ -109,22 +108,7 @@ Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial.
 - Simple bash over clever one-liners
 - Comments only where code isn't self-explanatory
 - On failure, return to menu — don't exit the entire app
-- Use `lib/helpers.sh` for gum-styled output in TUI context (launcher, app menus)
-- Use `lib/print.sh` for zero-dependency output in standalone installers
-
-## Gum Quick Reference
-
-```bash
-gum choose "Option 1" "Option 2"              # Single select
-gum choose --no-limit "A" "B" "C"             # Multi-select
-gum confirm "Proceed?" && do_thing            # Yes/no
-gum spin --spinner dot --title "Working..." -- cmd < /dev/null  # Spinner (stdin must be closed!)
-gum style --border normal --padding "1 2" "Title"    # Styled box
-```
-
-**Important**: Always redirect stdin from `/dev/null` when using `gum spin`. Without this, the spinner hangs indefinitely after the command completes because gum keeps waiting for stdin to close.
-
-**Sudo commands**: Call `ensure_sudo` from `lib/helpers.sh` before running sudo commands inside `gum spin`. This prompts for the password beforehand, avoiding hangs from password prompts that can't receive input.
+- Use `lib/print.sh` for colored output in standalone script installers
 
 ## Design Decisions
 
@@ -135,12 +119,12 @@ gum style --border normal --padding "1 2" "Title"    # Styled box
 
 ## Go TUI (tui/)
 
-A parallel TUI implementation in Go using Bubble Tea, located in `tui/`. Feature-complete and coexists with the bash version.
+The primary TUI implementation in Go using Bubble Tea.
 
 **Building**: User compiles manually. Claude provides commands but does not run `go build` directly (slow in sandboxed environments).
 
 ```bash
-cd ~/mypctools/tui && go build -o mypctools-tui ./main.go
+cd ~/mypctools/tui && go build -o mypctools ./main.go
 ```
 
 **Structure**:
