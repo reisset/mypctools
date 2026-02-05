@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+	"github.com/reisset/mypctools/tui/internal/screen/apps"
 	"github.com/reisset/mypctools/tui/internal/screen/scripts"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
@@ -94,8 +95,7 @@ func (m Model) handleSelection(id string) tea.Cmd {
 	case "exit":
 		return tea.Quit
 	case "apps":
-		// Phase 3: will navigate to app categories
-		return nil
+		return app.Navigate(apps.New(m.shared))
 	case "scripts":
 		return app.Navigate(scripts.New(m.shared))
 	case "system":

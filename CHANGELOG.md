@@ -11,6 +11,25 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.15.0] - 2026-02-04
+
+#### Added
+- **Go TUI Phase 3: App Installation** — "Install Apps" menu now functional
+  - App registry (`tui/internal/pkg/`) with 23 apps across 5 categories (AI Tools, Browsers, Gaming, Media, Dev Tools)
+  - Installation detection via command check, native package manager query, and flatpak list
+  - Category menu with app counts
+  - Multi-select app list with `[ ]`/`[x]` checkboxes, installed ✓ badges, install method hints
+  - Space to toggle selection, `a` to select all uninstalled, `n` to clear selection
+  - Confirmation screen previewing selected apps before install
+  - Sequential installation via `tea.ExecProcess()` with progress counter `[1/5]`
+  - Summary screen with succeeded/failed counts
+  - Install chain: native PM (apt/pacman/dnf) → flatpak → custom fallback command
+
+#### Known Issues
+- Same jarring TUI suspend behavior during installs (see 0.14.0) — future improvement to show inline progress
+
+---
+
 ### [0.14.0] - 2026-02-04
 
 #### Added
