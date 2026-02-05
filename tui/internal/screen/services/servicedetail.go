@@ -21,7 +21,6 @@ const (
 	actionRestart
 	actionEnable
 	actionDisable
-	actionViewStatus
 	actionBack
 )
 
@@ -34,11 +33,6 @@ type actionItem struct {
 // execDoneMsg is sent when a service action finishes.
 type execDoneMsg struct {
 	err error
-}
-
-// statusRefreshMsg is sent when status should be refreshed.
-type statusRefreshMsg struct {
-	status system.ServiceStatus
 }
 
 // ServiceDetailModel shows actions for a single service.
@@ -55,23 +49,42 @@ type ServiceDetailModel struct {
 
 // NewServiceDetail creates a new service detail screen.
 func NewServiceDetail(shared *state.Shared, serviceName string) ServiceDetailModel {
-	items := []actionItem{
-		{icon: theme.Icons.Update, label: "Start", action: actionStart},
-		{icon: theme.Icons.Cleanup, label: "Stop", action: actionStop},
-		{icon: theme.Icons.Update, label: "Restart", action: actionRestart},
-		{icon: theme.Icons.Check, label: "Enable", action: actionEnable},
-		{icon: theme.Icons.Cleanup, label: "Disable", action: actionDisable},
-		{icon: theme.Icons.Info, label: "View Status", action: actionViewStatus},
-		{icon: theme.Icons.Back, label: "Back", action: actionBack},
-	}
+	status := system.GetServiceStatus(serviceName)
 
 	return ServiceDetailModel{
 		shared:      shared,
 		serviceName: serviceName,
-		status:      system.GetServiceStatus(serviceName),
-		items:       items,
+		status:      status,
+		items:       buildMenuItems(status),
 		cursor:      0,
 	}
+}
+
+// buildMenuItems creates context-aware menu items based on service state.
+func buildMenuItems(status system.ServiceStatus) []actionItem {
+	var items []actionItem
+
+	// Running toggle: show Start if stopped, Stop if running
+	if status.Active == "active" {
+		items = append(items, actionItem{icon: theme.Icons.Cleanup, label: "Stop", action: actionStop})
+	} else {
+		items = append(items, actionItem{icon: theme.Icons.Update, label: "Start", action: actionStart})
+	}
+
+	// Restart always available
+	items = append(items, actionItem{icon: theme.Icons.Update, label: "Restart", action: actionRestart})
+
+	// Boot toggle: show Disable if enabled, Enable if disabled
+	if status.Enabled == "enabled" {
+		items = append(items, actionItem{icon: theme.Icons.Cleanup, label: "Disable", action: actionDisable})
+	} else {
+		items = append(items, actionItem{icon: theme.Icons.Check, label: "Enable", action: actionEnable})
+	}
+
+	// Back
+	items = append(items, actionItem{icon: theme.Icons.Back, label: "Back", action: actionBack})
+
+	return items
 }
 
 func (m ServiceDetailModel) Init() tea.Cmd {
@@ -85,8 +98,13 @@ func (m ServiceDetailModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		m.actionErr = msg.err
 		// Log the action
 		m.logServiceAction()
-		// Refresh status
+		// Refresh status and rebuild menu items
 		m.status = system.GetServiceStatus(m.serviceName)
+		m.items = buildMenuItems(m.status)
+		// Reset cursor if it's now out of bounds
+		if m.cursor >= len(m.items) {
+			m.cursor = len(m.items) - 1
+		}
 		return m, nil
 
 	case tea.KeyMsg:
@@ -120,11 +138,6 @@ func (m ServiceDetailModel) handleAction(action detailAction) tea.Cmd {
 	switch action {
 	case actionBack:
 		return app.PopScreen()
-	case actionViewStatus:
-		cmd := system.ServiceStatusCmd(m.serviceName)
-		return tea.ExecProcess(cmd, func(err error) tea.Msg {
-			return execDoneMsg{err: err}
-		})
 	case actionStart:
 		cmd := system.ServiceActionCmd(m.serviceName, "start")
 		return tea.ExecProcess(cmd, func(err error) tea.Msg {
@@ -155,7 +168,7 @@ func (m ServiceDetailModel) handleAction(action detailAction) tea.Cmd {
 }
 
 func (m ServiceDetailModel) logServiceAction() {
-	actionName := ""
+	var actionName string
 	switch m.lastAction {
 	case actionStart:
 		actionName = "start"
@@ -167,8 +180,6 @@ func (m ServiceDetailModel) logServiceAction() {
 		actionName = "enable"
 	case actionDisable:
 		actionName = "disable"
-	case actionViewStatus:
-		return // Don't log view status
 	default:
 		return
 	}

@@ -4,6 +4,17 @@ All notable changes to mypctools.
 
 ---
 
+## [0.24.2] - 2026-02-05
+
+### Improved
+- **Service Manager**: Simplified service detail menu from 7 items to 4 context-aware actions
+  - Shows "Start" or "Stop" based on current running state
+  - Shows "Enable" or "Disable" based on current boot state
+  - Removed redundant "View Status" (status badges already visible)
+  - Menu rebuilds dynamically after each action
+
+---
+
 ## [0.24.1] - 2026-02-05
 
 ### Fixed
