@@ -1,8 +1,6 @@
 package scripts
 
 import (
-	"strings"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
@@ -70,26 +68,25 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render("Personal script bundles and configs")
 
-	// Menu items
-	var menuLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Build list items
+	items := make([]ui.ListItem, len(m.bundles))
 	for i, b := range m.bundles {
-		label := theme.Icons.Scripts + "  " + b.Name
+		var suffix string
 		if bundle.IsInstalled(&b) {
-			label += ui.InstalledBadge()
+			suffix = ui.InstalledBadge()
 		}
-
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(label)
-			menuLines = append(menuLines, line)
-		} else {
-			menuLines = append(menuLines, "  "+normal.Render(label))
+		items[i] = ui.ListItem{
+			Icon:   theme.Icons.Scripts,
+			Label:  b.Name,
+			Suffix: suffix,
 		}
 	}
-	menu := strings.Join(menuLines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).

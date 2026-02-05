@@ -11,6 +11,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/screen/appinstall"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 type action int
@@ -77,11 +78,7 @@ func (m Model) View() string {
 	}
 
 	// Title
-	title := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Bold(true).
-		Render("Confirm Installation")
-
+	title := theme.SubheaderStyle().Render("Confirm Installation")
 	titleBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
@@ -98,7 +95,7 @@ func (m Model) View() string {
 	var appLines []string
 	for _, a := range m.apps {
 		method := pkg.InstallMethodDescription(&a, m.shared.Distro.Type)
-		line := fmt.Sprintf("  -> %s (%s)", a.Name, method)
+		line := fmt.Sprintf("  %s %s  %s", theme.Icons.Arrow, a.Name, ui.MethodBadge(method))
 		appLines = append(appLines, theme.MutedStyle().Render(line))
 	}
 	appList := strings.Join(appLines, "\n")
@@ -108,24 +105,26 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render(appList)
 
-	// Action buttons
-	var installBtn, cancelBtn string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
-	if m.cursor == actionInstall {
-		installBtn = cursor.Render("> ") + selected.Render("Install")
-		cancelBtn = "  " + normal.Render("Cancel")
-	} else {
-		installBtn = "  " + normal.Render("Install")
-		cancelBtn = cursor.Render("> ") + selected.Render("Cancel")
+	// Action buttons using list component
+	items := []ui.ListItem{
+		{Icon: theme.Icons.Apps, Label: "Install"},
+		{Icon: theme.Icons.Back, Label: "Cancel"},
 	}
+	cursor := 0
+	if m.cursor == actionCancel {
+		cursor = 1
+	}
+
+	buttons := ui.RenderList(items, cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	buttonsBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(installBtn + "\n" + cancelBtn)
+		Render(buttons)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		titleBlock,

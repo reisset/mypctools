@@ -1,8 +1,6 @@
 package scriptmenu
 
 import (
-	"strings"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
@@ -85,21 +83,16 @@ func (m Model) View() string {
 	}
 
 	// Title with bundle name
-	title := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Bold(true).
-		Render(m.bundle.Name)
-
+	title := theme.SubheaderStyle().Render(m.bundle.Name)
 	titleBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
 		Render(title)
 
-	// Description and status
-	desc := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Muted)).
-		Render(m.bundle.Description)
+	// Description
+	desc := theme.MutedStyle().Render(m.bundle.Description)
 
+	// Status
 	var status string
 	if bundle.IsInstalled(&m.bundle) {
 		status = theme.SuccessStyle().Render("Installed") + ui.InstalledBadge()
@@ -112,23 +105,20 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render(desc + "\n" + status)
 
-	// Menu items
-	var menuLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Build list items
+	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
-		label := item.icon + "  " + item.label
-
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(label)
-			menuLines = append(menuLines, line)
-		} else {
-			menuLines = append(menuLines, "  "+normal.Render(label))
+		items[i] = ui.ListItem{
+			Icon:  item.icon,
+			Label: item.label,
 		}
 	}
-	menu := strings.Join(menuLines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).

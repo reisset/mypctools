@@ -2,6 +2,7 @@ package sysinfo
 
 import (
 	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -9,6 +10,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 // Model handles the system info display screen.
@@ -45,80 +47,60 @@ func (m Model) View() string {
 	}
 
 	// Build system info content
-	sysLines := []string{}
+	var sysLines []string
 	if m.info.User != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  User       %s", m.info.User))
+		sysLines = append(sysLines, formatLine("User", m.info.User))
 	}
 	if m.info.OS != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  OS         %s", m.info.OS))
+		sysLines = append(sysLines, formatLine("OS", m.info.OS))
 	}
 	if m.info.Host != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  Host       %s", m.info.Host))
+		sysLines = append(sysLines, formatLine("Host", m.info.Host))
 	}
 	if m.info.Kernel != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  Kernel     %s", m.info.Kernel))
+		sysLines = append(sysLines, formatLine("Kernel", m.info.Kernel))
 	}
 	if m.info.Uptime != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  Uptime     %s", m.info.Uptime))
+		sysLines = append(sysLines, formatLine("Uptime", m.info.Uptime))
 	}
 	if m.info.Packages != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  Packages   %s", m.info.Packages))
+		sysLines = append(sysLines, formatLine("Packages", m.info.Packages))
 	}
 	if m.info.Shell != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  Shell      %s", m.info.Shell))
+		sysLines = append(sysLines, formatLine("Shell", m.info.Shell))
 	}
 	if m.info.DE != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  DE         %s", m.info.DE))
+		sysLines = append(sysLines, formatLine("DE", m.info.DE))
 	}
 	if m.info.Terminal != "" {
-		sysLines = append(sysLines, fmt.Sprintf("  Terminal   %s", m.info.Terminal))
+		sysLines = append(sysLines, formatLine("Terminal", m.info.Terminal))
 	}
 
 	// Build hardware info content
-	hwLines := []string{}
+	var hwLines []string
 	if m.info.CPU != "" {
-		hwLines = append(hwLines, fmt.Sprintf("  CPU        %s", m.info.CPU))
+		hwLines = append(hwLines, formatLine("CPU", m.info.CPU))
 	}
 	if m.info.GPU != "" {
-		hwLines = append(hwLines, fmt.Sprintf("  GPU        %s", m.info.GPU))
+		hwLines = append(hwLines, formatLine("GPU", m.info.GPU))
 	}
 	if m.info.Memory != "" {
-		hwLines = append(hwLines, fmt.Sprintf("  Memory     %s", m.info.Memory))
+		hwLines = append(hwLines, formatLine("Memory", m.info.Memory))
 	}
 	if m.info.Disk != "" {
-		hwLines = append(hwLines, fmt.Sprintf("  Disk (/)   %s", m.info.Disk))
+		hwLines = append(hwLines, formatLine("Disk (/)", m.info.Disk))
 	}
-
-	// Box styles
-	boxStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color(theme.Current.Secondary)).
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Padding(1, 2)
 
 	// Decide layout based on width
 	if width >= 90 {
-		// Two-column layout
+		// Two-column layout with titled boxes
 		colWidth := (width / 2) - 4
 
-		sysContent := ""
-		for i, line := range sysLines {
-			sysContent += line
-			if i < len(sysLines)-1 {
-				sysContent += "\n"
-			}
-		}
+		sysContent := strings.Join(sysLines, "\n")
+		hwContent := strings.Join(hwLines, "\n")
 
-		hwContent := ""
-		for i, line := range hwLines {
-			hwContent += line
-			if i < len(hwLines)-1 {
-				hwContent += "\n"
-			}
-		}
-
-		leftBox := boxStyle.Width(colWidth).Render(sysContent)
-		rightBox := boxStyle.Width(colWidth).Render(hwContent)
+		leftBox := ui.TitledBox("System", sysContent, colWidth, true)
+		rightBox := ui.TitledBox("Hardware", hwContent, colWidth, true)
 
 		infoBlock := lipgloss.JoinHorizontal(lipgloss.Top, leftBox, "  ", rightBox)
 
@@ -142,18 +124,10 @@ func (m Model) View() string {
 	}
 
 	// Single column layout for narrow terminals
-	allContent := ""
-	for _, line := range sysLines {
-		allContent += line + "\n"
-	}
-	for i, line := range hwLines {
-		allContent += line
-		if i < len(hwLines)-1 {
-			allContent += "\n"
-		}
-	}
+	allLines := append(sysLines, hwLines...)
+	allContent := strings.Join(allLines, "\n")
 
-	singleBox := boxStyle.Width(width - 4).Render(allContent)
+	singleBox := ui.TitledBox("System Info", allContent, width-4, true)
 
 	boxCentered := lipgloss.NewStyle().
 		Width(width).
@@ -180,4 +154,11 @@ func (m Model) Title() string {
 
 func (m Model) ShortHelp() []string {
 	return []string{"any key back"}
+}
+
+// formatLine formats a key-value line with proper alignment and coloring.
+func formatLine(key, value string) string {
+	keyStyle := theme.MutedStyle()
+	valueStyle := theme.PrimaryStyle()
+	return fmt.Sprintf("  %s  %s", keyStyle.Render(fmt.Sprintf("%-10s", key)), valueStyle.Render(value))
 }

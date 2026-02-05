@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Palette holds the 7 theme colors as hex strings.
+// Palette holds the theme colors as hex strings.
 type Palette struct {
 	Name      string
 	Primary   string
@@ -16,6 +16,11 @@ type Palette struct {
 	Warning   string
 	Error     string
 	Accent    string
+	// UI colors
+	Highlight string // Selection highlight background
+	Surface   string // Subtle surface background
+	Border    string // Active border color
+	BorderDim string // Inactive border color
 }
 
 var DefaultCyan = Palette{
@@ -27,6 +32,10 @@ var DefaultCyan = Palette{
 	Warning:   "#ffaf00",
 	Error:     "#ff0000",
 	Accent:    "#af87ff",
+	Highlight: "#003333",
+	Surface:   "#0a1a1a",
+	Border:    "#0087ff",
+	BorderDim: "#3c3c3c",
 }
 
 var CatppuccinMocha = Palette{
@@ -38,6 +47,10 @@ var CatppuccinMocha = Palette{
 	Warning:   "#fab387",
 	Error:     "#f38ba8",
 	Accent:    "#cba6f7",
+	Highlight: "#1e1e2e",
+	Surface:   "#181825",
+	Border:    "#89b4fa",
+	BorderDim: "#45475a",
 }
 
 var TokyoNight = Palette{
@@ -49,6 +62,10 @@ var TokyoNight = Palette{
 	Warning:   "#ff9e64",
 	Error:     "#f7768e",
 	Accent:    "#bb9af7",
+	Highlight: "#1a1b26",
+	Surface:   "#16161e",
+	Border:    "#7aa2f7",
+	BorderDim: "#414868",
 }
 
 // All available presets.

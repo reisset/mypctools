@@ -1,8 +1,6 @@
 package systemsetup
 
 import (
-	"strings"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
@@ -13,6 +11,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/screen/update"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 type menuItem struct {
@@ -94,22 +93,20 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Menu items
-	var menuLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Build list items
+	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
-		label := item.icon + "  " + item.label
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(label)
-			menuLines = append(menuLines, line)
-		} else {
-			menuLines = append(menuLines, "  "+normal.Render(label))
+		items[i] = ui.ListItem{
+			Icon:  item.icon,
+			Label: item.label,
 		}
 	}
-	menu := strings.Join(menuLines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).

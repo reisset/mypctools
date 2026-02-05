@@ -15,6 +15,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/screen/systemsetup"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 const logo = `███╗   ███╗██╗   ██╗██████╗  ██████╗████████╗ ██████╗  ██████╗ ██╗     ███████╗
@@ -23,6 +24,11 @@ const logo = `███╗   ███╗██╗   ██╗██████
 ██║╚██╔╝██║  ╚██╔╝  ██╔═══╝ ██║        ██║   ██║   ██║██║   ██║██║     ╚════██║
 ██║ ╚═╝ ██║   ██║   ██║     ╚██████╗   ██║   ╚██████╔╝╚██████╔╝███████╗███████║
 ╚═╝     ╚═╝   ╚═╝   ╚═╝      ╚═════╝   ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝`
+
+// Compact logo for narrow terminals
+const logoCompact = `╔╦╗╦ ╦╔═╗╔═╗╔╦╗╔═╗╔═╗╦  ╔═╗
+║║║╚╦╝╠═╝║   ║ ║ ║║ ║║  ╚═╗
+╩ ╩ ╩ ╩  ╚═╝ ╩ ╚═╝╚═╝╩═╝╚═╝`
 
 type menuItem struct {
 	icon  string
@@ -121,24 +127,30 @@ func (m Model) View() string {
 		width = 80
 	}
 
+	// Choose logo based on width
+	currentLogo := logo
+	if width < 85 {
+		currentLogo = logoCompact
+	}
+
 	// Logo
 	logoStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(theme.Current.Primary)).
 		Width(width).
 		Align(lipgloss.Center)
-	renderedLogo := logoStyle.Render(logo)
+	renderedLogo := logoStyle.Render(currentLogo)
 
 	// Update badge
 	var updateBadge string
 	if m.shared.UpdateCount > 0 {
 		updateBadge = lipgloss.NewStyle().
-			Foreground(lipgloss.Color(theme.Current.Muted)).
+			Foreground(lipgloss.Color(theme.Current.Accent)).
 			Width(width).
 			Align(lipgloss.Center).
-			Render(fmt.Sprintf("⬆ Update available (%d new)", m.shared.UpdateCount))
+			Render(fmt.Sprintf("%s Update available (%d new)", theme.Icons.Update, m.shared.UpdateCount))
 	}
 
-	// System info line
+	// System info line with better spacing
 	sysLine := buildSysLine(m.shared)
 	sysLineRendered := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(theme.Current.Muted)).
@@ -146,22 +158,20 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render(sysLine)
 
-	// Menu items
-	var menuLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Menu items using new list component
+	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
-		label := item.icon + "  " + item.label
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(label)
-			menuLines = append(menuLines, line)
-		} else {
-			menuLines = append(menuLines, "  "+normal.Render(label))
+		items[i] = ui.ListItem{
+			Icon:  item.icon,
+			Label: item.label,
 		}
 	}
-	menu := strings.Join(menuLines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	// Center the menu
 	menuBlock := lipgloss.NewStyle().
@@ -213,11 +223,12 @@ func buildSysLine(shared *state.Shared) string {
 		}
 	}
 
+	// Build with better spacing using dots
 	parts := []string{shared.Distro.Name}
 	if kernel != "" {
 		parts = append(parts, kernel)
 	}
 	parts = append(parts, shell)
 
-	return strings.Join(parts, " · ")
+	return strings.Join(parts, "  " + theme.Icons.Dot + "  ")
 }

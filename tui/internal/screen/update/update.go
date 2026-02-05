@@ -78,7 +78,7 @@ func (m Model) View() string {
 		if m.err != nil {
 			statusLine = theme.ErrorStyle().Render(fmt.Sprintf("Update failed: %v", m.err))
 		} else {
-			statusLine = theme.SuccessStyle().Render("System update completed successfully")
+			statusLine = theme.SuccessStyle().Render(theme.Icons.Check + " System update completed successfully")
 		}
 
 		prompt := theme.MutedStyle().Render("Press any key to continue...")

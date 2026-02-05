@@ -11,9 +11,11 @@ import (
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
+	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 type menuItem struct {
+	icon  string
 	label string
 	id    string
 }
@@ -28,9 +30,9 @@ type Model struct {
 // New creates a new service manager menu.
 func New(shared *state.Shared) Model {
 	items := []menuItem{
-		{label: theme.Icons.Service + "  Common Services", id: "common"},
-		{label: "All Services", id: "all"},
-		{label: theme.Icons.Back + "  Back", id: "back"},
+		{icon: theme.Icons.Service, label: "Common Services", id: "common"},
+		{icon: theme.Icons.Info, label: "All Services", id: "all"},
+		{icon: theme.Icons.Back, label: "Back", id: "back"},
 	}
 	return Model{
 		shared: shared,
@@ -82,21 +84,20 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Menu items
-	var menuLines []string
-	cursor := theme.MenuCursorStyle()
-	normal := theme.MenuItemStyle()
-	selected := theme.MenuSelectedStyle()
-
+	// Build list items
+	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
-		if i == m.cursor {
-			line := cursor.Render("> ") + selected.Render(item.label)
-			menuLines = append(menuLines, line)
-		} else {
-			menuLines = append(menuLines, "  "+normal.Render(item.label))
+		items[i] = ui.ListItem{
+			Icon:  item.icon,
+			Label: item.label,
 		}
 	}
-	menu := strings.Join(menuLines, "\n")
+
+	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
+		Width:         width,
+		ShowCursor:    true,
+		HighlightFull: true,
+	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
@@ -230,7 +231,7 @@ func (m *ServiceListModel) scrollToCursor() {
 	}
 }
 
-// renderRows builds the table content for the viewport.
+// renderRows builds the table content for the viewport with enhanced styling.
 func (m ServiceListModel) renderRows() string {
 	if len(m.services) == 0 {
 		return ""
@@ -238,29 +239,31 @@ func (m ServiceListModel) renderRows() string {
 
 	var rows []string
 	for i, svc := range m.services {
-		statusColor := theme.Current.Muted
-		if svc.Active == "active" {
-			statusColor = theme.Current.Success
-		} else if svc.Active == "failed" {
-			statusColor = theme.Current.Error
-		}
-
-		enabledColor := theme.Current.Muted
-		if svc.Enabled == "enabled" {
-			enabledColor = theme.Current.Success
-		}
-
+		// Format service name
 		name := fmt.Sprintf("%-20s", truncate(svc.Name, 20))
-		status := lipgloss.NewStyle().Foreground(lipgloss.Color(statusColor)).Render(fmt.Sprintf("%-12s", svc.Active))
-		enabled := lipgloss.NewStyle().Foreground(lipgloss.Color(enabledColor)).Render(fmt.Sprintf("%-12s", svc.Enabled))
+
+		// Status badge with colors
+		var status string
+		if svc.Active == "active" {
+			status = ui.StatusBadge("active")
+		} else if svc.Active == "failed" {
+			status = ui.StatusBadge("failed")
+		} else {
+			status = ui.StatusBadge(svc.Active)
+		}
+		status = fmt.Sprintf("%-14s", status) // Pad for alignment
+
+		// Enabled badge
+		enabled := ui.EnabledBadge(svc.Enabled)
+		enabled = fmt.Sprintf("%-12s", enabled)
 
 		row := name + status + enabled
 
 		if i == m.cursor {
-			cursor := theme.MenuCursorStyle()
-			row = cursor.Render("> ") + theme.MenuSelectedStyle().Render(row)
+			// Full-width highlight for selected row
+			row = theme.TableRowSelectedStyle().Render(theme.Icons.Cursor + " " + row)
 		} else {
-			row = "  " + theme.MenuItemStyle().Render(row)
+			row = "  " + theme.TableRowStyle().Render(row)
 		}
 		rows = append(rows, row)
 	}
@@ -292,13 +295,12 @@ func (m ServiceListModel) View() string {
 			Render(content)
 	}
 
-	// Table header (fixed, not scrolled)
-	header := fmt.Sprintf("%-20s %-12s %-12s", "Service", "Status", "Enabled")
-	headerStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Muted)).
-		Bold(true)
-	headerLine := headerStyle.Render(header)
-	separator := strings.Repeat("─", 46)
+	// Table header with styling
+	header := fmt.Sprintf("%-20s %-14s %-12s", "Service", "Status", "Enabled")
+	headerLine := theme.TableHeaderStyle().Render(header)
+
+	// Separator using theme color
+	separator := theme.HelpDividerStyle().Render(strings.Repeat("─", 48))
 
 	// Scroll indicator
 	scrollInfo := ""
