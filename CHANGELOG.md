@@ -93,163 +93,27 @@ All notable changes to mypctools.
 - **New curl|bash installer** — `curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh | bash`
 - **Binary distribution** — Pre-built binaries via GitHub Releases (amd64, arm64)
 - **Repo cloned to ~/.local/share/mypctools** — Scripts accessed from there
-
-### Added
-- `.github/workflows/release.yml` — CI/CD builds binaries on tag push
-- `simple_choose()` in `lib/print.sh` — Pure bash menu selection (no gum)
-
-### Removed
-- `launcher.sh` — Gum TUI entry point
-- `apps/` directory — All 6 app menu scripts (ai.sh, browsers.sh, dev-tools.sh, gaming.sh, media.sh, service-manager.sh)
-- `lib/helpers.sh` — Gum-dependent helpers
-- `lib/theme.sh` — Gum theming
-
-### Migrated
-- `scripts/screensaver/install.sh` — Now uses `lib/print.sh` instead of `lib/helpers.sh`
-- `scripts/spicetify/install.sh` — Now uses `lib/print.sh` and `simple_choose()` instead of gum
+- CI/CD via `.github/workflows/release.yml` — builds binaries on tag push
 
 ---
 
-## [0.20.0] - 2026-02-05
+## Pre-release development (v0.4.0–v0.20.0)
 
-### Go TUI Phase 7: UI/UX Overhaul
-- Full-width highlight bars on menu selection (lazygit-inspired)
-- Inline breadcrumb navigation (`Parent / Current`)
-- Nerd font checkboxes with ASCII fallback
-- btop-inspired rounded border boxes
-- Service status pill badges with background colors
-- Responsive main menu logo for narrow terminals
-- 15+ cached Lip Gloss styles for performance
+<details>
+<summary>Go TUI build-up and bash TUI history (2026-01-25 to 2026-02-05)</summary>
 
----
+- **v0.20.0** — UI overhaul: full-width highlight bars, breadcrumbs, nerd font checkboxes, btop-style boxes, cached styles
+- **v0.19.0** — Performance: flatpak cache, menu item cache, style caching
+- **v0.18.0** — Operation logging, desktop notifications, Go TUI feature-complete
+- **v0.17.0** — Pull Updates screen, Theme Picker with swatches, viewport scrolling
+- **v0.16.0** — System Setup: update, cleanup, service manager
+- **v0.15.0** — App installation: 23 apps, 5 categories, multi-select, install chain (native PM → flatpak → fallback)
+- **v0.14.0** — Script bundles via `tea.ExecProcess()`, installation detection
+- **v0.13.0** — Bubble Tea scaffolding, 3 themes, nerd font detection, background update check
+- **v0.12.0** — All Services browser, operation logging, removed Flatpak Manager
+- **v0.10.0–v0.11.0** — Theme system, nerd font icons, service manager, installed badges, notifications
+- **v0.8.0–v0.9.0** — Fastfetch bundle, shared libraries, code consolidation
+- **v0.5.0–v0.7.0** — Screensaver, terminal bundles (foot, alacritty, ghostty, kitty)
+- **v0.4.0–v0.4.9** — LiteZsh, LiteBash, shared tool installer, service manager, system update/cleanup
 
-## [0.19.0] - 2026-02-05
-
-### Performance & Polish
-- Flatpak cache (30s) to avoid repeated shell calls
-- Menu items cache — only rebuild when update count changes
-- Style caching — pre-build all lipgloss styles once
-- Fixed duplicate titles, breadcrumb centering, vertical centering threshold
-
----
-
-## [0.18.0] - 2026-02-04
-
-### Go TUI Phase 6: Final Polish
-- Operation logging to `~/.local/share/mypctools/mypctools.log`
-- Desktop notifications via `notify-send` for long operations
-- **Go TUI now feature-complete** with full bash version parity
-
----
-
-## [0.17.0] - 2026-02-04
-
-### Go TUI Phase 5: Polish
-- Pull Updates screen with `git pull origin main`
-- Theme Picker with visual color swatches
-- Viewport scrolling for services list (100+ items)
-
----
-
-## [0.16.0] - 2026-02-04
-
-### Go TUI Phase 4: System Setup
-- Full System Update (apt/pacman/dnf)
-- System Cleanup with cache clearing prompts
-- Service Manager with Common Services table and All Services browser
-- System Info with two-column layout
-
----
-
-## [0.15.0] - 2026-02-04
-
-### Go TUI Phase 3: App Installation
-- 23 apps across 5 categories (AI, Browsers, Gaming, Media, Dev Tools)
-- Multi-select with checkboxes, installed badges, install method hints
-- Sequential installation with progress counter
-- Install chain: native PM → flatpak → custom fallback
-
----
-
-## [0.14.0] - 2026-02-04
-
-### Go TUI Phase 2: Script Bundles
-- All 10 script bundles with install/uninstall via `tea.ExecProcess()`
-- Installation detection via marker file checks
-- Spacebar as alternative to Enter for selection
-
----
-
-## [0.13.0] - 2026-02-04
-
-### Go TUI Phase 1: Scaffolding
-- Bubble Tea architecture with screen stack navigation
-- 3 theme presets (DefaultCyan, CatppuccinMocha, TokyoNight)
-- Nerd Font detection with ASCII fallback
-- Background git update check
-- CLI flags: `--help`, `--version`
-
----
-
-## [0.12.0] - 2026-02-04
-
-- All Services browser with `gum filter` fuzzy search
-- Operation logging (`log_action()`)
-- Nerd Font detection with ASCII fallback
-- Removed Flatpak Manager (flatpak still works as install fallback)
-
----
-
-## [0.10.0–0.11.0] - 2026-02-04
-
-- Theme system (3 presets saved to `~/.config/mypctools/theme`)
-- Nerd Font icons (15 icon variables)
-- Service Manager with `gum table` layout
-- Installed status badges (✓) on apps and script bundles
-- Desktop notifications after long operations
-
----
-
-## [0.8.0–0.9.0] - 2026-02-04
-
-- **Fastfetch bundle** with tree-style layout
-- **Shared libraries**: `lib/print.sh`, `lib/symlink.sh`, `lib/shell-setup.sh`, `lib/terminal-install.sh`
-- Major code consolidation (-255 lines)
-- Live output for Full System Update
-
----
-
-## [0.5.0–0.7.0] - 2026-01-29 to 2026-02-03
-
-- **Screensaver bundle** (tte + hypridle integration)
-- **Terminal bundles**: foot, alacritty, ghostty, kitty (all with 3 themes)
-- Removed `set -e` from 11 scripts (was causing silent failures)
-- TUI visual refresh with state colors and fuzzy search
-
----
-
-## [0.4.0–0.4.9] - 2026-01-25 to 2026-01-28
-
-- **LiteZsh bundle** with syntax highlighting and autosuggestions
-- **LiteBash bundle** with modern CLI tools
-- `lib/tools-install.sh` shared tool installer
-- `scripts/shared/` for aliases and starship config
-- Service Manager, Full System Update, System Cleanup
-- `--help`/`--version` flags, automatic update check
-
----
-
-## Script Bundles
-
-| Bundle | Description |
-|--------|-------------|
-| litebash | Speed-focused bash with eza, bat, ripgrep, fd, zoxide, lazygit, yazi, starship |
-| litezsh | Zsh counterpart with syntax highlighting, autosuggestions, arrow-key completion |
-| terminal | foot config (Wayland only) with 3 themes |
-| alacritty | alacritty config (X11 + Wayland) with 3 themes |
-| ghostty | ghostty config (X11 + Wayland) with 3 themes |
-| kitty | kitty config (X11 + Wayland) with 3 themes |
-| fastfetch | Custom config with tree-style layout |
-| screensaver | Terminal screensaver via hypridle + tte (Hyprland only) |
-| claude | Claude Code skills and statusline |
-| spicetify | Spotify theming (native installs only) |
+</details>
