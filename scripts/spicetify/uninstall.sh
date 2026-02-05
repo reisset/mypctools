@@ -4,7 +4,7 @@
 # v1.0.0
 
 _SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$_SCRIPT_DIR/../../lib/helpers.sh"
+source "$_SCRIPT_DIR/../../lib/print.sh"
 
 SPICETIFY_DIR="$HOME/.spicetify"
 

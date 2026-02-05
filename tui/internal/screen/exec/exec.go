@@ -2,6 +2,7 @@ package exec
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -56,9 +57,13 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		m.done = true
 		m.err = msg.err
 		if msg.err != nil {
-			logging.LogAction(fmt.Sprintf("Script %s %s failed", m.bundle.Name, m.action))
+			if err := logging.LogAction(fmt.Sprintf("Script %s %s failed", m.bundle.Name, m.action)); err != nil {
+				fmt.Fprintf(os.Stderr, "logging failed: %v\n", err)
+			}
 		} else {
-			logging.LogAction(fmt.Sprintf("Script %s %s completed", m.bundle.Name, m.action))
+			if err := logging.LogAction(fmt.Sprintf("Script %s %s completed", m.bundle.Name, m.action)); err != nil {
+				fmt.Fprintf(os.Stderr, "logging failed: %v\n", err)
+			}
 			system.Notify("mypctools", fmt.Sprintf("%s %s completed", m.bundle.Name, m.action))
 		}
 		return m, nil

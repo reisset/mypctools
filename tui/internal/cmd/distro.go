@@ -91,19 +91,24 @@ func DetectDistro() DistroInfo {
 }
 
 func parseOSRelease() map[string]string {
+	fields := make(map[string]string)
+
 	f, err := os.Open("/etc/os-release")
 	if err != nil {
-		return nil
+		return fields
 	}
 	defer f.Close()
 
-	fields := make(map[string]string)
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if k, v, ok := strings.Cut(line, "="); ok {
 			fields[k] = strings.Trim(v, "\"")
 		}
+	}
+	// Check for scanner errors (e.g., line too long)
+	if err := scanner.Err(); err != nil {
+		return fields
 	}
 	return fields
 }

@@ -58,9 +58,14 @@ simple_choose() {
 # Prompt for sudo and keep credentials alive in background
 # Call at the start of scripts that need sustained sudo access
 init_sudo() {
+    # Guard against multiple background loops
+    if [[ -n "$_INIT_SUDO_PID" ]] && kill -0 "$_INIT_SUDO_PID" 2>/dev/null; then
+        return 0
+    fi
     echo "This installer requires sudo privileges to function properly."
     echo "Read the entire script if you do not trust the author."
     echo ""
     sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    _INIT_SUDO_PID=$!
 }

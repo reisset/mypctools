@@ -4,6 +4,28 @@ All notable changes to mypctools.
 
 ---
 
+## [0.24.1] - 2026-02-05
+
+### Fixed
+- **Critical**: Fixed missing `helpers.sh` reference in `lib/package-manager.sh` and `scripts/spicetify/uninstall.sh` (changed to `print.sh`)
+- **Critical**: Fixed nil map panic risk in `parseOSRelease()` — now returns empty map on error
+- Added scanner error check in distro detection
+- Added panic recovery in background update check goroutine
+- Added bounds validation in service manager before accessing services slice
+- Fixed theme save error handling (no longer silently ignored)
+- Fixed logging error handling in exec screen (logs to stderr on failure)
+- Added `init_sudo` loop guard to prevent multiple background sudo refresh loops
+- Added `gpg`/`wget` existence checks in VSCode and Spotify fallback installers
+
+### Improved
+- Fixed Unicode truncation in service names (now uses rune count)
+- Use `strings.Builder` in list rendering for efficiency
+- Preallocate slice in `AppsByCategory()`
+- Removed unused `user.Current()` call in main menu
+- Fixed shebang in `scripts/claude/install.sh` to use `#!/usr/bin/env bash`
+
+---
+
 ## [0.24.0] - 2026-02-05
 
 ### Added

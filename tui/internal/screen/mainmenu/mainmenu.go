@@ -3,7 +3,6 @@ package mainmenu
 import (
 	"fmt"
 	"os"
-	"os/user"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -174,7 +173,7 @@ func (m Model) View() string {
 	// Wrap menu in a subtle box for visual containment
 	menuBox := theme.BoxStyle().
 		Width(56).
-		Align(lipgloss.Center).
+		Align(lipgloss.Left).
 		Render(menu)
 
 	// Center the menu
@@ -210,14 +209,6 @@ func buildSysLine(shared *state.Shared) string {
 		shell = "sh"
 	}
 
-	hostname := "localhost"
-	if u, err := user.Current(); err == nil {
-		_ = u
-	}
-	if h, err := os.Hostname(); err == nil {
-		hostname = h
-	}
-	_ = hostname
 
 	kernel := ""
 	if data, err := os.ReadFile("/proc/version"); err == nil {

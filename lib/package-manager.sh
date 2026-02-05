@@ -6,7 +6,7 @@
 # Source distro detection
 _PKG_MGR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_PKG_MGR_DIR/distro-detect.sh"
-source "$_PKG_MGR_DIR/helpers.sh"
+source "$_PKG_MGR_DIR/print.sh"
 
 # Get the appropriate package manager
 get_package_manager() {
@@ -132,7 +132,10 @@ install_vscode_fallback() {
     fi
 
     ensure_sudo || return 1
-    sudo apt-get install -y wget gpg || return 1
+    # Ensure gpg and wget are available
+    if ! command_exists gpg || ! command_exists wget; then
+        sudo apt-get install -y wget gpg || return 1
+    fi
     local gpg_key gpg_dearmored
     gpg_key=$(mktemp)
     gpg_dearmored=$(mktemp)
@@ -197,6 +200,11 @@ install_spotify_fallback() {
     if [[ "$DISTRO_TYPE" != "debian" ]]; then
         print_error "Spotify deb fallback only supports Debian-based distros. Try flatpak."
         return 1
+    fi
+
+    if ! command_exists gpg; then
+        ensure_sudo || return 1
+        sudo apt-get install -y gpg || return 1
     fi
 
     local gpg_key
