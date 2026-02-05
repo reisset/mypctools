@@ -4,6 +4,13 @@ All notable changes to mypctools.
 
 ---
 
+## [0.23.0] - 2026-02-05
+
+### Removed
+- **System Info screen** — Redundant with fastfetch bundle; had ANSI rendering issues
+
+---
+
 ## [0.22.0] - 2026-02-05
 
 ### UI/UX Overhaul
