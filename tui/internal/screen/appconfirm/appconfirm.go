@@ -47,7 +47,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "j", "down", "k", "up", "tab":
+		case "down", "up", "tab":
 			// Toggle between Install and Cancel
 			if m.cursor == actionInstall {
 				m.cursor = actionCancel
@@ -141,5 +141,5 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{"j/k navigate", "enter select", "y install", "n cancel"}
+	return []string{"y install", "n cancel"}
 }

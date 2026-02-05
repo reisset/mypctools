@@ -35,12 +35,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "j", "down":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.bundles) {
 				m.cursor = 0
 			}
-		case "k", "up":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.bundles) - 1
@@ -105,5 +105,5 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{"j/k navigate", "enter select"}
+	return []string{}
 }

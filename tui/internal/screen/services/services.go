@@ -49,12 +49,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "j", "down":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "k", "up":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
@@ -112,7 +112,7 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{"j/k navigate", "enter select"}
+	return []string{}
 }
 
 // ServiceListModel shows a list of services with their status.
@@ -191,14 +191,14 @@ func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		}
 
 		switch msg.String() {
-		case "j", "down":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.services) {
 				m.cursor = 0
 			}
 			m.scrollToCursor()
 			m.viewport.SetContent(m.renderRows())
-		case "k", "up":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.services) - 1
@@ -242,22 +242,21 @@ func (m ServiceListModel) renderRows() string {
 		// Format service name
 		name := fmt.Sprintf("%-20s", truncate(svc.Name, 20))
 
-		// Status badge with colors
-		var status string
-		if svc.Active == "active" {
-			status = ui.StatusBadge("active")
-		} else if svc.Active == "failed" {
-			status = ui.StatusBadge("failed")
-		} else {
-			status = ui.StatusBadge(svc.Active)
+		// Status badge with colors - use lipgloss.Width for ANSI-aware padding
+		status := ui.StatusBadge(svc.Active)
+		statusWidth := lipgloss.Width(status)
+		if statusWidth < 12 {
+			status = status + strings.Repeat(" ", 12-statusWidth)
 		}
-		status = fmt.Sprintf("%-14s", status) // Pad for alignment
 
-		// Enabled badge
+		// Enabled badge - use lipgloss.Width for ANSI-aware padding
 		enabled := ui.EnabledBadge(svc.Enabled)
-		enabled = fmt.Sprintf("%-12s", enabled)
+		enabledWidth := lipgloss.Width(enabled)
+		if enabledWidth < 10 {
+			enabled = enabled + strings.Repeat(" ", 10-enabledWidth)
+		}
 
-		row := name + status + enabled
+		row := name + "  " + status + "  " + enabled
 
 		if i == m.cursor {
 			// Full-width highlight for selected row
@@ -296,7 +295,7 @@ func (m ServiceListModel) View() string {
 	}
 
 	// Table header with styling
-	header := fmt.Sprintf("%-20s %-14s %-12s", "Service", "Status", "Enabled")
+	header := fmt.Sprintf("%-20s  %-12s  %-10s", "Service", "Status", "Enabled")
 	headerLine := theme.TableHeaderStyle().Render(header)
 
 	// Separator using theme color
@@ -334,7 +333,7 @@ func (m ServiceListModel) Title() string {
 }
 
 func (m ServiceListModel) ShortHelp() []string {
-	return []string{"j/k navigate", "enter select"}
+	return []string{}
 }
 
 func truncate(s string, max int) string {

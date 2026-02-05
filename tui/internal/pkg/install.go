@@ -60,17 +60,17 @@ func InstallMethodDescription(app *App, distroType cmd.DistroType) string {
 	_, method := InstallCommand(app, distroType)
 	switch method {
 	case "pacman":
-		return "via pacman"
+		return "pacman"
 	case "apt":
-		return "via apt"
+		return "apt"
 	case "dnf":
-		return "via dnf"
+		return "dnf"
 	case "flatpak":
-		return "via Flatpak"
+		return "Flatpak"
 	case "fallback":
-		return "via custom installer"
+		return "custom installer"
 	default:
-		return "no method available"
+		return ""
 	}
 }
 

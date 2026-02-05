@@ -4,6 +4,21 @@ All notable changes to mypctools.
 
 ---
 
+## [0.22.0] - 2026-02-05
+
+### UI/UX Overhaul
+- Fixed menu items shifting horizontally on hover (consistent width)
+- Fixed duplicate "via via pacman" badge text
+- Fixed service manager columns running together (ANSI-aware padding)
+- Added subtle box around main menu for visual containment
+
+### Streamlined Controls
+- Removed vim keybinds (j/k) — arrow keys only
+- Removed "q" to quit — use Escape or Ctrl+C
+- Simplified footer help text (only context-specific hints)
+
+---
+
 ## [0.21.0] - 2026-02-05
 
 ### Changed

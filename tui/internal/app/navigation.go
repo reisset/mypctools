@@ -8,7 +8,7 @@ type Screen interface {
 	Update(tea.Msg) (Screen, tea.Cmd)
 	View() string
 	Title() string
-	ShortHelp() []string // e.g. ["j/k navigate", "enter select"]
+	ShortHelp() []string // Context-specific hints only (e.g. ["y yes", "n no"])
 }
 
 // NavigateMsg pushes a new screen onto the stack.

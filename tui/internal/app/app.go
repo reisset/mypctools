@@ -105,7 +105,6 @@ func (m Model) View() string {
 	if len(m.stack) > 1 {
 		helpKeys = append(helpKeys, ui.HelpKey{Key: "esc", Desc: "back"})
 	}
-	helpKeys = append(helpKeys, ui.HelpKey{Key: "q", Desc: "quit"})
 
 	footer := "\n" + ui.Footer(helpKeys, width)
 
