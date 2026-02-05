@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+	"github.com/reisset/mypctools/tui/internal/logging"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
@@ -81,6 +82,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		m.cacheErr = msg.err
 		m.cacheCleared = true
 		m.phase = phaseDone
+		m.logAndNotify()
 		return m, nil
 
 	case tea.KeyMsg:
@@ -99,12 +101,14 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 					return m, m.clearCaches()
 				}
 				m.phase = phaseDone
+				m.logAndNotify()
 				return m, nil
 			case "y":
 				m.phase = phaseClearingCache
 				return m, m.clearCaches()
 			case "n":
 				m.phase = phaseDone
+				m.logAndNotify()
 				return m, nil
 			}
 		case phaseDone:
@@ -119,6 +123,15 @@ func (m Model) clearCaches() tea.Cmd {
 		err := system.ClearUserCaches()
 		return cacheClearDoneMsg{err: err}
 	}
+}
+
+func (m Model) logAndNotify() {
+	if m.pkgErr != nil {
+		logging.LogAction("System cleanup completed with errors")
+	} else {
+		logging.LogAction("System cleanup completed")
+	}
+	system.Notify("mypctools", "System cleanup completed")
 }
 
 func (m Model) View() string {

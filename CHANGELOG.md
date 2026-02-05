@@ -11,6 +11,21 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.18.0] - 2026-02-04
+
+#### Added
+- **Go TUI Phase 6: Final Polish** — Operation logging and desktop notifications
+  - Logging package (`tui/internal/logging/`) — `LogAction()` appends timestamped entries to `~/.local/share/mypctools/mypctools.log`
+  - Notification function (`tui/internal/system/notify.go`) — `Notify()` sends desktop notifications via `notify-send`
+  - All operations now logged: app installs, script bundle install/uninstall, system update, system cleanup, service actions
+  - Desktop notifications after: system update, system cleanup, batch app installs, script bundle operations
+
+#### Notes
+- Go TUI is now feature-complete with full bash version parity
+- All 6 phases complete: scaffolding → script bundles → app installation → system setup → polish → final polish
+
+---
+
 ### [0.17.0] - 2026-02-04
 
 #### Added
@@ -99,8 +114,7 @@ All notable changes to mypctools and its bundled scripts.
   - Background git update check (same `fetch origin main` + `rev-list --count` pattern)
 
 #### Notes
-- Go TUI and bash TUI coexist — the Go version does not replace `launcher.sh` yet
-- Phase 2–6 will add: script bundles, app installation, system setup, service manager, polish
+- Go TUI and bash TUI coexist — user can choose either version
 - Dependencies: `github.com/charmbracelet/bubbletea`, `lipgloss`, `bubbles`
 - Issue during initial setup: `go mod tidy` hung in the default shell environment; resolved by running Go commands in a clean `env -i` subshell
 

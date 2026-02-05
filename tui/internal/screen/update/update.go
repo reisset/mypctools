@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+	"github.com/reisset/mypctools/tui/internal/logging"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
@@ -48,6 +49,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	case execDoneMsg:
 		m.done = true
 		m.err = msg.err
+		if msg.err != nil {
+			logging.LogAction("System update failed")
+		} else {
+			logging.LogAction("System update completed")
+			system.Notify("mypctools", "System update completed")
+		}
 		return m, nil
 
 	case tea.KeyMsg:
