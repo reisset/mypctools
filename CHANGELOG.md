@@ -11,6 +11,23 @@ All notable changes to mypctools and its bundled scripts.
 
 ## mypctools
 
+### [0.17.0] - 2026-02-04
+
+#### Added
+- **Go TUI Phase 5: Polish** — Missing features and viewport scrolling
+  - Pull Updates screen (`tui/internal/screen/pullupdate/`) — runs `git pull origin main`, clears update badge on success
+  - Theme Picker screen (`tui/internal/screen/themepicker/`) — visual color swatches for all 3 themes, "(current)" indicator
+  - Theme option added to System Setup menu
+  - Bubbles viewport component for services list scrolling
+
+#### Fixed
+- All Services list now scrolls properly — cursor stays visible when navigating 100+ items, scroll indicator `[N/M]` shows position
+
+#### Known Issues
+- TUI suspend/resume during sudo operations remains (accepted tradeoff for `tea.ExecProcess()` design)
+
+---
+
 ### [0.16.0] - 2026-02-04
 
 #### Added
@@ -25,7 +42,7 @@ All notable changes to mypctools and its bundled scripts.
 
 #### Known Issues
 - Same jarring TUI suspend behavior during sudo operations (see 0.14.0)
-- All Services list has no viewport scrolling — cursor disappears when navigating beyond visible terminal bounds (list too long for fixed-height view)
+- ~~All Services list has no viewport scrolling~~ — Fixed in 0.17.0
 
 ---
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
@@ -135,6 +136,7 @@ type ServiceListModel struct {
 	cursor   int
 	showAll  bool
 	loading  bool
+	viewport viewport.Model
 }
 
 // servicesLoadedMsg is sent when service list is loaded.
@@ -144,10 +146,21 @@ type servicesLoadedMsg struct {
 
 // NewServiceList creates a new service list screen.
 func NewServiceList(shared *state.Shared, showAll bool) ServiceListModel {
+	// Initialize viewport with current terminal size (will be resized on WindowSizeMsg)
+	width := shared.TerminalWidth
+	height := shared.TerminalHeight
+	if width == 0 {
+		width = 80
+	}
+	if height == 0 {
+		height = 24
+	}
+	vp := viewport.New(width, height-6)
 	return ServiceListModel{
-		shared:  shared,
-		showAll: showAll,
-		loading: true,
+		shared:   shared,
+		showAll:  showAll,
+		loading:  true,
+		viewport: vp,
 	}
 }
 
@@ -174,9 +187,16 @@ func (m ServiceListModel) loadServices() tea.Cmd {
 
 func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		headerHeight := 6 // header + separator + padding + footer
+		m.viewport = viewport.New(msg.Width, msg.Height-headerHeight)
+		m.viewport.SetContent(m.renderRows())
+		return m, nil
+
 	case servicesLoadedMsg:
 		m.services = msg.services
 		m.loading = false
+		m.viewport.SetContent(m.renderRows())
 		return m, nil
 
 	case tea.KeyMsg:
@@ -190,11 +210,15 @@ func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 			if m.cursor >= len(m.services) {
 				m.cursor = 0
 			}
+			m.scrollToCursor()
+			m.viewport.SetContent(m.renderRows())
 		case "k", "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.services) - 1
 			}
+			m.scrollToCursor()
+			m.viewport.SetContent(m.renderRows())
 		case "enter", " ":
 			if len(m.services) > 0 && m.cursor < len(m.services) {
 				return m, app.Navigate(NewServiceDetail(m.shared, m.services[m.cursor].Name))
@@ -204,42 +228,30 @@ func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	return m, nil
 }
 
-func (m ServiceListModel) View() string {
-	width := m.shared.TerminalWidth
-	if width == 0 {
-		width = 80
+// scrollToCursor adjusts viewport offset to keep cursor visible.
+func (m *ServiceListModel) scrollToCursor() {
+	visibleHeight := m.viewport.Height
+	if visibleHeight <= 0 {
+		return
 	}
 
-	if m.loading {
-		loading := theme.MutedStyle().Render("Loading services...")
-		return lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(loading)
-	}
+	topLine := m.viewport.YOffset
+	bottomLine := topLine + visibleHeight - 1
 
+	if m.cursor < topLine {
+		m.viewport.SetYOffset(m.cursor)
+	} else if m.cursor > bottomLine {
+		m.viewport.SetYOffset(m.cursor - visibleHeight + 1)
+	}
+}
+
+// renderRows builds the table content for the viewport.
+func (m ServiceListModel) renderRows() string {
 	if len(m.services) == 0 {
-		noServices := theme.WarningStyle().Render("No services found")
-		prompt := theme.MutedStyle().Render("Press esc to go back")
-		content := lipgloss.JoinVertical(lipgloss.Center, noServices, "", prompt)
-		return lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(content)
+		return ""
 	}
 
-	// Table header
-	header := fmt.Sprintf("%-20s %-12s %-12s", "Service", "Status", "Enabled")
-	headerStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Muted)).
-		Bold(true)
-	headerLine := headerStyle.Render(header)
-
-	// Table rows
 	var rows []string
-	rows = append(rows, headerLine)
-	rows = append(rows, strings.Repeat("─", 46))
-
 	for i, svc := range m.services {
 		statusColor := theme.Current.Muted
 		if svc.Active == "active" {
@@ -268,16 +280,62 @@ func (m ServiceListModel) View() string {
 		rows = append(rows, row)
 	}
 
-	table := strings.Join(rows, "\n")
+	return strings.Join(rows, "\n")
+}
 
-	tableBlock := lipgloss.NewStyle().
+func (m ServiceListModel) View() string {
+	width := m.shared.TerminalWidth
+	if width == 0 {
+		width = 80
+	}
+
+	if m.loading {
+		loading := theme.MutedStyle().Render("Loading services...")
+		return lipgloss.NewStyle().
+			Width(width).
+			Align(lipgloss.Center).
+			Render(loading)
+	}
+
+	if len(m.services) == 0 {
+		noServices := theme.WarningStyle().Render("No services found")
+		prompt := theme.MutedStyle().Render("Press esc to go back")
+		content := lipgloss.JoinVertical(lipgloss.Center, noServices, "", prompt)
+		return lipgloss.NewStyle().
+			Width(width).
+			Align(lipgloss.Center).
+			Render(content)
+	}
+
+	// Table header (fixed, not scrolled)
+	header := fmt.Sprintf("%-20s %-12s %-12s", "Service", "Status", "Enabled")
+	headerStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(theme.Current.Muted)).
+		Bold(true)
+	headerLine := headerStyle.Render(header)
+	separator := strings.Repeat("─", 46)
+
+	// Scroll indicator
+	scrollInfo := ""
+	if len(m.services) > m.viewport.Height {
+		scrollInfo = theme.MutedStyle().Render(fmt.Sprintf(" [%d/%d]", m.cursor+1, len(m.services)))
+	}
+
+	headerBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(table)
+		Render(headerLine + scrollInfo + "\n" + separator)
+
+	// Viewport content (scrollable)
+	viewportBlock := lipgloss.NewStyle().
+		Width(width).
+		Align(lipgloss.Center).
+		Render(m.viewport.View())
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		"",
-		tableBlock,
+		headerBlock,
+		viewportBlock,
 	)
 }
 
