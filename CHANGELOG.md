@@ -4,6 +4,14 @@ All notable changes to mypctools.
 
 ---
 
+## [0.24.0] - 2026-02-05
+
+### Added
+- **Chromium** browser (apt/pacman/dnf/flatpak)
+- **Zen Browser** (AUR/flatpak/curl installer)
+
+---
+
 ## [0.23.0] - 2026-02-05
 
 ### Removed
