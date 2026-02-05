@@ -6,8 +6,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+	"github.com/reisset/mypctools/tui/internal/logging"
 	"github.com/reisset/mypctools/tui/internal/pkg"
 	"github.com/reisset/mypctools/tui/internal/state"
+	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
@@ -66,11 +68,14 @@ func (m Model) installCurrent() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case execDoneMsg:
-		// Update counters
+		// Log and update counters
+		appName := m.apps[m.current].Name
 		if msg.err != nil {
 			m.failed++
+			logging.LogAction(fmt.Sprintf("App install failed: %s", appName))
 		} else {
 			m.succeeded++
+			logging.LogAction(fmt.Sprintf("App installed: %s", appName))
 		}
 
 		// Move to next app
@@ -79,6 +84,11 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		if m.current >= len(m.apps) {
 			// All done
 			m.done = true
+			if len(m.apps) > 1 {
+				system.Notify("mypctools", fmt.Sprintf("Installed %d apps (%d failed)", m.succeeded, m.failed))
+			} else if m.succeeded > 0 {
+				system.Notify("mypctools", fmt.Sprintf("%s installed", appName))
+			}
 			return m, nil
 		}
 

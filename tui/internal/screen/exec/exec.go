@@ -9,7 +9,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/bundle"
+	"github.com/reisset/mypctools/tui/internal/logging"
 	"github.com/reisset/mypctools/tui/internal/state"
+	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
@@ -53,6 +55,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	case execDoneMsg:
 		m.done = true
 		m.err = msg.err
+		if msg.err != nil {
+			logging.LogAction(fmt.Sprintf("Script %s %s failed", m.bundle.Name, m.action))
+		} else {
+			logging.LogAction(fmt.Sprintf("Script %s %s completed", m.bundle.Name, m.action))
+			system.Notify("mypctools", fmt.Sprintf("%s %s completed", m.bundle.Name, m.action))
+		}
 		return m, nil
 
 	case tea.KeyMsg:

@@ -135,7 +135,7 @@ gum style --border normal --padding "1 2" "Title"    # Styled box
 
 ## Go TUI (tui/)
 
-A parallel TUI implementation in Go using Bubble Tea, located in `tui/`. Coexists with the bash version.
+A parallel TUI implementation in Go using Bubble Tea, located in `tui/`. Feature-complete and coexists with the bash version.
 
 **Building**: User compiles manually. Claude provides commands but does not run `go build` directly (slow in sandboxed environments).
 
@@ -145,12 +145,17 @@ cd ~/mypctools/tui && go build -o mypctools-tui ./main.go
 
 **Structure**:
 - `tui/internal/app/` — Root model, screen interface, navigation (Navigate/PopScreen)
-- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec)
+- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, apps, etc.)
 - `tui/internal/bundle/` — Script bundle registry and installation detection
 - `tui/internal/theme/` — Color palettes, Lip Gloss styles, icons
 - `tui/internal/state/` — Shared state (distro info, terminal size, update count)
+- `tui/internal/logging/` — Operation logging to ~/.local/share/mypctools/mypctools.log
+- `tui/internal/system/` — System operations (update, cleanup, services, sysinfo, notifications)
+- `tui/internal/pkg/` — Package installation with apt/pacman/flatpak support
 
 **Patterns**:
 - Screens implement `app.Screen` interface: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`
 - Navigation: `app.Navigate(screen)` pushes, `app.PopScreen()` pops
 - Script execution: `tea.ExecProcess()` suspends TUI, gives script full terminal control
+- Logging: `logging.LogAction()` for all operations (installs, updates, service actions)
+- Notifications: `system.Notify()` for long operations (update, cleanup, batch installs)

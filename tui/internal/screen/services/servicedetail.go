@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+	"github.com/reisset/mypctools/tui/internal/logging"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
@@ -48,6 +49,7 @@ type ServiceDetailModel struct {
 	items       []actionItem
 	actionDone  bool
 	actionErr   error
+	lastAction  detailAction
 }
 
 // NewServiceDetail creates a new service detail screen.
@@ -80,6 +82,8 @@ func (m ServiceDetailModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	case execDoneMsg:
 		m.actionDone = true
 		m.actionErr = msg.err
+		// Log the action
+		m.logServiceAction()
 		// Refresh status
 		m.status = system.GetServiceStatus(m.serviceName)
 		return m, nil
@@ -104,6 +108,7 @@ func (m ServiceDetailModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 				m.cursor = len(m.items) - 1
 			}
 		case "enter", " ":
+			m.lastAction = m.items[m.cursor].action
 			return m, m.handleAction(m.items[m.cursor].action)
 		}
 	}
@@ -146,6 +151,32 @@ func (m ServiceDetailModel) handleAction(action detailAction) tea.Cmd {
 		})
 	}
 	return nil
+}
+
+func (m ServiceDetailModel) logServiceAction() {
+	actionName := ""
+	switch m.lastAction {
+	case actionStart:
+		actionName = "start"
+	case actionStop:
+		actionName = "stop"
+	case actionRestart:
+		actionName = "restart"
+	case actionEnable:
+		actionName = "enable"
+	case actionDisable:
+		actionName = "disable"
+	case actionViewStatus:
+		return // Don't log view status
+	default:
+		return
+	}
+
+	if m.actionErr != nil {
+		logging.LogAction(fmt.Sprintf("Service %s %s failed", m.serviceName, actionName))
+	} else {
+		logging.LogAction(fmt.Sprintf("Service %s %s", m.serviceName, actionName))
+	}
 }
 
 func (m ServiceDetailModel) View() string {
