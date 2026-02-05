@@ -81,8 +81,14 @@ func main() {
 }
 
 // findRootDir locates the mypctools repo root.
-// It walks up from the executable path looking for launcher.sh.
+// It walks up from the executable path looking for scripts/ directory.
 func findRootDir() string {
+	// Try ~/.local/share/mypctools first (standard install location)
+	homeShare := filepath.Join(os.Getenv("HOME"), ".local", "share", "mypctools")
+	if _, err := os.Stat(filepath.Join(homeShare, "scripts")); err == nil {
+		return homeShare
+	}
+
 	// Try relative to executable
 	exe, err := os.Executable()
 	if err == nil {
@@ -92,7 +98,7 @@ func findRootDir() string {
 		if filepath.Base(dir) == "tui" {
 			dir = filepath.Dir(dir)
 		}
-		if _, err := os.Stat(filepath.Join(dir, "launcher.sh")); err == nil {
+		if _, err := os.Stat(filepath.Join(dir, "scripts")); err == nil {
 			return dir
 		}
 	}
@@ -100,16 +106,16 @@ func findRootDir() string {
 	// Try CWD
 	cwd, err := os.Getwd()
 	if err == nil {
-		if _, err := os.Stat(filepath.Join(cwd, "launcher.sh")); err == nil {
+		if _, err := os.Stat(filepath.Join(cwd, "scripts")); err == nil {
 			return cwd
 		}
 		// Try parent of CWD (if running from tui/)
 		parent := filepath.Dir(cwd)
-		if _, err := os.Stat(filepath.Join(parent, "launcher.sh")); err == nil {
+		if _, err := os.Stat(filepath.Join(parent, "scripts")); err == nil {
 			return parent
 		}
 	}
 
-	// Fallback: assume current directory
-	return cwd
+	// Fallback: ~/.local/share/mypctools
+	return homeShare
 }
