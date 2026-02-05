@@ -117,5 +117,5 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{}
+	return []string{"enter select"}
 }

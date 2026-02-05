@@ -113,7 +113,7 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{}
+	return []string{"enter select"}
 }
 
 // ServiceListModel shows a list of services with their status.
@@ -334,7 +334,7 @@ func (m ServiceListModel) Title() string {
 }
 
 func (m ServiceListModel) ShortHelp() []string {
-	return []string{}
+	return []string{"enter details"}
 }
 
 func truncate(s string, max int) string {

@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"io"
 	"os/exec"
 	"strings"
 	"sync"
@@ -50,33 +51,28 @@ func isNativePkgInstalled(app *App, distroType cmd.DistroType) bool {
 		if app.PacmanPkg == "" {
 			return false
 		}
-		// pacman -Q returns 0 if package is installed
-		cmd := exec.Command("pacman", "-Q", app.PacmanPkg)
-		return cmd.Run() == nil
+		c := exec.Command("pacman", "-Q", app.PacmanPkg)
+		c.Stdout = io.Discard
+		c.Stderr = io.Discard
+		return c.Run() == nil
 
 	case cmd.DistroDebian:
 		if app.AptPkg == "" {
 			return false
 		}
-		// dpkg -s returns 0 if package is installed
-		cmd := exec.Command("dpkg", "-s", app.AptPkg)
-		return cmd.Run() == nil
+		c := exec.Command("dpkg", "-s", app.AptPkg)
+		c.Stdout = io.Discard
+		c.Stderr = io.Discard
+		return c.Run() == nil
 
 	case cmd.DistroFedora:
-		// Fedora names sometimes match Debian, sometimes Arch - try both
-		if app.AptPkg != "" {
-			cmd := exec.Command("rpm", "-q", app.AptPkg)
-			if cmd.Run() == nil {
-				return true
-			}
+		if app.DnfPkg == "" {
+			return false
 		}
-		if app.PacmanPkg != "" && app.PacmanPkg != app.AptPkg {
-			cmd := exec.Command("rpm", "-q", app.PacmanPkg)
-			if cmd.Run() == nil {
-				return true
-			}
-		}
-		return false
+		c := exec.Command("rpm", "-q", app.DnfPkg)
+		c.Stdout = io.Discard
+		c.Stderr = io.Discard
+		return c.Run() == nil
 	}
 
 	return false

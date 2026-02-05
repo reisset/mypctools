@@ -25,10 +25,6 @@ func InstallCommand(app *App, distroType cmd.DistroType) (string, string) {
 		if app.DnfPkg != "" {
 			return fmt.Sprintf("sudo dnf install -y %s", app.DnfPkg), "dnf"
 		}
-		// Fall back to AptPkg if DnfPkg not specified (many packages share names)
-		if app.AptPkg != "" {
-			return fmt.Sprintf("sudo dnf install -y %s", app.AptPkg), "dnf"
-		}
 	}
 
 	// Flatpak fallback
