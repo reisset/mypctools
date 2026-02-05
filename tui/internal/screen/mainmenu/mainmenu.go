@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/screen/apps"
+	"github.com/reisset/mypctools/tui/internal/screen/pullupdate"
 	"github.com/reisset/mypctools/tui/internal/screen/scripts"
 	"github.com/reisset/mypctools/tui/internal/screen/systemsetup"
 	"github.com/reisset/mypctools/tui/internal/state"
@@ -102,8 +103,7 @@ func (m Model) handleSelection(id string) tea.Cmd {
 	case "system":
 		return app.Navigate(systemsetup.New(m.shared))
 	case "update":
-		// Phase 4: will navigate to pull update screen
-		return nil
+		return app.Navigate(pullupdate.New(m.shared))
 	}
 	return nil
 }
