@@ -47,7 +47,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down", "up", "tab":
+		case "down", "up", "tab", "j", "k":
 			// Toggle between Install and Cancel
 			if m.cursor == actionInstall {
 				m.cursor = actionCancel

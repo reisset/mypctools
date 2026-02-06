@@ -35,12 +35,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down":
+		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(m.bundles) {
 				m.cursor = 0
 			}
-		case "up":
+		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.bundles) - 1

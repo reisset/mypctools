@@ -18,6 +18,7 @@ type menuItem struct {
 	label    string
 	category string
 	count    int
+	desc     string
 }
 
 // Model is the app category selection screen.
@@ -30,11 +31,11 @@ type Model struct {
 // New creates a new apps category menu.
 func New(shared *state.Shared) Model {
 	items := []menuItem{
-		{icon: theme.Icons.AI, label: "AI Tools", category: pkg.CategoryAI, count: len(pkg.AppsByCategory(pkg.CategoryAI))},
-		{icon: theme.Icons.Browser, label: "Browsers", category: pkg.CategoryBrowsers, count: len(pkg.AppsByCategory(pkg.CategoryBrowsers))},
-		{icon: theme.Icons.Gaming, label: "Gaming", category: pkg.CategoryGaming, count: len(pkg.AppsByCategory(pkg.CategoryGaming))},
-		{icon: theme.Icons.Media, label: "Media", category: pkg.CategoryMedia, count: len(pkg.AppsByCategory(pkg.CategoryMedia))},
-		{icon: theme.Icons.Dev, label: "Dev Tools", category: pkg.CategoryDevTools, count: len(pkg.AppsByCategory(pkg.CategoryDevTools))},
+		{icon: theme.Icons.AI, label: "AI Tools", category: pkg.CategoryAI, count: len(pkg.AppsByCategory(pkg.CategoryAI)), desc: "ChatGPT, Ollama, Claude Code, and more"},
+		{icon: theme.Icons.Browser, label: "Browsers", category: pkg.CategoryBrowsers, count: len(pkg.AppsByCategory(pkg.CategoryBrowsers)), desc: "Brave, Firefox, Chromium, and more"},
+		{icon: theme.Icons.Gaming, label: "Gaming", category: pkg.CategoryGaming, count: len(pkg.AppsByCategory(pkg.CategoryGaming)), desc: "Steam, Lutris, game launchers"},
+		{icon: theme.Icons.Media, label: "Media", category: pkg.CategoryMedia, count: len(pkg.AppsByCategory(pkg.CategoryMedia)), desc: "Spotify, VLC, media players"},
+		{icon: theme.Icons.Dev, label: "Dev Tools", category: pkg.CategoryDevTools, count: len(pkg.AppsByCategory(pkg.CategoryDevTools)), desc: "VS Code, Docker, dev environments"},
 		{icon: theme.Icons.Back, label: "Back", category: "back"},
 	}
 	return Model{
@@ -52,12 +53,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down":
+		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up":
+		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
@@ -99,6 +100,7 @@ func (m Model) View() string {
 			Icon:   item.icon,
 			Label:  item.label,
 			Suffix: suffix,
+			Desc:   item.desc,
 		}
 	}
 

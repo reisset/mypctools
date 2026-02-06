@@ -42,15 +42,17 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		m.done = true
 		m.err = msg.err
 		if msg.err == nil {
-			// Clear update count on success
-			return m, func() tea.Msg {
-				return state.UpdateCountMsg{Count: 0}
-			}
+			// Clear update count and toast on success
+			return m, tea.Batch(
+				func() tea.Msg { return state.UpdateCountMsg{Count: 0} },
+				app.Toast(theme.Icons.Check+" Updated! Restart mypctools to use new version.", false),
+			)
 		}
 		return m, nil
 
 	case tea.KeyMsg:
 		if m.done {
+			// Only reached on error
 			return m, app.PopScreen()
 		}
 	}

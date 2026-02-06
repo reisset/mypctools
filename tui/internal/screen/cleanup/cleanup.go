@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
@@ -48,14 +49,19 @@ type Model struct {
 	pkgErr       error
 	cacheCleared bool
 	cacheErr     error
+	spinner      spinner.Model
 }
 
 // New creates a new cleanup screen.
 func New(shared *state.Shared) Model {
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Current.Primary))
 	return Model{
-		shared: shared,
-		phase:  phasePackageCleanup,
-		cursor: actionYes,
+		shared:  shared,
+		phase:   phasePackageCleanup,
+		cursor:  actionYes,
+		spinner: s,
 	}
 }
 
@@ -73,6 +79,27 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
+	// Forward spinner ticks during cache-clearing phase
+	if m.phase == phaseClearingCache {
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		// Check for completion message first, then return spinner cmd
+		switch msg := msg.(type) {
+		case cacheClearDoneMsg:
+			m.cacheErr = msg.err
+			m.cacheCleared = true
+			m.phase = phaseDone
+			m.logAndNotify()
+			if m.pkgErr == nil && m.cacheErr == nil {
+				return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
+			}
+			return m, nil
+		default:
+			_ = msg
+		}
+		return m, cmd
+	}
+
 	switch msg := msg.(type) {
 	case execDoneMsg:
 		m.pkgErr = msg.err
@@ -84,13 +111,16 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		m.cacheCleared = true
 		m.phase = phaseDone
 		m.logAndNotify()
+		if m.pkgErr == nil && m.cacheErr == nil {
+			return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
+		}
 		return m, nil
 
 	case tea.KeyMsg:
 		switch m.phase {
 		case phaseAskUserCache:
 			switch msg.String() {
-			case "down", "up", "tab":
+			case "down", "up", "tab", "j", "k":
 				if m.cursor == actionYes {
 					m.cursor = actionNo
 				} else {
@@ -99,17 +129,23 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 			case "enter", " ":
 				if m.cursor == actionYes {
 					m.phase = phaseClearingCache
-					return m, m.clearCaches()
+					return m, tea.Batch(m.spinner.Tick, m.clearCaches())
 				}
 				m.phase = phaseDone
 				m.logAndNotify()
+				if m.pkgErr == nil {
+					return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
+				}
 				return m, nil
 			case "y":
 				m.phase = phaseClearingCache
-				return m, m.clearCaches()
+				return m, tea.Batch(m.spinner.Tick, m.clearCaches())
 			case "n":
 				m.phase = phaseDone
 				m.logAndNotify()
+				if m.pkgErr == nil {
+					return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
+				}
 				return m, nil
 			}
 		case phaseDone:
@@ -198,7 +234,7 @@ func (m Model) View() string {
 		)
 
 	case phaseClearingCache:
-		content = theme.MutedStyle().Render("Clearing user caches...")
+		content = m.spinner.View() + " Clearing user caches..."
 
 	case phaseDone:
 		var lines []string

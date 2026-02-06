@@ -30,9 +30,11 @@ const logoCompact = `╔╦╗╦ ╦╔═╗╔═╗╔╦╗╔═╗╔═�
 ╩ ╩ ╩ ╩  ╚═╝ ╩ ╚═╝╚═╝╩═╝╚═╝`
 
 type menuItem struct {
-	icon  string
-	label string
-	id    string
+	icon      string
+	label     string
+	id        string
+	desc      string
+	separator bool
 }
 
 // Model is the main menu screen.
@@ -59,9 +61,9 @@ func (m *Model) rebuildItemsIfNeeded() {
 	}
 	m.lastUpdateCount = m.shared.UpdateCount
 	m.items = []menuItem{
-		{icon: theme.Icons.Apps, label: "Install Apps", id: "apps"},
-		{icon: theme.Icons.Scripts, label: "My Scripts", id: "scripts"},
-		{icon: theme.Icons.System, label: "System Setup", id: "system"},
+		{icon: theme.Icons.Apps, label: "Install Apps", id: "apps", desc: "Browse and install applications"},
+		{icon: theme.Icons.Scripts, label: "My Scripts", id: "scripts", desc: "Script bundles and terminal configs"},
+		{icon: theme.Icons.System, label: "System Setup", id: "system", desc: "Updates, cleanup, services, and themes"},
 	}
 	if m.shared.UpdateCount > 0 {
 		m.items = append(m.items, menuItem{
@@ -70,6 +72,7 @@ func (m *Model) rebuildItemsIfNeeded() {
 			id:    "update",
 		})
 	}
+	m.items = append(m.items, menuItem{separator: true})
 	m.items = append(m.items, menuItem{icon: theme.Icons.Exit, label: "Exit", id: "exit"})
 	if m.cursor >= len(m.items) {
 		m.cursor = len(m.items) - 1
@@ -86,18 +89,30 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down":
+		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up":
+			if m.items[m.cursor].separator {
+				m.cursor++
+				if m.cursor >= len(m.items) {
+					m.cursor = 0
+				}
+			}
+		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
 			}
+			if m.items[m.cursor].separator {
+				m.cursor--
+				if m.cursor < 0 {
+					m.cursor = len(m.items) - 1
+				}
+			}
 		case "enter", " ":
-			if m.cursor < len(m.items) {
+			if m.cursor < len(m.items) && !m.items[m.cursor].separator {
 				return m, m.handleSelection(m.items[m.cursor].id)
 			}
 		}
@@ -127,18 +142,14 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Choose logo based on width
+	// Choose logo based on width and apply gradient
 	currentLogo := logo
-	if width < 85 {
+	compact := width < 85
+	if compact {
 		currentLogo = logoCompact
 	}
 
-	// Logo
-	logoStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Primary)).
-		Width(width).
-		Align(lipgloss.Center)
-	renderedLogo := logoStyle.Render(currentLogo)
+	renderedLogo := renderGradientLogo(currentLogo, compact, width)
 
 	// Update badge
 	var updateBadge string
@@ -162,8 +173,10 @@ func (m Model) View() string {
 	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
 		items[i] = ui.ListItem{
-			Icon:  item.icon,
-			Label: item.label,
+			Icon:      item.icon,
+			Label:     item.label,
+			Desc:      item.desc,
+			Separator: item.separator,
 		}
 	}
 
@@ -200,6 +213,45 @@ func (m Model) Title() string {
 
 func (m Model) ShortHelp() []string {
 	return []string{"enter select"}
+}
+
+func renderGradientLogo(logoText string, compact bool, width int) string {
+	lines := strings.Split(logoText, "\n")
+	gradient := theme.Current.LogoGradient
+	if len(gradient) == 0 {
+		// Fallback: single color
+		return lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Current.Primary)).
+			Width(width).
+			Align(lipgloss.Center).
+			Render(logoText)
+	}
+
+	var coloredLines []string
+	for i, line := range lines {
+		// Map line index to gradient color
+		var colorIdx int
+		if compact {
+			// 3-line logo: use colors[0], colors[2], colors[4]
+			colorIdx = i * 2
+		} else {
+			colorIdx = i
+		}
+		if colorIdx >= len(gradient) {
+			colorIdx = len(gradient) - 1
+		}
+
+		styled := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(gradient[colorIdx])).
+			Render(line)
+		coloredLines = append(coloredLines, styled)
+	}
+
+	joined := strings.Join(coloredLines, "\n")
+	return lipgloss.NewStyle().
+		Width(width).
+		Align(lipgloss.Center).
+		Render(joined)
 }
 
 func buildSysLine(shared *state.Shared) string {

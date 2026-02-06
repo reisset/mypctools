@@ -65,12 +65,17 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 				fmt.Fprintf(os.Stderr, "logging failed: %v\n", err)
 			}
 			system.Notify("mypctools", fmt.Sprintf("%s %s completed", m.bundle.Name, m.action))
+			// Success: auto-dismiss with toast
+			return m, app.Toast(
+				fmt.Sprintf("%s %s %s completed", theme.Icons.Check, m.bundle.Name, m.action),
+				false,
+			)
 		}
 		return m, nil
 
 	case tea.KeyMsg:
 		if m.done {
-			// Any key returns to the script menu
+			// Any key returns (only reached on error)
 			return m, app.PopScreen()
 		}
 	}

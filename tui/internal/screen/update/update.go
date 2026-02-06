@@ -54,6 +54,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		} else {
 			logging.LogAction("System update completed")
 			system.Notify("mypctools", "System update completed")
+			return m, app.Toast(theme.Icons.Check+" System update completed", false)
 		}
 		return m, nil
 
