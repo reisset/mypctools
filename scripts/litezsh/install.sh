@@ -106,8 +106,8 @@ main() {
     print_status "Updating package database..."
     $PKG_UPDATE || print_warning "Package database update had issues (continuing anyway)"
 
-    # Install zsh
-    install_zsh
+    # Install zsh (required — everything else depends on it)
+    install_zsh || { print_error "Cannot continue without zsh. Aborting."; return 1; }
 
     # Install dependencies
     print_status "Installing dependencies..."

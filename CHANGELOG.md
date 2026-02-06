@@ -4,6 +4,15 @@ All notable changes to mypctools.
 
 ---
 
+## [0.24.6] - 2026-02-06
+
+### Fixed
+- **Terminal theme selection broken**: Removed codepath that sourced nonexistent `lib/theme.sh` when `gum` was installed — text-based theme picker now always used
+- **Starship config removed on partial uninstall**: Uninstalling litebash or litezsh no longer removes `~/.config/starship.toml` if the sibling bundle is still installed
+- **LiteZsh continues after zsh install failure**: Installer now aborts early if zsh cannot be installed, instead of proceeding to install plugins and set default shell
+
+---
+
 ## [0.24.5] - 2026-02-06
 
 ### Fixed

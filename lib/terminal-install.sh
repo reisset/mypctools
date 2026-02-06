@@ -14,27 +14,18 @@ source "$_TERMINAL_INSTALL_DIR/distro-detect.sh"
 # Theme selection
 select_theme() {
     local theme_display
-    if command -v gum &>/dev/null; then
-        source "$_TERMINAL_INSTALL_DIR/theme.sh"
-        echo ""
-        theme_display=$(themed_choose "Select theme:" \
-            "Catppuccin Mocha" \
-            "Tokyo Night" \
-            "HackTheBox")
-    else
-        echo ""
-        echo "Select theme:"
-        echo "  1) Catppuccin Mocha (default)"
-        echo "  2) Tokyo Night"
-        echo "  3) HackTheBox"
-        echo ""
-        read -rp "[1/2/3]: " theme_choice
-        case "$theme_choice" in
-            2) theme_display="Tokyo Night" ;;
-            3) theme_display="HackTheBox" ;;
-            *) theme_display="Catppuccin Mocha" ;;
-        esac
-    fi
+    echo ""
+    echo "Select theme:"
+    echo "  1) Catppuccin Mocha (default)"
+    echo "  2) Tokyo Night"
+    echo "  3) HackTheBox"
+    echo ""
+    read -rp "[1/2/3]: " theme_choice
+    case "$theme_choice" in
+        2) theme_display="Tokyo Night" ;;
+        3) theme_display="HackTheBox" ;;
+        *) theme_display="Catppuccin Mocha" ;;
+    esac
 
     case "$theme_display" in
         "Tokyo Night") THEME="tokyo-night" ;;
