@@ -1,6 +1,6 @@
 # mypctools
 
-A personal TUI for managing scripts and app installations across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
+A TUI for managing scripts and app installations across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
 ## Quick Start
 
@@ -9,7 +9,7 @@ curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh |
 mypctools
 ```
 
-To uninstall:
+Uninstall:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh | bash
 ```
@@ -18,7 +18,7 @@ curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh
 
 ### Install Apps
 
-Install apps across distros from a single menu. The installer tries native package managers first, then Flatpak, then custom installers.
+Install apps from a single menu. The installer tries native package managers first, then Flatpak, then custom fallbacks.
 
 | Category | Apps |
 |----------|------|
@@ -28,35 +28,36 @@ Install apps across distros from a single menu. The installer tries native packa
 | Media | Discord, Spotify, VLC, MPV |
 | Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK, Python |
 
-The LiteBash and LiteZsh bundles include CLI tools: btop, bat, eza, zoxide, fzf, ripgrep, and fd.
+LiteBash and LiteZsh also install these CLI tools: btop, bat, eza, fzf, ripgrep, fd, zoxide, lazygit, dust, dysk, yazi, starship, tldr, glow, micro, and github-cli.
 
 ### My Scripts
 
-Bundled script collections you can install or uninstall:
+Script bundles you can install or uninstall:
 
-- **LiteBash** - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi).
-- **LiteZsh** - Zsh environment with syntax highlighting, autosuggestions, and arrow-key completion. Sets zsh as default shell.
-- **Terminal - foot** - Wayland terminal with Catppuccin Mocha, Tokyo Night, and HackTheBox themes.
-- **Terminal - alacritty** - X11/Wayland terminal with the same themes.
-- **Terminal - ghostty** - X11/Wayland terminal with the same themes.
-- **Terminal - kitty** - X11/Wayland terminal with the same themes.
-- **Fastfetch** - Custom config with boxed layout, nerd font icons, and compact distro logo.
-- **Screensaver** - Terminal screensaver via hypridle and Terminal Text Effects. Hyprland only.
-- **Spicetify Theme** - Spotify theming with StarryNight or text themes. Native Spotify only.
-- **Claude Setup** - Claude Code custom skills (pdf, docx, xlsx, pptx, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline.
+- **LiteBash** — Bash with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi). Fast startup.
+- **LiteZsh** — Zsh with syntax highlighting, autosuggestions, and arrow-key completion. Sets zsh as default shell.
+- **Terminal — foot** — Wayland terminal config. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox.
+- **Terminal — alacritty** — X11/Wayland terminal config. Same themes.
+- **Terminal — ghostty** — X11/Wayland terminal config. Same themes.
+- **Terminal — kitty** — X11/Wayland terminal config. Same themes.
+- **Fastfetch** — Tree-style layout with nerd font icons and compact distro logo.
+- **Screensaver** — Terminal screensaver via hypridle and Terminal Text Effects. Hyprland only.
+- **Spicetify** — StarryNight theme for native Spotify.
+- **Claude Setup** — Claude Code skills (pdf, docx, xlsx, pptx, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline.
 
 ### System Setup
 
-- **Full System Update** - Run apt, pacman, or dnf upgrade with one click.
-- **System Cleanup** - Remove orphaned packages, clear caches, empty trash.
-- **Service Manager** - Browse common services or search all services with fuzzy matching.
-- **Theme** - Switch between DefaultCyan, CatppuccinMocha, and TokyoNight color schemes.
+- **Full System Update** — Runs apt, pacman, or dnf upgrade.
+- **System Cleanup** — Removes orphaned packages, clears caches, empties trash.
+- **Service Manager** — Browse or search systemd services.
+- **Theme** — Switch between DefaultCyan, CatppuccinMocha, and TokyoNight.
 
-### CLI Flags
+### CLI
 
 ```bash
-mypctools --help      # Show usage
-mypctools --version   # Show version
+mypctools --help      # Usage
+mypctools --version   # Version
+mypctools update      # Update binary and scripts
 ```
 
 The app checks for updates at launch.
@@ -67,7 +68,7 @@ The app checks for updates at launch.
 Native (apt/pacman/dnf) → Flatpak → Custom fallback
 ```
 
-The installer stops at the first successful method. Custom fallbacks handle apps requiring special setup:
+The installer stops at the first method that succeeds. Custom fallbacks handle apps that require special setup:
 
 | App | Fallback Method |
 |-----|-----------------|
@@ -90,7 +91,6 @@ The installer stops at the first successful method. Custom fallbacks handle apps
 
 - Linux (Debian/Ubuntu, Arch, or Fedora-based)
 - x86_64 or arm64
-- Internet connection
 
 ## Build from Source
 
@@ -103,4 +103,4 @@ go build -o mypctools ./main.go
 
 ## License
 
-MIT - see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
