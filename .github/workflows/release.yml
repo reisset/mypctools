@@ -40,9 +40,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
 
+      - name: Generate checksums
+        run: |
+          sha256sum mypctools-linux-amd64/mypctools-linux-amd64 \
+                    mypctools-linux-arm64/mypctools-linux-arm64 > checksums.txt
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             mypctools-linux-amd64/mypctools-linux-amd64
             mypctools-linux-arm64/mypctools-linux-arm64
+            checksums.txt
