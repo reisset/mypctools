@@ -45,7 +45,6 @@ mypctools/
 ├── lib/                        # Bash libraries (for script bundles)
 │   ├── print.sh                # Zero-dependency print functions (pure ANSI)
 │   ├── distro-detect.sh        # Sets DISTRO_TYPE, DISTRO_NAME, PKG_MGR, PKG_INSTALL, PKG_UPDATE
-│   ├── package-manager.sh      # install_package() with apt/pacman/flatpak fallback chain
 │   ├── tools-install.sh        # Shared CLI tool install/uninstall for litebash & litezsh
 │   ├── shell-setup.sh          # Parametric set_default_shell shared by litebash & litezsh
 │   ├── symlink.sh              # safe_symlink() with path resolution, backup, idempotency
@@ -69,19 +68,7 @@ The installer:
 
 ## Key Patterns
 
-**Package installation** uses `install_package` from `lib/package-manager.sh`:
-```bash
-install_package "Display Name" "apt_pkg" "pacman_pkg" "flatpak_id" "fallback_fn"
-```
-Order: native package manager → flatpak → custom fallback function.
-
-**Adding a curl-based installer**: Add a fallback function to `lib/package-manager.sh`:
-```bash
-install_toolname_fallback() {
-    curl -fsSL https://example.com/install.sh | bash
-}
-```
-Then reference it in `install_package` calls: `install_package "Tool" "" "" "" "install_toolname_fallback"`
+**Package installation** is handled by the Go TUI in `tui/internal/pkg/`. Apps are registered in `registry.go` with native package names (`AptPkg`, `PacmanPkg`, `DnfPkg`), `FlatpakID`, and `FallbackCmd`. Install priority: native PM → flatpak → fallback command.
 
 **Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Register in `tui/internal/bundle/registry.go`.
 
@@ -141,7 +128,7 @@ cd ~/mypctools/tui && go build -o mypctools ./main.go
 
 **Structure**:
 - `tui/internal/app/` — Root model, screen interface, navigation (Navigate/PopScreen)
-- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, apps, applist, appconfirm, appinstall, pullupdate, systemsetup, themepicker, system)
+- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, apps, applist, appconfirm, appinstall, pullupdate, systemsetup, themepicker)
 - `tui/internal/bundle/` — Script bundle registry and installation detection
 - `tui/internal/theme/` — Color palettes, gradient logo, Lip Gloss styles, icons
 - `tui/internal/ui/` — Shared UI components (list rendering, badges, header, footer, box, checkbox)
@@ -150,7 +137,7 @@ cd ~/mypctools/tui && go build -o mypctools ./main.go
 - `tui/internal/cmd/` — CLI argument handling
 - `tui/internal/logging/` — Operation logging to ~/.local/share/mypctools/mypctools.log
 - `tui/internal/selfupdate/` — Binary self-update with SHA256 verification
-- `tui/internal/system/` — System operations (update, cleanup, services, sysinfo, notifications)
+- `tui/internal/system/` — System operations (update, cleanup, services, notifications)
 - `tui/internal/pkg/` — Package installation with apt/pacman/dnf/flatpak support
 
 **Patterns**:

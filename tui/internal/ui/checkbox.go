@@ -12,8 +12,3 @@ func Checkbox(checked bool) string {
 	}
 	return theme.MutedStyle().Render(theme.Icons.CheckBox)
 }
-
-// CheckMark renders a simple checkmark (for installed status).
-func CheckMark() string {
-	return theme.SuccessStyle().Render(theme.Icons.Check)
-}
