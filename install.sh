@@ -34,6 +34,10 @@ esac
 
 info "Detected architecture: $ARCH"
 
+# Check dependencies
+command -v git &>/dev/null || error "git is required but not installed"
+command -v curl &>/dev/null || error "curl is required but not installed"
+
 # Create directories
 mkdir -p "$BIN_DIR"
 mkdir -p "$INSTALL_DIR"

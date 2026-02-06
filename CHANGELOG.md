@@ -4,6 +4,17 @@ All notable changes to mypctools.
 
 ---
 
+## [0.24.5] - 2026-02-06
+
+### Fixed
+- **Screensaver uninstall broken**: `uninstall.sh` sourced nonexistent `lib/helpers.sh` — changed to `lib/print.sh`
+- **Release checksums**: CI workflow now generates and uploads `checksums.txt` so self-update SHA256 verification actually works
+- **Installer dependency check**: `install.sh` now verifies `git` and `curl` are available before use
+- **Main menu cursor safety**: Cursor clamped after dynamic menu rebuild to prevent out-of-bounds when "Pull Updates" item disappears
+- **Stale help text**: Removed leftover "q quit" from main menu footer (q was removed in v0.22.0)
+
+---
+
 ## [0.24.4] - 2026-02-05
 
 ### Fixed

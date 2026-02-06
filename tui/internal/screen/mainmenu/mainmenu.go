@@ -71,6 +71,9 @@ func (m *Model) rebuildItemsIfNeeded() {
 		})
 	}
 	m.items = append(m.items, menuItem{icon: theme.Icons.Exit, label: "Exit", id: "exit"})
+	if m.cursor >= len(m.items) {
+		m.cursor = len(m.items) - 1
+	}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -196,7 +199,7 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{"enter select", "q quit"}
+	return []string{"enter select"}
 }
 
 func buildSysLine(shared *state.Shared) string {
