@@ -14,9 +14,11 @@ import (
 )
 
 type menuItem struct {
-	icon  string
-	label string
-	id    string
+	icon      string
+	label     string
+	id        string
+	desc      string
+	separator bool
 }
 
 // Model is the system setup menu screen.
@@ -29,10 +31,11 @@ type Model struct {
 // New creates a new system setup menu.
 func New(shared *state.Shared) Model {
 	items := []menuItem{
-		{icon: theme.Icons.Update, label: "Full System Update", id: "update"},
-		{icon: theme.Icons.Cleanup, label: "System Cleanup", id: "cleanup"},
-		{icon: theme.Icons.Service, label: "Service Manager", id: "services"},
-		{icon: theme.Icons.Theme, label: "Theme", id: "theme"},
+		{icon: theme.Icons.Update, label: "Full System Update", id: "update", desc: "Update all system packages"},
+		{icon: theme.Icons.Cleanup, label: "System Cleanup", id: "cleanup", desc: "Remove unused packages and caches"},
+		{icon: theme.Icons.Service, label: "Service Manager", id: "services", desc: "Start, stop, enable system services"},
+		{separator: true},
+		{icon: theme.Icons.Theme, label: "Theme", id: "theme", desc: "Switch color theme"},
 		{icon: theme.Icons.Back, label: "Back", id: "back"},
 	}
 	return Model{
@@ -50,18 +53,32 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down":
+		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up":
+			if m.items[m.cursor].separator {
+				m.cursor++
+				if m.cursor >= len(m.items) {
+					m.cursor = 0
+				}
+			}
+		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
 			}
+			if m.items[m.cursor].separator {
+				m.cursor--
+				if m.cursor < 0 {
+					m.cursor = len(m.items) - 1
+				}
+			}
 		case "enter", " ":
-			return m, m.handleSelection(m.items[m.cursor].id)
+			if !m.items[m.cursor].separator {
+				return m, m.handleSelection(m.items[m.cursor].id)
+			}
 		}
 	}
 	return m, nil
@@ -93,8 +110,10 @@ func (m Model) View() string {
 	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
 		items[i] = ui.ListItem{
-			Icon:  item.icon,
-			Label: item.label,
+			Icon:      item.icon,
+			Label:     item.label,
+			Desc:      item.desc,
+			Separator: item.separator,
 		}
 	}
 

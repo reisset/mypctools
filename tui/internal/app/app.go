@@ -1,18 +1,24 @@
 package app
 
 import (
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/state"
+	"github.com/reisset/mypctools/tui/internal/theme"
 	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
 // Model is the root Bubble Tea model. It holds a screen stack and shared state.
 type Model struct {
-	stack  []Screen
-	shared *state.Shared
-	width  int
-	height int
+	stack       []Screen
+	shared      *state.Shared
+	width       int
+	height      int
+	toast       string    // Current toast message
+	toastError  bool      // Whether toast is an error
+	toastExpiry time.Time // When toast should be dismissed
 }
 
 // NewModel creates the root model with an initial screen.
@@ -51,6 +57,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.stack[len(m.stack)-1].Init()
 		}
 		return m, tea.Quit
+
+	case ToastMsg:
+		m.toast = msg.Text
+		m.toastError = msg.IsError
+		m.toastExpiry = time.Now().Add(toastDuration)
+		// Pop back to previous screen
+		if len(m.stack) > 1 {
+			m.stack = m.stack[:len(m.stack)-1]
+		}
+		return m, tea.Tick(toastDuration, func(t time.Time) tea.Msg {
+			return clearToastMsg{}
+		})
+
+	case clearToastMsg:
+		if !m.toastExpiry.IsZero() && time.Now().After(m.toastExpiry) {
+			m.toast = ""
+		}
+		return m, nil
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -102,7 +126,24 @@ func (m Model) View() string {
 		helpKeys = append(helpKeys, ui.HelpKey{Key: "esc", Desc: "back"})
 	}
 
-	footer := "\n" + ui.Footer(helpKeys, width)
+	// Toast line above footer
+	var toastLine string
+	if m.toast != "" {
+		toastStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Current.Success)).
+			Bold(true)
+		if m.toastError {
+			toastStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color(theme.Current.Error)).
+				Bold(true)
+		}
+		toastLine = "\n" + lipgloss.NewStyle().
+			Width(width).
+			Align(lipgloss.Center).
+			Render(toastStyle.Render(m.toast))
+	}
+
+	footer := toastLine + "\n" + ui.Footer(helpKeys, width)
 
 	// Compose view - each component already handles its own centering via Width(width).Align(Center)
 	content := top.View()

@@ -19,10 +19,11 @@ type menuItem struct {
 
 // Model is the install/uninstall menu for a specific bundle.
 type Model struct {
-	shared *state.Shared
-	bundle bundle.Bundle
-	items  []menuItem
-	cursor int
+	shared     *state.Shared
+	bundle     bundle.Bundle
+	items      []menuItem
+	cursor     int
+	confirming bool // true when showing uninstall confirmation
 }
 
 // New creates a script menu for the given bundle.
@@ -46,18 +47,33 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		if m.confirming {
+			switch msg.String() {
+			case "y", "Y":
+				m.confirming = false
+				return m, app.Navigate(exec.New(m.shared, m.bundle, "uninstall"))
+			case "n", "N", "esc":
+				m.confirming = false
+			}
+			return m, nil
+		}
+
 		switch msg.String() {
-		case "down":
+		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up":
+		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
 			}
 		case "enter", " ":
+			if m.items[m.cursor].id == "uninstall" {
+				m.confirming = true
+				return m, nil
+			}
 			return m, m.handleSelection(m.items[m.cursor].id)
 		}
 	}
@@ -69,7 +85,8 @@ func (m Model) handleSelection(id string) tea.Cmd {
 	case "install":
 		return app.Navigate(exec.New(m.shared, m.bundle, "install"))
 	case "uninstall":
-		return app.Navigate(exec.New(m.shared, m.bundle, "uninstall"))
+		// Handled in Update via confirming state
+		return nil
 	case "back":
 		return app.PopScreen()
 	}
@@ -105,6 +122,23 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render(desc + "\n" + status)
 
+	if m.confirming {
+		// Confirmation dialog
+		confirmMsg := theme.WarningStyle().Render("Uninstall " + m.bundle.Name + "?")
+		confirmHint := theme.MutedStyle().Render("y to confirm, n to cancel")
+		confirmBlock := lipgloss.NewStyle().
+			Width(width).
+			Align(lipgloss.Center).
+			Render(confirmMsg + "\n" + confirmHint)
+
+		return lipgloss.JoinVertical(lipgloss.Left,
+			titleBlock,
+			infoBlock,
+			"",
+			confirmBlock,
+		)
+	}
+
 	// Build list items
 	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
@@ -138,5 +172,8 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
+	if m.confirming {
+		return []string{"y confirm", "n cancel"}
+	}
 	return []string{"enter select"}
 }

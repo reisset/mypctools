@@ -4,6 +4,19 @@ All notable changes to mypctools.
 
 ---
 
+## [0.25.0] - 2026-02-06
+
+### Added
+- **Gradient logo**: Main menu logo now renders with a per-theme color gradient (6 colors across 6 lines)
+- **Section separators**: Thin `───` dividers in main menu (before Exit) and system setup (before Theme) for visual grouping
+- **j/k vim navigation**: All menu screens now support `j`/`k` for up/down alongside arrow keys
+- **Animated spinner**: Cache-clearing phase in System Cleanup now shows a spinning indicator
+- **Uninstall confirmation**: Script menu now asks "Uninstall {bundle}? y/n" before proceeding
+- **Toast messages**: Successful operations (script install/uninstall, system update, cleanup) auto-dismiss with a brief toast notification instead of "press any key"
+- **Item descriptions**: Selected menu items can show a muted description line (infrastructure for future use)
+
+---
+
 ## [0.24.6] - 2026-02-06
 
 ### Fixed

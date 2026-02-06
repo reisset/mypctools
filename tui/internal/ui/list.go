@@ -9,10 +9,12 @@ import (
 
 // ListItem represents a single item in a list.
 type ListItem struct {
-	Icon    string // Icon to display before label
-	Label   string // Main text
-	Suffix  string // Additional text (badges, hints) - already styled
-	Dimmed  bool   // Whether item should be dimmed
+	Icon      string // Icon to display before label
+	Label     string // Main text
+	Suffix    string // Additional text (badges, hints) - already styled
+	Dimmed    bool   // Whether item should be dimmed
+	Desc      string // Description shown below selected item only
+	Separator bool   // Render as a separator line (not selectable)
 }
 
 // ListConfig configures list rendering.
@@ -57,6 +59,15 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		if i > 0 {
 			sb.WriteByte('\n')
 		}
+
+		// Separator items render as a thin muted line
+		if item.Separator {
+			sepLine := strings.Repeat(" ", cursorWidth) +
+				theme.MutedStyle().Render("───")
+			sb.WriteString(sepLine)
+			continue
+		}
+
 		isSelected := i == cursor
 
 		// Build the label with icon
@@ -104,6 +115,13 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 					line = spacer + theme.MenuSelectedStyle().Render(label)
 				}
 			}
+
+			// Show description below selected item
+			if item.Desc != "" {
+				descIndent := strings.Repeat(" ", cursorWidth+4) // past cursor + icon columns
+				descLine := descIndent + theme.MutedStyle().Render(item.Desc)
+				line += "\n" + descLine
+			}
 		} else {
 			spacer := strings.Repeat(" ", cursorWidth)
 			if item.Dimmed {
@@ -117,6 +135,20 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 	}
 
 	return sb.String()
+}
+
+// SkipSeparator adjusts cursor to skip separator items.
+// direction: +1 for down, -1 for up.
+func SkipSeparator(items []ListItem, cursor int, direction int) int {
+	if cursor >= 0 && cursor < len(items) && items[cursor].Separator {
+		cursor += direction
+		if cursor >= len(items) {
+			cursor = 0
+		} else if cursor < 0 {
+			cursor = len(items) - 1
+		}
+	}
+	return cursor
 }
 
 // RenderSimpleList renders a basic list without icons.

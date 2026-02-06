@@ -50,12 +50,12 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down":
+		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up":
+		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
@@ -192,14 +192,14 @@ func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		}
 
 		switch msg.String() {
-		case "down":
+		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(m.services) {
 				m.cursor = 0
 			}
 			m.scrollToCursor()
 			m.viewport.SetContent(m.renderRows())
-		case "up":
+		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.services) - 1
