@@ -33,7 +33,6 @@ type menuItem struct {
 	icon      string
 	label     string
 	id        string
-	desc      string
 	separator bool
 }
 
@@ -61,9 +60,9 @@ func (m *Model) rebuildItemsIfNeeded() {
 	}
 	m.lastUpdateCount = m.shared.UpdateCount
 	m.items = []menuItem{
-		{icon: theme.Icons.Apps, label: "Install Apps", id: "apps", desc: "Browse and install applications"},
-		{icon: theme.Icons.Scripts, label: "My Scripts", id: "scripts", desc: "Script bundles and terminal configs"},
-		{icon: theme.Icons.System, label: "System Setup", id: "system", desc: "Updates, cleanup, services, and themes"},
+		{icon: theme.Icons.Apps, label: "Install Apps", id: "apps"},
+		{icon: theme.Icons.Scripts, label: "My Scripts", id: "scripts"},
+		{icon: theme.Icons.System, label: "System Setup", id: "system"},
 	}
 	if m.shared.UpdateCount > 0 {
 		m.items = append(m.items, menuItem{
@@ -175,7 +174,6 @@ func (m Model) View() string {
 		items[i] = ui.ListItem{
 			Icon:      item.icon,
 			Label:     item.label,
-			Desc:      item.desc,
 			Separator: item.separator,
 		}
 	}

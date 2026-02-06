@@ -13,7 +13,11 @@ All notable changes to mypctools.
 - **Animated spinner**: Cache-clearing phase in System Cleanup now shows a spinning indicator
 - **Uninstall confirmation**: Script menu now asks "Uninstall {bundle}? y/n" before proceeding
 - **Toast messages**: Successful operations (script install/uninstall, system update, cleanup) auto-dismiss with a brief toast notification instead of "press any key"
-- **Item descriptions**: Selected menu items can show a muted description line (infrastructure for future use)
+- **Script descriptions**: My Scripts screen shows short descriptions to the right of each bundle name with checkmarks in a fixed column for easy scanning
+- **Configurable list width**: `ListConfig.MaxInnerWidth` allows wider content areas (used by scripts screen at 80 chars)
+
+### Removed
+- **Menu descriptions**: Removed verbose description text from main menu, app categories, and system setup (menus are self-explanatory)
 
 ---
 

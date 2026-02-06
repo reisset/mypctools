@@ -17,7 +17,6 @@ type menuItem struct {
 	icon      string
 	label     string
 	id        string
-	desc      string
 	separator bool
 }
 
@@ -31,11 +30,11 @@ type Model struct {
 // New creates a new system setup menu.
 func New(shared *state.Shared) Model {
 	items := []menuItem{
-		{icon: theme.Icons.Update, label: "Full System Update", id: "update", desc: "Update all system packages"},
-		{icon: theme.Icons.Cleanup, label: "System Cleanup", id: "cleanup", desc: "Remove unused packages and caches"},
-		{icon: theme.Icons.Service, label: "Service Manager", id: "services", desc: "Start, stop, enable system services"},
+		{icon: theme.Icons.Update, label: "Full System Update", id: "update"},
+		{icon: theme.Icons.Cleanup, label: "System Cleanup", id: "cleanup"},
+		{icon: theme.Icons.Service, label: "Service Manager", id: "services"},
 		{separator: true},
-		{icon: theme.Icons.Theme, label: "Theme", id: "theme", desc: "Switch color theme"},
+		{icon: theme.Icons.Theme, label: "Theme", id: "theme"},
 		{icon: theme.Icons.Back, label: "Back", id: "back"},
 	}
 	return Model{
@@ -112,7 +111,6 @@ func (m Model) View() string {
 		items[i] = ui.ListItem{
 			Icon:      item.icon,
 			Label:     item.label,
-			Desc:      item.desc,
 			Separator: item.separator,
 		}
 	}
