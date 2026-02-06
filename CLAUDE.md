@@ -100,7 +100,7 @@ The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles
 
 ## Distro Support
 
-Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial.
+Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial (uses `DnfPkg` field only — no apt name fallback).
 `DISTRO_TYPE` is exported by `lib/distro-detect.sh` and used throughout.
 
 ## Code Style
@@ -129,17 +129,25 @@ cd ~/mypctools/tui && go build -o mypctools ./main.go
 
 **Structure**:
 - `tui/internal/app/` — Root model, screen interface, navigation (Navigate/PopScreen)
-- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, apps, etc.)
+- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, apps, applist, appconfirm, appinstall, pullupdate, systemsetup, themepicker, system)
 - `tui/internal/bundle/` — Script bundle registry and installation detection
-- `tui/internal/theme/` — Color palettes, Lip Gloss styles, icons
+- `tui/internal/theme/` — Color palettes, gradient logo, Lip Gloss styles, icons
+- `tui/internal/ui/` — Shared UI components (list rendering, badges, header, footer, box, checkbox)
 - `tui/internal/state/` — Shared state (distro info, terminal size, update count)
+- `tui/internal/config/` — User configuration (theme persistence)
+- `tui/internal/cmd/` — CLI argument handling
 - `tui/internal/logging/` — Operation logging to ~/.local/share/mypctools/mypctools.log
+- `tui/internal/selfupdate/` — Binary self-update with SHA256 verification
 - `tui/internal/system/` — System operations (update, cleanup, services, sysinfo, notifications)
-- `tui/internal/pkg/` — Package installation with apt/pacman/flatpak support
+- `tui/internal/pkg/` — Package installation with apt/pacman/dnf/flatpak support
 
 **Patterns**:
 - Screens implement `app.Screen` interface: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`
-- Navigation: `app.Navigate(screen)` pushes, `app.PopScreen()` pops
+- Navigation: `app.Navigate(screen)` pushes, `app.PopScreen()` pops, `j/k` vim keys alongside arrows
+- Menu rendering: `ui.RenderList()` handles cursors, highlight bars, suffixes, separators, dimming
+- List width: `ListConfig.MaxInnerWidth` controls max content width (default 50, scripts uses 80)
+- Script descriptions: Shown as muted right-side suffix in scripts screen (from `bundle.Description`)
 - Script execution: `tea.ExecProcess()` suspends TUI, gives script full terminal control
+- Toast messages: Auto-dismissing notifications after operations (install, update, cleanup)
 - Logging: `logging.LogAction()` for all operations (installs, updates, service actions)
 - Notifications: `system.Notify()` for long operations (update, cleanup, batch installs)
