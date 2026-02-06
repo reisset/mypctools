@@ -73,7 +73,9 @@ func (m Model) View() string {
 	for i, b := range m.bundles {
 		var suffix string
 		if bundle.IsInstalled(&b) {
-			suffix = ui.InstalledBadge()
+			suffix = ui.InstalledBadge() + "  " + theme.MutedStyle().Render(b.Description)
+		} else {
+			suffix = "     " + theme.MutedStyle().Render(b.Description)
 		}
 		items[i] = ui.ListItem{
 			Icon:   theme.Icons.Scripts,
@@ -86,6 +88,7 @@ func (m Model) View() string {
 		Width:         width,
 		ShowCursor:    true,
 		HighlightFull: true,
+		MaxInnerWidth: 80,
 	})
 
 	menuBlock := lipgloss.NewStyle().

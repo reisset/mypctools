@@ -13,15 +13,15 @@ type ListItem struct {
 	Label     string // Main text
 	Suffix    string // Additional text (badges, hints) - already styled
 	Dimmed    bool   // Whether item should be dimmed
-	Desc      string // Description shown below selected item only
 	Separator bool   // Render as a separator line (not selectable)
 }
 
 // ListConfig configures list rendering.
 type ListConfig struct {
-	Width         int    // Total width for full-width highlights
-	ShowCursor    bool   // Show arrow cursor on selected item
-	HighlightFull bool   // Use full-width highlight bar
+	Width         int  // Total width for full-width highlights
+	ShowCursor    bool // Show arrow cursor on selected item
+	HighlightFull bool // Use full-width highlight bar
+	MaxInnerWidth int  // Max content width (0 = default 50)
 }
 
 // RenderList renders a list of items with the cursor at the given position.
@@ -47,8 +47,12 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 	}
 	// Limit content width for cleaner appearance
 	innerWidth := contentWidth - 8 // Account for centering margins
-	if innerWidth > 50 {
-		innerWidth = 50
+	maxInner := cfg.MaxInnerWidth
+	if maxInner == 0 {
+		maxInner = 50
+	}
+	if innerWidth > maxInner {
+		innerWidth = maxInner
 	}
 
 	// Fixed cursor column width for consistent alignment
@@ -116,12 +120,6 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 				}
 			}
 
-			// Show description below selected item
-			if item.Desc != "" {
-				descIndent := strings.Repeat(" ", cursorWidth+4) // past cursor + icon columns
-				descLine := descIndent + theme.MutedStyle().Render(item.Desc)
-				line += "\n" + descLine
-			}
 		} else {
 			spacer := strings.Repeat(" ", cursorWidth)
 			if item.Dimmed {
