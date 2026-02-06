@@ -9,11 +9,12 @@ import (
 
 // ListItem represents a single item in a list.
 type ListItem struct {
-	Icon      string // Icon to display before label
-	Label     string // Main text
-	Suffix    string // Additional text (badges, hints) - already styled
-	Dimmed    bool   // Whether item should be dimmed
-	Separator bool   // Render as a separator line (not selectable)
+	Icon        string // Icon to display before label
+	Label       string // Main text
+	Suffix      string // Additional text (badges, hints) - already styled
+	Description string // Rendered as dimmed second line below label
+	Dimmed      bool   // Whether item should be dimmed
+	Separator   bool   // Render as a separator line (not selectable)
 }
 
 // ListConfig configures list rendering.
@@ -43,20 +44,19 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 	// Build content width for highlight bar
 	contentWidth := cfg.Width
 	if contentWidth == 0 {
-		contentWidth = 60 // Reasonable default
+		contentWidth = theme.ListWidthDefault
 	}
 	// Limit content width for cleaner appearance
 	innerWidth := contentWidth - 8 // Account for centering margins
 	maxInner := cfg.MaxInnerWidth
 	if maxInner == 0 {
-		maxInner = 50
+		maxInner = theme.ListInnerWidthMax
 	}
 	if innerWidth > maxInner {
 		innerWidth = maxInner
 	}
 
-	// Fixed cursor column width for consistent alignment
-	const cursorWidth = 3
+	const cursorWidth = theme.ListCursorWidth
 
 	var sb strings.Builder
 	for i, item := range items {
@@ -64,10 +64,23 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 			sb.WriteByte('\n')
 		}
 
-		// Separator items render as a thin muted line
+		// Separator items render as a thin muted line, optionally with a label
 		if item.Separator {
-			sepLine := strings.Repeat(" ", cursorWidth) +
-				theme.MutedStyle().Render("───")
+			var sepLine string
+			if item.Label != "" {
+				label := theme.MutedStyle().Bold(true).Render(item.Label)
+				labelWidth := lipgloss.Width(label)
+				remaining := innerWidth - labelWidth - 6 // "── " + " " + trailing dashes
+				if remaining < 4 {
+					remaining = 4
+				}
+				sepLine = strings.Repeat(" ", cursorWidth) +
+					theme.MutedStyle().Render("── ") + label +
+					theme.MutedStyle().Render(" "+strings.Repeat("─", remaining))
+			} else {
+				sepLine = strings.Repeat(" ", cursorWidth) +
+					theme.MutedStyle().Render(theme.ListSeparator)
+			}
 			sb.WriteString(sepLine)
 			continue
 		}
@@ -91,11 +104,17 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 			label = padded + item.Suffix
 		}
 
+		// Center content when item has a description
+		hasDesc := item.Description != ""
+
 		var line string
 		if isSelected {
 			if cfg.HighlightFull {
 				// Full-width highlight bar style
 				highlight := theme.ListHighlightStyle().Width(innerWidth)
+				if hasDesc {
+					highlight = highlight.Align(lipgloss.Center)
+				}
 				if cfg.ShowCursor {
 					cursorStr := lipgloss.NewStyle().
 						Width(cursorWidth).
@@ -123,13 +142,33 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		} else {
 			spacer := strings.Repeat(" ", cursorWidth)
 			if item.Dimmed {
-				line = spacer + theme.ListDimmedStyle().Width(innerWidth).Render(label)
+				style := theme.ListDimmedStyle().Width(innerWidth)
+				if hasDesc {
+					style = style.Align(lipgloss.Center)
+				}
+				line = spacer + style.Render(label)
 			} else {
-				line = spacer + theme.ListNormalStyle().Width(innerWidth).Render(label)
+				style := theme.ListNormalStyle().Width(innerWidth)
+				if hasDesc {
+					style = style.Align(lipgloss.Center)
+				}
+				line = spacer + style.Render(label)
 			}
 		}
 
 		sb.WriteString(line)
+
+		// Render description as a centered dimmed second line
+		if hasDesc {
+			descStyle := theme.MutedStyle()
+			if isSelected && cfg.HighlightFull {
+				descStyle = descStyle.Italic(true)
+			}
+			descLine := strings.Repeat(" ", cursorWidth) +
+				lipgloss.NewStyle().Width(innerWidth).Align(lipgloss.Center).
+					Render(descStyle.Render(item.Description))
+			sb.WriteString("\n" + descLine)
+		}
 	}
 
 	return sb.String()

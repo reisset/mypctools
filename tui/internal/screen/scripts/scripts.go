@@ -73,14 +73,13 @@ func (m Model) View() string {
 	for i, b := range m.bundles {
 		var suffix string
 		if bundle.IsInstalled(&b) {
-			suffix = ui.InstalledBadge() + "  " + theme.MutedStyle().Render(b.Description)
-		} else {
-			suffix = "     " + theme.MutedStyle().Render(b.Description)
+			suffix = ui.InstalledBadge()
 		}
 		items[i] = ui.ListItem{
-			Icon:   theme.Icons.Scripts,
-			Label:  b.Name,
-			Suffix: suffix,
+			Icon:        theme.Icons.Scripts,
+			Label:       b.Name,
+			Suffix:      suffix,
+			Description: b.Description,
 		}
 	}
 

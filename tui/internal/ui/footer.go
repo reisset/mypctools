@@ -40,16 +40,16 @@ func Footer(keys []HelpKey, width int) string {
 		parts = append(parts, keyStyle.Render(k.Key)+" "+descStyle.Render(k.Desc))
 	}
 
-	sep := dividerStyle.Render(" │ ")
+	sep := dividerStyle.Render(theme.FooterKeySep)
 	helpText := strings.Join(parts, sep)
 
 	// Create divider line
 	dividerWidth := width - 4
-	if dividerWidth > 60 {
-		dividerWidth = 60
+	if dividerWidth > theme.FooterDividerMax {
+		dividerWidth = theme.FooterDividerMax
 	}
-	if dividerWidth < 20 {
-		dividerWidth = 20
+	if dividerWidth < theme.FooterDividerMin {
+		dividerWidth = theme.FooterDividerMin
 	}
 	divider := dividerStyle.Render(strings.Repeat("─", dividerWidth))
 

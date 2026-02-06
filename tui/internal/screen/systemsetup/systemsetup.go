@@ -33,7 +33,7 @@ func New(shared *state.Shared) Model {
 		{icon: theme.Icons.Update, label: "Full System Update", id: "update"},
 		{icon: theme.Icons.Cleanup, label: "System Cleanup", id: "cleanup"},
 		{icon: theme.Icons.Service, label: "Service Manager", id: "services"},
-		{separator: true},
+		{separator: true, label: "Settings"},
 		{icon: theme.Icons.Theme, label: "Theme", id: "theme"},
 		{icon: theme.Icons.Back, label: "Back", id: "back"},
 	}
