@@ -14,12 +14,8 @@ type cachedStyles struct {
 	accent    lipgloss.Style
 
 	// Component styles
-	logo           lipgloss.Style
-	subheader      lipgloss.Style
-	menuCursor     lipgloss.Style
-	menuItem       lipgloss.Style
-	menuSelected   lipgloss.Style
-	badgeInstalled lipgloss.Style
+	subheader    lipgloss.Style
+	menuSelected lipgloss.Style
 
 	// Full-width highlight bar styles (new)
 	listHighlight lipgloss.Style
@@ -27,10 +23,9 @@ type cachedStyles struct {
 	listDimmed    lipgloss.Style
 
 	// Box/card styles (btop-inspired)
-	box        lipgloss.Style
-	boxActive  lipgloss.Style
-	boxTitle   lipgloss.Style
-	boxContent lipgloss.Style
+	box       lipgloss.Style
+	boxActive lipgloss.Style
+	boxTitle  lipgloss.Style
 
 	// Table styles
 	tableHeader      lipgloss.Style
@@ -66,24 +61,16 @@ func RebuildStyles() {
 	styles.err = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Error))
 	styles.accent = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Accent))
 
-	// Logo
-	styles.logo = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(Current.Primary)).
-		Align(lipgloss.Center)
-
 	// Subheader (inline style, no box)
 	styles.subheader = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.Primary)).
 		Bold(true)
 
-	// Menu cursor and items
-	styles.menuCursor = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Primary))
-	styles.menuItem = lipgloss.NewStyle().PaddingLeft(PadItemH)
+	// Menu selected style
 	styles.menuSelected = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.Primary)).
 		Bold(true).
 		PaddingLeft(PadItemH)
-	styles.badgeInstalled = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Success))
 
 	// Full-width highlight bar for selected items
 	styles.listHighlight = lipgloss.NewStyle().
@@ -114,9 +101,6 @@ func RebuildStyles() {
 	styles.boxTitle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.Primary)).
 		Bold(true)
-
-	styles.boxContent = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(Current.Primary))
 
 	// Table styles
 	styles.tableHeader = lipgloss.NewStyle().
@@ -167,22 +151,17 @@ func WarningStyle() lipgloss.Style   { return styles.warning }
 func ErrorStyle() lipgloss.Style     { return styles.err }
 func AccentStyle() lipgloss.Style    { return styles.accent }
 
-func LogoStyle() lipgloss.Style         { return styles.logo }
 func SubheaderStyle() lipgloss.Style    { return styles.subheader }
-func MenuCursorStyle() lipgloss.Style   { return styles.menuCursor }
-func MenuItemStyle() lipgloss.Style     { return styles.menuItem }
 func MenuSelectedStyle() lipgloss.Style { return styles.menuSelected }
-func BadgeInstalledStyle() lipgloss.Style { return styles.badgeInstalled }
 
 // New style accessors
 func ListHighlightStyle() lipgloss.Style { return styles.listHighlight }
 func ListNormalStyle() lipgloss.Style    { return styles.listNormal }
 func ListDimmedStyle() lipgloss.Style    { return styles.listDimmed }
 
-func BoxStyle() lipgloss.Style        { return styles.box }
-func BoxActiveStyle() lipgloss.Style  { return styles.boxActive }
-func BoxTitleStyle() lipgloss.Style   { return styles.boxTitle }
-func BoxContentStyle() lipgloss.Style { return styles.boxContent }
+func BoxStyle() lipgloss.Style       { return styles.box }
+func BoxActiveStyle() lipgloss.Style { return styles.boxActive }
+func BoxTitleStyle() lipgloss.Style  { return styles.boxTitle }
 
 func TableHeaderStyle() lipgloss.Style      { return styles.tableHeader }
 func TableRowStyle() lipgloss.Style         { return styles.tableRow }

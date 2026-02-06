@@ -4,6 +4,28 @@ All notable changes to mypctools.
 
 ---
 
+## [0.26.1] - 2026-02-06
+
+### Fixed
+- **Scripts screen alignment**: Removed centering from script names and descriptions — all items now left-align consistently regardless of checkmark presence
+- **Italic on hover removed**: Selected script descriptions no longer turn italic
+- **Description indentation**: Descriptions now have matching left padding so they align under the label text
+
+### Removed
+- Deleted `lib/package-manager.sh` — dead code, never sourced; Go TUI has its own `tui/internal/pkg/` implementation
+- Removed unused Go functions: `ui.TitledBox`, `ui.RenderSimpleList`, `ui.SkipSeparator`, `ui.CheckMark`, `system.ServiceStatusCmd`, `pkg.AppByID`
+- Removed unused Go type `pkg.CategoryInfo`
+- Removed unused theme style accessors: `LogoStyle`, `MenuCursorStyle`, `MenuItemStyle`, `BadgeInstalledStyle`, `BoxContentStyle`
+- Removed unused spacing constants: `SpaceXS`, `SpaceSM`, `SpaceMD`, `SpaceLG`, `SpaceXL`
+- Removed empty `tui/internal/screen/system/` directory (leftover from v0.23.0)
+- Removed git-tracked binary `tui/mypctools` from index
+
+### Fixed
+- Updated `config.Version` from stale `0.24.4` to current
+- Added `tui/mypctools` to `.gitignore` (was only ignoring `tui/mypctools-tui`)
+
+---
+
 ## [0.26.0] - 2026-02-06
 
 ### Added

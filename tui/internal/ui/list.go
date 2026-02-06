@@ -104,7 +104,6 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 			label = padded + item.Suffix
 		}
 
-		// Center content when item has a description
 		hasDesc := item.Description != ""
 
 		var line string
@@ -112,9 +111,6 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 			if cfg.HighlightFull {
 				// Full-width highlight bar style
 				highlight := theme.ListHighlightStyle().Width(innerWidth)
-				if hasDesc {
-					highlight = highlight.Align(lipgloss.Center)
-				}
 				if cfg.ShowCursor {
 					cursorStr := lipgloss.NewStyle().
 						Width(cursorWidth).
@@ -142,31 +138,19 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		} else {
 			spacer := strings.Repeat(" ", cursorWidth)
 			if item.Dimmed {
-				style := theme.ListDimmedStyle().Width(innerWidth)
-				if hasDesc {
-					style = style.Align(lipgloss.Center)
-				}
-				line = spacer + style.Render(label)
+				line = spacer + theme.ListDimmedStyle().Width(innerWidth).Render(label)
 			} else {
-				style := theme.ListNormalStyle().Width(innerWidth)
-				if hasDesc {
-					style = style.Align(lipgloss.Center)
-				}
-				line = spacer + style.Render(label)
+				line = spacer + theme.ListNormalStyle().Width(innerWidth).Render(label)
 			}
 		}
 
 		sb.WriteString(line)
 
-		// Render description as a centered dimmed second line
+		// Render description as a dimmed second line, indented to match label
 		if hasDesc {
-			descStyle := theme.MutedStyle()
-			if isSelected && cfg.HighlightFull {
-				descStyle = descStyle.Italic(true)
-			}
 			descLine := strings.Repeat(" ", cursorWidth) +
-				lipgloss.NewStyle().Width(innerWidth).Align(lipgloss.Center).
-					Render(descStyle.Render(item.Description))
+				lipgloss.NewStyle().Width(innerWidth).PaddingLeft(theme.PadItemH).
+					Render(theme.MutedStyle().Render(item.Description))
 			sb.WriteString("\n" + descLine)
 		}
 	}
@@ -174,29 +158,3 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 	return sb.String()
 }
 
-// SkipSeparator adjusts cursor to skip separator items.
-// direction: +1 for down, -1 for up.
-func SkipSeparator(items []ListItem, cursor int, direction int) int {
-	if cursor >= 0 && cursor < len(items) && items[cursor].Separator {
-		cursor += direction
-		if cursor >= len(items) {
-			cursor = 0
-		} else if cursor < 0 {
-			cursor = len(items) - 1
-		}
-	}
-	return cursor
-}
-
-// RenderSimpleList renders a basic list without icons.
-func RenderSimpleList(labels []string, cursor int, width int) string {
-	items := make([]ListItem, len(labels))
-	for i, label := range labels {
-		items[i] = ListItem{Label: label}
-	}
-	return RenderList(items, cursor, ListConfig{
-		Width:         width,
-		ShowCursor:    true,
-		HighlightFull: true,
-	})
-}

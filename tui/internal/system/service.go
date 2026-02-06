@@ -86,10 +86,6 @@ func ServiceActionCmd(name, action string) *exec.Cmd {
 	return exec.Command("sudo", "systemctl", action, name)
 }
 
-// ServiceStatusCmd returns an exec.Cmd to show service status.
-func ServiceStatusCmd(name string) *exec.Cmd {
-	return exec.Command("systemctl", "status", name, "--no-pager")
-}
 
 // ListAllServices returns all service names on the system.
 func ListAllServices() ([]string, error) {

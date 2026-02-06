@@ -22,14 +22,6 @@ const (
 	CategoryDevTools = "devtools"
 )
 
-// CategoryInfo holds display metadata for a category.
-type CategoryInfo struct {
-	ID    string
-	Name  string
-	Icon  string
-	Count int
-}
-
 var apps = []App{
 	// AI Tools (5)
 	{
@@ -301,14 +293,4 @@ func CategoryDisplayName(id string) string {
 	default:
 		return id
 	}
-}
-
-// AppByID returns an app by its ID, or nil if not found.
-func AppByID(id string) *App {
-	for i := range apps {
-		if apps[i].ID == id {
-			return &apps[i]
-		}
-	}
-	return nil
 }

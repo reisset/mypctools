@@ -60,14 +60,6 @@ func Box(content string, cfg BoxConfig) string {
 	return rendered
 }
 
-// TitledBox is a convenience function for creating a titled box.
-func TitledBox(title, content string, width int, active bool) string {
-	return Box(content, BoxConfig{
-		Title:  title,
-		Width:  width,
-		Active: active,
-	})
-}
 
 // splitLines splits a string into lines.
 func splitLines(s string) []string {
