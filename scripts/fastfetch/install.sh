@@ -17,8 +17,10 @@ install_fastfetch() {
     print_status "Installing fastfetch..."
     case "$PKG_MGR" in
         pacman) $PKG_INSTALL fastfetch ;;
-        apt) $PKG_INSTALL fastfetch ;;
         dnf) $PKG_INSTALL fastfetch ;;
+        apt)
+            $PKG_INSTALL fastfetch 2>/dev/null || install_fastfetch_deb
+            ;;
     esac
 
     if command -v fastfetch &>/dev/null; then
@@ -27,6 +29,27 @@ install_fastfetch() {
         print_error "Failed to install fastfetch"
         return 1
     fi
+}
+
+# Download latest .deb from GitHub releases (for Debian/Ubuntu/Pop where apt lacks fastfetch)
+install_fastfetch_deb() {
+    print_status "Package not in repos, downloading from GitHub..."
+    local arch
+    arch=$(dpkg --print-architecture 2>/dev/null || echo "amd64")
+    local api_url="https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest"
+    local deb_url
+    deb_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP '"browser_download_url":\s*"\K[^"]*linux-'"$arch"'\.deb' | head -1)
+
+    if [ -z "$deb_url" ]; then
+        print_error "Could not find fastfetch .deb download URL"
+        return 1
+    fi
+
+    local tmp
+    tmp=$(mktemp --suffix=.deb)
+    curl -fsSL -o "$tmp" "$deb_url" || { rm -f "$tmp"; return 1; }
+    sudo dpkg -i "$tmp"
+    rm -f "$tmp"
 }
 
 # Link config
@@ -40,7 +63,7 @@ create_config() {
 
 # Main
 main() {
-    install_fastfetch
+    install_fastfetch || { echo ""; return 1; }
     create_config
 
     echo ""

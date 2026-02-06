@@ -4,6 +4,15 @@ All notable changes to mypctools.
 
 ---
 
+## [0.24.4] - 2026-02-05
+
+### Fixed
+- **Fastfetch on Debian/Ubuntu/Pop!_OS**: Added GitHub release `.deb` download fallback when `apt install fastfetch` fails (package not in default repos)
+- **Fastfetch false success**: Install script no longer reports "Installation complete!" when fastfetch fails to install
+- **Brave on Debian/Pop!_OS**: Now uses official curl installer (`dl.brave.com`) instead of Flatpak fallback
+
+---
+
 ## [0.24.3] - 2026-02-05
 
 ### Security

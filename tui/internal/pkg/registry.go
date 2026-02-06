@@ -74,7 +74,6 @@ var apps = []App{
 		Name:         "Brave",
 		Category:     CategoryBrowsers,
 		PacmanPkg:    "brave-bin",
-		FlatpakID:    "com.brave.Browser",
 		CommandCheck: "brave",
 		FallbackCmd:  "curl -fsS https://dl.brave.com/install.sh | bash",
 	},
