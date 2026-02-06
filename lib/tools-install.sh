@@ -301,7 +301,11 @@ print_pkg_removal_instructions() {
 }
 
 # Remove starship config only if it points to our shared config
+# Skip removal if the sibling bundle (litebash or litezsh) is still installed
 uninstall_starship_config() {
+    [ -d "$HOME/.local/share/litebash" ] && return 0
+    [ -d "$HOME/.local/share/litezsh" ] && return 0
+
     if [ -L "$HOME/.config/starship.toml" ]; then
         local target
         target=$(readlink -f "$HOME/.config/starship.toml" 2>/dev/null)
