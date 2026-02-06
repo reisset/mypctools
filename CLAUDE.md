@@ -8,6 +8,18 @@ mypctools is a personal TUI (Terminal User Interface) for managing scripts and a
 
 See README.md for user documentation and quick start.
 
+## Project Context
+
+This is a Go TUI project. Use Bubble Tea / Lip Gloss patterns. When researching UI inspiration, produce concrete implementation plans with specific styling values (colors, padding, borders) rather than vague suggestions.
+
+## UI/UX Principles
+
+When adding text/descriptions to UI elements, default to minimal and concise. Never add verbose descriptions to standard menu items — only add short descriptions for user-created/custom items. Less is more for TUI interfaces.
+
+## Workflow
+
+When implementing UI changes from a plan, show a preview or summary of text content (labels, descriptions, menu items) BEFORE writing the code. Ask for approval on copy/wording before implementing.
+
 ## Architecture
 
 ```

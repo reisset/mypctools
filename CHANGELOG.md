@@ -4,6 +4,20 @@ All notable changes to mypctools.
 
 ---
 
+## [0.26.0] - 2026-02-06
+
+### Added
+- **Two-line list items**: List items now support a `Description` field rendered as a centered muted line below the label — scripts screen uses this for cleaner layout
+- **Centered description layout**: Script name + checkmark are centered over the description text for visual balance
+- **Labeled section separators**: Separators can now display section headers (e.g. `── Settings ──────`) — used in System Setup menu
+- **Centralized layout constants**: All hardcoded widths, column sizes, and separator strings extracted to `theme/layout.go` for consistency
+
+### Changed
+- **Scripts screen**: Descriptions moved from cramped single-line suffixes to dedicated second line below each bundle name
+- **Service table**: Column widths now reference `theme.ServiceCol*` constants instead of hardcoded values
+
+---
+
 ## [0.25.0] - 2026-02-06
 
 ### Added

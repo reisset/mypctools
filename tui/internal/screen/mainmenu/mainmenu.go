@@ -143,7 +143,7 @@ func (m Model) View() string {
 
 	// Choose logo based on width and apply gradient
 	currentLogo := logo
-	compact := width < 85
+	compact := width < theme.MainMenuLogoBreak
 	if compact {
 		currentLogo = logoCompact
 	}
@@ -186,7 +186,7 @@ func (m Model) View() string {
 
 	// Wrap menu in a subtle box for visual containment
 	menuBox := theme.BoxStyle().
-		Width(56).
+		Width(theme.MainMenuBoxWidth).
 		Align(lipgloss.Left).
 		Render(menu)
 

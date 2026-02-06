@@ -241,20 +241,20 @@ func (m ServiceListModel) renderRows() string {
 	var rows []string
 	for i, svc := range m.services {
 		// Format service name
-		name := fmt.Sprintf("%-20s", truncate(svc.Name, 20))
+		name := fmt.Sprintf("%-*s", theme.ServiceColName, truncate(svc.Name, theme.ServiceColName))
 
 		// Status badge with colors - use lipgloss.Width for ANSI-aware padding
 		status := ui.StatusBadge(svc.Active)
 		statusWidth := lipgloss.Width(status)
-		if statusWidth < 12 {
-			status = status + strings.Repeat(" ", 12-statusWidth)
+		if statusWidth < theme.ServiceColStatus {
+			status = status + strings.Repeat(" ", theme.ServiceColStatus-statusWidth)
 		}
 
 		// Enabled badge - use lipgloss.Width for ANSI-aware padding
 		enabled := ui.EnabledBadge(svc.Enabled)
 		enabledWidth := lipgloss.Width(enabled)
-		if enabledWidth < 10 {
-			enabled = enabled + strings.Repeat(" ", 10-enabledWidth)
+		if enabledWidth < theme.ServiceColEnabled {
+			enabled = enabled + strings.Repeat(" ", theme.ServiceColEnabled-enabledWidth)
 		}
 
 		row := name + "  " + status + "  " + enabled
@@ -296,11 +296,11 @@ func (m ServiceListModel) View() string {
 	}
 
 	// Table header with styling
-	header := fmt.Sprintf("%-20s  %-12s  %-10s", "Service", "Status", "Enabled")
+	header := fmt.Sprintf("%-*s  %-*s  %-*s", theme.ServiceColName, "Service", theme.ServiceColStatus, "Status", theme.ServiceColEnabled, "Enabled")
 	headerLine := theme.TableHeaderStyle().Render(header)
 
 	// Separator using theme color
-	separator := theme.HelpDividerStyle().Render(strings.Repeat("─", 48))
+	separator := theme.HelpDividerStyle().Render(strings.Repeat("─", theme.ServiceTableWidth))
 
 	// Scroll indicator
 	scrollInfo := ""
