@@ -1,22 +1,52 @@
+<div align="center">
+
 # mypctools
 
-A TUI for managing scripts and app installations across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
+**A TUI for managing scripts and app installations across Linux systems.**
 
-## Quick Start
+Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
+
+[![Version](https://img.shields.io/badge/version-0.26.1-00c896?style=for-the-badge&labelColor=0a0a0c)](https://github.com/reisset/mypctools/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0a0a0c)](LICENSE)
+[![Go](https://img.shields.io/badge/go-1.23%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0a0a0c)](https://go.dev)
+[![Bubble Tea](https://img.shields.io/badge/bubble%20tea-TUI-ff75b5?style=for-the-badge&labelColor=0a0a0c)](https://github.com/charmbracelet/bubbletea)
+
+</div>
+
+---
+
+## ✨ Features
+
+| | |
+|---|---|
+| 🖥️ **Terminal UI** | Navigate with arrow keys or vim bindings — no commands to memorize |
+| 📦 **One-Command Install** | `curl \| bash` to install, same to uninstall |
+| 🔍 **Smart Package Manager** | Tries apt/pacman/dnf first, then Flatpak, then custom fallback |
+| 🛠️ **Script Bundles** | Shell configs, terminal themes, fastfetch, screensaver, and more |
+| ⚙️ **System Tools** | Full system update, cleanup, and systemd service manager |
+| 🎨 **Themes** | Switch between DefaultCyan, CatppuccinMocha, and TokyoNight |
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh | bash
 mypctools
 ```
 
-Uninstall:
+<details>
+<summary><strong>Uninstall</strong></summary>
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh | bash
 ```
 
-## Features
+</details>
 
-### Install Apps
+---
+
+## 📦 Install Apps
 
 Install apps from a single menu. The installer tries native package managers first, then Flatpak, then custom fallbacks.
 
@@ -28,9 +58,11 @@ Install apps from a single menu. The installer tries native package managers fir
 | Media | Discord, Spotify, VLC, MPV |
 | Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK, Python |
 
-LiteBash and LiteZsh also install these CLI tools: btop, bat, eza, fzf, ripgrep, fd, zoxide, lazygit, dust, dysk, yazi, starship, tldr, glow, micro, and github-cli.
+> LiteBash and LiteZsh also install these CLI tools: btop, bat, eza, fzf, ripgrep, fd, zoxide, lazygit, dust, dysk, yazi, starship, tldr, glow, micro, and github-cli.
 
-### My Scripts
+---
+
+## 🛠️ My Scripts
 
 Script bundles you can install or uninstall:
 
@@ -45,14 +77,18 @@ Script bundles you can install or uninstall:
 - **Spicetify** — StarryNight theme for native Spotify.
 - **Claude Setup** — Claude Code skills (pdf, docx, xlsx, pptx, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline.
 
-### System Setup
+---
+
+## ⚙️ System Setup
 
 - **Full System Update** — Runs apt, pacman, or dnf upgrade.
 - **System Cleanup** — Removes orphaned packages, clears caches, empties trash.
 - **Service Manager** — Browse or search systemd services.
 - **Theme** — Switch between DefaultCyan, CatppuccinMocha, and TokyoNight.
 
-### CLI
+---
+
+## 📋 CLI
 
 ```bash
 mypctools --help      # Usage
@@ -62,13 +98,18 @@ mypctools update      # Update binary and scripts
 
 The app checks for updates at launch.
 
-## Package Installation Order
+---
+
+## 🔧 Package Installation Order
 
 ```
 Native (apt/pacman/dnf) → Flatpak → Custom fallback
 ```
 
-The installer stops at the first method that succeeds. Custom fallbacks handle apps that require special setup:
+The installer stops at the first method that succeeds.
+
+<details>
+<summary><strong>Custom fallback details</strong></summary>
 
 | App | Fallback Method |
 |-----|-----------------|
@@ -87,12 +128,19 @@ The installer stops at the first method that succeeds. Custom fallbacks handle a
 | Ollama | Official install script |
 | LM Studio | AppImage download |
 
-## Requirements
+</details>
+
+---
+
+## 🖥️ Requirements
 
 - Linux (Debian/Ubuntu, Arch, or Fedora-based)
 - x86_64 or arm64
 
-## Build from Source
+---
+
+<details>
+<summary><strong>🏗️ Build from Source</strong></summary>
 
 ```bash
 git clone https://github.com/reisset/mypctools.git
@@ -101,6 +149,14 @@ go build -o mypctools ./main.go
 ./mypctools
 ```
 
-## License
+</details>
 
-MIT — see [LICENSE](LICENSE).
+---
+
+<div align="center">
+
+MIT — see [LICENSE](LICENSE)
+
+Built by [Reisset](https://github.com/reisset)
+
+</div>
