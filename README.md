@@ -46,6 +46,8 @@ curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh
 
 ---
 
+<img width="939" height="643" alt="Screenshot_2026-02-07_21-30-06" src="https://github.com/user-attachments/assets/0c70b9d4-b094-4b5b-90b7-b929b5d17e76" />
+
 ## 📦 Install Apps
 
 Install apps from a single menu. The installer tries native package managers first, then Flatpak, then custom fallbacks.
