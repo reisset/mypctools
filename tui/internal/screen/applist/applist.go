@@ -144,14 +144,20 @@ func (m Model) View() string {
 	}
 
 	list := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
-		ShowCursor: true,
+		Width:         theme.WideBoxWidth,
+		ShowCursor:    true,
+		MaxInnerWidth: 76,
+	})
+
+	listBox := ui.Box(list, ui.BoxConfig{
+		Width:  theme.WideBoxWidth,
+		Active: true,
 	})
 
 	listBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(list)
+		Render(listBox)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		subtitleBlock,

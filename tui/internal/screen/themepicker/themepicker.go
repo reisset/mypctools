@@ -96,14 +96,19 @@ func (m Model) View() string {
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
+		Width:      theme.SubMenuBoxWidth,
 		ShowCursor: true,
+	})
+
+	menuBox := ui.Box(menu, ui.BoxConfig{
+		Width:  theme.SubMenuBoxWidth,
+		Active: true,
 	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(menu)
+		Render(menuBox)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		titleBlock,
@@ -142,6 +147,14 @@ func themeDisplayName(name string) string {
 		return "Catppuccin Mocha"
 	case "tokyo-night":
 		return "Tokyo Night"
+	case "dracula":
+		return "Dracula"
+	case "nord":
+		return "Nord"
+	case "gruvbox":
+		return "Gruvbox Dark"
+	case "rose-pine":
+		return "Rosé Pine"
 	default:
 		return name
 	}

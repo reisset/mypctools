@@ -116,14 +116,19 @@ func (m Model) View() string {
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
+		Width:      theme.SubMenuBoxWidth,
 		ShowCursor: true,
+	})
+
+	menuBox := ui.Box(menu, ui.BoxConfig{
+		Width:  theme.SubMenuBoxWidth,
+		Active: true,
 	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(menu)
+		Render(menuBox)
 
 	return menuBlock
 }

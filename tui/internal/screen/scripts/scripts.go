@@ -84,15 +84,20 @@ func (m Model) View() string {
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
-		ShowCursor: true,
-		MaxInnerWidth: 80,
+		Width:         theme.WideBoxWidth,
+		ShowCursor:    true,
+		MaxInnerWidth: 76,
+	})
+
+	menuBox := ui.Box(menu, ui.BoxConfig{
+		Width:  theme.WideBoxWidth,
+		Active: true,
 	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(menu)
+		Render(menuBox)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		subtitle,

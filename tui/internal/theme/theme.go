@@ -73,8 +73,72 @@ var TokyoNight = Palette{
 	LogoGradient: []string{"#c0caf5", "#b4b8f0", "#a8a6eb", "#bb9af7", "#9db8e0", "#7dcfff"},
 }
 
+var Dracula = Palette{
+	Name:         "dracula",
+	Primary:      "#f8f8f2",
+	Secondary:    "#bd93f9",
+	Muted:        "#6272a4",
+	Success:      "#50fa7b",
+	Warning:      "#ffb86c",
+	Error:        "#ff5555",
+	Accent:       "#ff79c6",
+	Highlight:    "#44475a",
+	Surface:      "#282a36",
+	Border:       "#bd93f9",
+	BorderDim:    "#44475a",
+	LogoGradient: []string{"#ff79c6", "#e48cde", "#cc9df0", "#bd93f9", "#9cb3fc", "#8be9fd"},
+}
+
+var Nord = Palette{
+	Name:         "nord",
+	Primary:      "#eceff4",
+	Secondary:    "#88c0d0",
+	Muted:        "#4c566a",
+	Success:      "#a3be8c",
+	Warning:      "#ebcb8b",
+	Error:        "#bf616a",
+	Accent:       "#b48ead",
+	Highlight:    "#3b4252",
+	Surface:      "#2e3440",
+	Border:       "#88c0d0",
+	BorderDim:    "#434c5e",
+	LogoGradient: []string{"#8fbcbb", "#88c0d0", "#81a1c1", "#5e81ac", "#7b9fbd", "#b48ead"},
+}
+
+var GruvboxDark = Palette{
+	Name:         "gruvbox",
+	Primary:      "#ebdbb2",
+	Secondary:    "#fe8019",
+	Muted:        "#665c54",
+	Success:      "#b8bb26",
+	Warning:      "#fabd2f",
+	Error:        "#fb4934",
+	Accent:       "#d3869b",
+	Highlight:    "#3c3836",
+	Surface:      "#282828",
+	Border:       "#fe8019",
+	BorderDim:    "#504945",
+	LogoGradient: []string{"#fb4934", "#fe8019", "#fabd2f", "#b8bb26", "#8ec07c", "#83a598"},
+}
+
+var RosePine = Palette{
+	Name:         "rose-pine",
+	Primary:      "#e0def4",
+	Secondary:    "#c4a7e7",
+	Muted:        "#6e6a86",
+	Success:      "#9ccfd8",
+	Warning:      "#f6c177",
+	Error:        "#eb6f92",
+	Accent:       "#ebbcba",
+	Highlight:    "#26233a",
+	Surface:      "#191724",
+	Border:       "#c4a7e7",
+	BorderDim:    "#403d52",
+	LogoGradient: []string{"#eb6f92", "#ebbcba", "#f6c177", "#9ccfd8", "#c4a7e7", "#e0def4"},
+}
+
 // All available presets.
-var Presets = []Palette{DefaultCyan, CatppuccinMocha, TokyoNight}
+var Presets = []Palette{DefaultCyan, CatppuccinMocha, TokyoNight, Dracula, Nord, GruvboxDark, RosePine}
 
 // Current is the active palette. Set via Load().
 var Current = DefaultCyan
@@ -99,6 +163,14 @@ func Load() {
 		Current = CatppuccinMocha
 	case "tokyo-night":
 		Current = TokyoNight
+	case "dracula":
+		Current = Dracula
+	case "nord":
+		Current = Nord
+	case "gruvbox":
+		Current = GruvboxDark
+	case "rose-pine":
+		Current = RosePine
 	default:
 		Current = DefaultCyan
 	}

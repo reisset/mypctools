@@ -67,7 +67,7 @@ func RebuildStyles() {
 
 	// Menu selected style
 	styles.menuSelected = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(Current.Primary)).
+		Foreground(lipgloss.Color("#FFFFFF")).
 		Bold(true).
 		PaddingLeft(PadItemH)
 
