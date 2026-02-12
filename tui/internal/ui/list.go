@@ -68,15 +68,15 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		if item.Separator {
 			var sepLine string
 			if item.Label != "" {
-				label := theme.MutedStyle().Bold(true).Render(item.Label)
+				label := theme.MutedStyle().Render(item.Label)
 				labelWidth := lipgloss.Width(label)
-				remaining := innerWidth - labelWidth - 6 // "── " + " " + trailing dashes
-				if remaining < 4 {
-					remaining = 4
+				rightDash := innerWidth - labelWidth - 5 // 3 left dashes + 2 spaces
+				if rightDash < 2 {
+					rightDash = 2
 				}
 				sepLine = strings.Repeat(" ", cursorWidth) +
-					theme.MutedStyle().Render("── ") + label +
-					theme.MutedStyle().Render(" "+strings.Repeat("─", remaining))
+					theme.MutedStyle().Render("─── ") + label +
+					theme.MutedStyle().Render(" "+strings.Repeat("─", rightDash))
 			} else {
 				sepLine = strings.Repeat(" ", cursorWidth) +
 					theme.MutedStyle().Render(theme.ListSeparator)
@@ -110,7 +110,7 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		if isSelected {
 			if cfg.HighlightFull {
 				// Full-width highlight bar style
-				highlight := theme.ListHighlightStyle().Width(innerWidth)
+				highlight := theme.ListHighlightStyle()
 				if cfg.ShowCursor {
 					cursorStr := lipgloss.NewStyle().
 						Width(cursorWidth).

@@ -29,6 +29,9 @@ type IconSet struct {
 	Dot        string
 	Arrow      string
 	Separator  string
+	Distro     string
+	Kernel     string
+	Shell      string
 }
 
 var NerdIcons = IconSet{
@@ -54,6 +57,9 @@ var NerdIcons = IconSet{
 	Dot:        "\uf111",  // nf-fa-circle (•)
 	Arrow:      "\uf061",  // nf-fa-arrow_right (→)
 	Separator:  "\ue621",  // nf-custom-folder_config (│)
+	Distro:     "\uf31b",  // nf-linux-tux
+	Kernel:     "\uf4bc",  // nf-oct-cpu
+	Shell:      "\uf120",  // nf-fa-terminal
 }
 
 var ASCIIIcons = IconSet{
@@ -79,6 +85,9 @@ var ASCIIIcons = IconSet{
 	Dot:        ".",
 	Arrow:      "->",
 	Separator:  "|",
+	Distro:     "@",
+	Kernel:     "#",
+	Shell:      "$",
 }
 
 // Icons is the active icon set, chosen at init.

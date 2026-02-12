@@ -39,8 +39,12 @@ type cachedStyles struct {
 
 	// Footer/help styles
 	helpKey     lipgloss.Style
+	helpKeyPill lipgloss.Style
 	helpDesc    lipgloss.Style
 	helpDivider lipgloss.Style
+
+	// Breadcrumb
+	breadcrumb lipgloss.Style
 }
 
 var styles cachedStyles
@@ -134,11 +138,22 @@ func RebuildStyles() {
 		Foreground(lipgloss.Color(Current.Secondary)).
 		Bold(true)
 
+	styles.helpKeyPill = lipgloss.NewStyle().
+		Background(lipgloss.Color(Current.Surface)).
+		Foreground(lipgloss.Color(Current.Secondary)).
+		Bold(true).
+		Padding(0, 1)
+
 	styles.helpDesc = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.Muted))
 
 	styles.helpDivider = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.BorderDim))
+
+	// Breadcrumb
+	styles.breadcrumb = lipgloss.NewStyle().
+		Background(lipgloss.Color(Current.Surface)).
+		Padding(0, 2)
 }
 
 // Style accessors return cached styles.
@@ -172,5 +187,8 @@ func StatusInactiveStyle() lipgloss.Style { return styles.statusInactive }
 func StatusErrorStyle() lipgloss.Style    { return styles.statusError }
 
 func HelpKeyStyle() lipgloss.Style     { return styles.helpKey }
+func HelpKeyPillStyle() lipgloss.Style { return styles.helpKeyPill }
 func HelpDescStyle() lipgloss.Style    { return styles.helpDesc }
 func HelpDividerStyle() lipgloss.Style { return styles.helpDivider }
+
+func BreadcrumbStyle() lipgloss.Style { return styles.breadcrumb }

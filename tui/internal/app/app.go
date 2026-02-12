@@ -18,6 +18,7 @@ type Model struct {
 	height      int
 	toast       string    // Current toast message
 	toastError  bool      // Whether toast is an error
+	toastFading bool      // Toast is dimming before clear
 	toastExpiry time.Time // When toast should be dismissed
 }
 
@@ -61,18 +62,31 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case ToastMsg:
 		m.toast = msg.Text
 		m.toastError = msg.IsError
+		m.toastFading = false
 		m.toastExpiry = time.Now().Add(toastDuration)
 		// Pop back to previous screen
 		if len(m.stack) > 1 {
 			m.stack = m.stack[:len(m.stack)-1]
 		}
-		return m, tea.Tick(toastDuration, func(t time.Time) tea.Msg {
-			return clearToastMsg{}
-		})
+		return m, tea.Batch(
+			tea.Tick(toastDuration-500*time.Millisecond, func(t time.Time) tea.Msg {
+				return fadeToastMsg{}
+			}),
+			tea.Tick(toastDuration, func(t time.Time) tea.Msg {
+				return clearToastMsg{}
+			}),
+		)
+
+	case fadeToastMsg:
+		if m.toast != "" {
+			m.toastFading = true
+		}
+		return m, nil
 
 	case clearToastMsg:
 		if !m.toastExpiry.IsZero() && time.Now().After(m.toastExpiry) {
 			m.toast = ""
+			m.toastFading = false
 		}
 		return m, nil
 
@@ -129,14 +143,16 @@ func (m Model) View() string {
 	// Toast line above footer
 	var toastLine string
 	if m.toast != "" {
-		toastStyle := lipgloss.NewStyle().
-			Foreground(lipgloss.Color(theme.Current.Success)).
-			Bold(true)
+		toastColor := theme.Current.Success
 		if m.toastError {
-			toastStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color(theme.Current.Error)).
-				Bold(true)
+			toastColor = theme.Current.Error
 		}
+		if m.toastFading {
+			toastColor = theme.Current.Muted
+		}
+		toastStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(toastColor)).
+			Bold(!m.toastFading)
 		toastLine = "\n" + lipgloss.NewStyle().
 			Width(width).
 			Align(lipgloss.Center).
