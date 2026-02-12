@@ -18,12 +18,11 @@ current_dir=$(echo "$input" | jq -r '.workspace.current_dir // "~"')
 session_id=$(echo "$input" | jq -r '.session_id // ""')
 
 # Token usage
-total_input=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
-total_output=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
+# Note: total_input_tokens represents the cumulative context size
+# Don't add total_output_tokens as it's already included in the context calculation
+total_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
 context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
 cache_read=$(echo "$input" | jq -r '.context_window.current_usage.cache_read_input_tokens // 0')
-
-total_tokens=$((total_input + total_output))
 
 if [ "$total_tokens" -ge 1000 ]; then
     tokens_display="$(awk "BEGIN {printf \"%.1fK\", $total_tokens/1000}")"

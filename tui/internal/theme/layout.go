@@ -17,6 +17,10 @@ const (
 	MainMenuBoxWidth  = 56
 	MainMenuLogoBreak = 85 // Terminal width threshold for compact logo
 
+	// Sub-menu boxes
+	SubMenuBoxWidth = 64 // Standard sub-menu box width
+	WideBoxWidth    = 84 // Wide box for scripts/app list (descriptions/badges)
+
 	// Service table columns
 	ServiceColName    = 20
 	ServiceColStatus  = 12

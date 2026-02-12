@@ -4,6 +4,22 @@ All notable changes to mypctools.
 
 ---
 
+## [0.27.0] - 2026-02-12
+
+### Added
+- **Boxed sub-menus**: All sub-menu screens now render inside rounded border boxes (matching main menu style) — scripts, apps, system setup, script menu, app list, theme picker
+- **4 new themes**: Dracula, Nord, Gruvbox Dark, Rosé Pine — each with full palette, logo gradient, and color swatches in the theme picker
+- **White text highlight**: Selected/focused menu items now render as bright white bold text, contrasting clearly against theme-colored unselected items
+
+### Fixed
+- **Statusline token inflation**: Token count was double-counting by adding `total_output_tokens` on top of `total_input_tokens` (which already represents cumulative context size)
+
+### Changed
+- **Script menu layout**: Bundle title, description, and install status now render inside the box alongside the install/uninstall actions
+- **Sub-menu box widths**: Standard menus use 64-char boxes, scripts and app list use 84-char wide boxes for descriptions and badges
+
+---
+
 ## [0.26.2] - 2026-02-12
 
 ### Removed

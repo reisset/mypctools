@@ -99,12 +99,10 @@ func (m Model) View() string {
 		width = 80
 	}
 
+	boxWidth := theme.SubMenuBoxWidth
+
 	// Title with bundle name
 	title := theme.SubheaderStyle().Render(m.bundle.Name)
-	titleBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(title)
 
 	// Description
 	desc := theme.MutedStyle().Render(m.bundle.Description)
@@ -117,26 +115,22 @@ func (m Model) View() string {
 		status = theme.MutedStyle().Render("Not installed")
 	}
 
-	infoBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(desc + "\n" + status)
+	info := title + "\n" + desc + "\n" + status
 
 	if m.confirming {
-		// Confirmation dialog
 		confirmMsg := theme.WarningStyle().Render("Uninstall " + m.bundle.Name + "?")
 		confirmHint := theme.MutedStyle().Render("y to confirm, n to cancel")
-		confirmBlock := lipgloss.NewStyle().
+		content := info + "\n\n" + confirmMsg + "\n" + confirmHint
+
+		menuBox := ui.Box(content, ui.BoxConfig{
+			Width:  boxWidth,
+			Active: true,
+		})
+
+		return lipgloss.NewStyle().
 			Width(width).
 			Align(lipgloss.Center).
-			Render(confirmMsg + "\n" + confirmHint)
-
-		return lipgloss.JoinVertical(lipgloss.Left,
-			titleBlock,
-			infoBlock,
-			"",
-			confirmBlock,
-		)
+			Render(menuBox)
 	}
 
 	// Build list items
@@ -149,21 +143,21 @@ func (m Model) View() string {
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
+		Width:      boxWidth,
 		ShowCursor: true,
 	})
 
-	menuBlock := lipgloss.NewStyle().
+	content := info + "\n\n" + menu
+
+	menuBox := ui.Box(content, ui.BoxConfig{
+		Width:  boxWidth,
+		Active: true,
+	})
+
+	return lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(menu)
-
-	return lipgloss.JoinVertical(lipgloss.Left,
-		titleBlock,
-		infoBlock,
-		"",
-		menuBlock,
-	)
+		Render(menuBox)
 }
 
 func (m Model) Title() string {
