@@ -28,7 +28,7 @@ func ParseHelpString(s string) HelpKey {
 // Footer renders a help key bar with a divider above.
 // Keys are rendered as pill badges with subtle backgrounds.
 func Footer(keys []HelpKey, width int) string {
-	keyStyle := theme.HelpKeyPillStyle()
+	keyStyle := theme.HelpKeyStyle()
 	descStyle := theme.HelpDescStyle()
 	dividerStyle := theme.HelpDividerStyle()
 

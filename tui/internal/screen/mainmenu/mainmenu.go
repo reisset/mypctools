@@ -214,9 +214,8 @@ func (m Model) View() string {
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:         width,
-		ShowCursor:    true,
-		HighlightFull: true,
+		Width:      width,
+		ShowCursor: true,
 	})
 
 	// Wrap menu in a box with active border

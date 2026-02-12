@@ -4,6 +4,19 @@ All notable changes to mypctools.
 
 ---
 
+## [0.26.2] - 2026-02-12
+
+### Removed
+- **Highlight bar**: Removed the cyan background rectangle on hovered/selected menu items across all screens — selection now shown with arrow cursor + bold text only
+- **Breadcrumb pill**: Removed dark background box from breadcrumb navigation — text styling preserved
+- **Footer key pills**: Removed dark background boxes from footer help keys — plain bold text instead
+- Dead style code: `HighlightFull` list config, `ListHighlightStyle`, `HelpKeyPillStyle`, `BreadcrumbStyle`
+
+### Fixed
+- **Selection centering bug**: Selected items no longer shift horizontally when navigating menus — all lines now render at consistent width
+
+---
+
 ## [0.26.1] - 2026-02-06
 
 ### Fixed

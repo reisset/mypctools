@@ -14,8 +14,8 @@ const (
 	FooterKeySep     = " │ "
 
 	// Main menu
-	MainMenuBoxWidth   = 56
-	MainMenuLogoBreak  = 85 // Terminal width threshold for compact logo
+	MainMenuBoxWidth  = 56
+	MainMenuLogoBreak = 85 // Terminal width threshold for compact logo
 
 	// Service table columns
 	ServiceColName    = 20

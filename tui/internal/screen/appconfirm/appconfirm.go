@@ -116,9 +116,8 @@ func (m Model) View() string {
 	}
 
 	buttons := ui.RenderList(items, cursor, ui.ListConfig{
-		Width:         width,
-		ShowCursor:    true,
-		HighlightFull: true,
+		Width:      width,
+		ShowCursor: true,
 	})
 
 	buttonsBlock := lipgloss.NewStyle().

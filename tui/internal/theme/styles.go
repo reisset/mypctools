@@ -17,10 +17,9 @@ type cachedStyles struct {
 	subheader    lipgloss.Style
 	menuSelected lipgloss.Style
 
-	// Full-width highlight bar styles (new)
-	listHighlight lipgloss.Style
-	listNormal    lipgloss.Style
-	listDimmed    lipgloss.Style
+	// List styles
+	listNormal lipgloss.Style
+	listDimmed lipgloss.Style
 
 	// Box/card styles (btop-inspired)
 	box       lipgloss.Style
@@ -39,12 +38,8 @@ type cachedStyles struct {
 
 	// Footer/help styles
 	helpKey     lipgloss.Style
-	helpKeyPill lipgloss.Style
 	helpDesc    lipgloss.Style
 	helpDivider lipgloss.Style
-
-	// Breadcrumb
-	breadcrumb lipgloss.Style
 }
 
 var styles cachedStyles
@@ -76,13 +71,7 @@ func RebuildStyles() {
 		Bold(true).
 		PaddingLeft(PadItemH)
 
-	// Full-width highlight bar for selected items
-	styles.listHighlight = lipgloss.NewStyle().
-		Background(lipgloss.Color(Current.Highlight)).
-		Foreground(lipgloss.Color(Current.Primary)).
-		Bold(true).
-		Padding(0, PadItemH)
-
+	// List item styles
 	styles.listNormal = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.Primary)).
 		Padding(0, PadItemH)
@@ -138,22 +127,11 @@ func RebuildStyles() {
 		Foreground(lipgloss.Color(Current.Secondary)).
 		Bold(true)
 
-	styles.helpKeyPill = lipgloss.NewStyle().
-		Background(lipgloss.Color(Current.Surface)).
-		Foreground(lipgloss.Color(Current.Secondary)).
-		Bold(true).
-		Padding(0, 1)
-
 	styles.helpDesc = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.Muted))
 
 	styles.helpDivider = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.BorderDim))
-
-	// Breadcrumb
-	styles.breadcrumb = lipgloss.NewStyle().
-		Background(lipgloss.Color(Current.Surface)).
-		Padding(0, 2)
 }
 
 // Style accessors return cached styles.
@@ -169,10 +147,8 @@ func AccentStyle() lipgloss.Style    { return styles.accent }
 func SubheaderStyle() lipgloss.Style    { return styles.subheader }
 func MenuSelectedStyle() lipgloss.Style { return styles.menuSelected }
 
-// New style accessors
-func ListHighlightStyle() lipgloss.Style { return styles.listHighlight }
-func ListNormalStyle() lipgloss.Style    { return styles.listNormal }
-func ListDimmedStyle() lipgloss.Style    { return styles.listDimmed }
+func ListNormalStyle() lipgloss.Style { return styles.listNormal }
+func ListDimmedStyle() lipgloss.Style { return styles.listDimmed }
 
 func BoxStyle() lipgloss.Style       { return styles.box }
 func BoxActiveStyle() lipgloss.Style { return styles.boxActive }
@@ -187,8 +163,5 @@ func StatusInactiveStyle() lipgloss.Style { return styles.statusInactive }
 func StatusErrorStyle() lipgloss.Style    { return styles.statusError }
 
 func HelpKeyStyle() lipgloss.Style     { return styles.helpKey }
-func HelpKeyPillStyle() lipgloss.Style { return styles.helpKeyPill }
 func HelpDescStyle() lipgloss.Style    { return styles.helpDesc }
 func HelpDividerStyle() lipgloss.Style { return styles.helpDivider }
-
-func BreadcrumbStyle() lipgloss.Style { return styles.breadcrumb }

@@ -241,9 +241,8 @@ func (m ServiceDetailModel) View() string {
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:         width,
-		ShowCursor:    true,
-		HighlightFull: true,
+		Width:      width,
+		ShowCursor: true,
 	})
 
 	menuBlock := lipgloss.NewStyle().
