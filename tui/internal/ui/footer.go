@@ -26,22 +26,19 @@ func ParseHelpString(s string) HelpKey {
 }
 
 // Footer renders a help key bar with a divider above.
-// Format: ─────────────────────────────────
-//
-//	j/k move │ enter select │ q quit
+// Keys are rendered as pill badges with subtle backgrounds.
 func Footer(keys []HelpKey, width int) string {
-	keyStyle := theme.HelpKeyStyle()
+	keyStyle := theme.HelpKeyPillStyle()
 	descStyle := theme.HelpDescStyle()
 	dividerStyle := theme.HelpDividerStyle()
 
-	// Build help text
+	// Build help text with pill-style keys
 	var parts []string
 	for _, k := range keys {
 		parts = append(parts, keyStyle.Render(k.Key)+" "+descStyle.Render(k.Desc))
 	}
 
-	sep := dividerStyle.Render(theme.FooterKeySep)
-	helpText := strings.Join(parts, sep)
+	helpText := strings.Join(parts, "  ")
 
 	// Create divider line
 	dividerWidth := width - 4

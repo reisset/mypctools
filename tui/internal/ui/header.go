@@ -29,9 +29,11 @@ func Breadcrumb(titles []string, width int) string {
 		}
 	}
 
-	// Center the breadcrumb
+	// Wrap in pill background and center
+	pill := theme.BreadcrumbStyle().Render(result)
+
 	return lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(result)
+		Render(pill)
 }

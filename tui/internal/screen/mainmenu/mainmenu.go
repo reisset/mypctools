@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+
 	"github.com/reisset/mypctools/tui/internal/screen/apps"
 	"github.com/reisset/mypctools/tui/internal/screen/pullupdate"
 	"github.com/reisset/mypctools/tui/internal/screen/scripts"
@@ -36,12 +38,22 @@ type menuItem struct {
 	separator bool
 }
 
+// Logo reveal animation
+type logoRevealMsg struct{}
+
+const (
+	logoRevealTicks    = 8
+	logoRevealInterval = 50 * time.Millisecond
+)
+
 // Model is the main menu screen.
 type Model struct {
 	shared          *state.Shared
 	items           []menuItem
 	cursor          int
 	lastUpdateCount int
+	revealProgress  int  // 0..logoRevealTicks = animating, -1 = done
+	hasAnimated     bool // Prevents re-animating on PopScreen
 }
 
 func New(shared *state.Shared) Model {
@@ -79,13 +91,32 @@ func (m *Model) rebuildItemsIfNeeded() {
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	if m.hasAnimated {
+		return nil
+	}
+	return tea.Tick(logoRevealInterval, func(t time.Time) tea.Msg {
+		return logoRevealMsg{}
+	})
 }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	m.rebuildItemsIfNeeded()
 
 	switch msg := msg.(type) {
+	case logoRevealMsg:
+		if m.revealProgress >= 0 && m.revealProgress < logoRevealTicks {
+			m.revealProgress++
+			if m.revealProgress >= logoRevealTicks {
+				m.revealProgress = -1 // Done
+				m.hasAnimated = true
+				return m, nil
+			}
+			return m, tea.Tick(logoRevealInterval, func(t time.Time) tea.Msg {
+				return logoRevealMsg{}
+			})
+		}
+		return m, nil
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "down", "j":
@@ -148,7 +179,11 @@ func (m Model) View() string {
 		currentLogo = logoCompact
 	}
 
-	renderedLogo := renderGradientLogo(currentLogo, compact, width)
+	revealFrac := 1.0
+	if m.revealProgress >= 0 {
+		revealFrac = float64(m.revealProgress) / float64(logoRevealTicks)
+	}
+	renderedLogo := renderGradientLogo(currentLogo, compact, width, revealFrac)
 
 	// Update badge
 	var updateBadge string
@@ -184,11 +219,11 @@ func (m Model) View() string {
 		HighlightFull: true,
 	})
 
-	// Wrap menu in a subtle box for visual containment
-	menuBox := theme.BoxStyle().
-		Width(theme.MainMenuBoxWidth).
-		Align(lipgloss.Left).
-		Render(menu)
+	// Wrap menu in a box with active border
+	menuBox := ui.Box(menu, ui.BoxConfig{
+		Width:  theme.MainMenuBoxWidth,
+		Active: true,
+	})
 
 	// Center the menu
 	menuBlock := lipgloss.NewStyle().
@@ -196,11 +231,18 @@ func (m Model) View() string {
 		Align(lipgloss.Center).
 		Render(menuBox)
 
+	// Tagline below system info
+	tagline := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(theme.Current.Muted)).
+		Width(width).
+		Align(lipgloss.Center).
+		Render("linux toolkit")
+
 	parts := []string{renderedLogo}
 	if updateBadge != "" {
 		parts = append(parts, updateBadge)
 	}
-	parts = append(parts, sysLineRendered, "", menuBlock)
+	parts = append(parts, sysLineRendered, tagline, "", menuBlock)
 
 	return lipgloss.JoinVertical(lipgloss.Left, parts...)
 }
@@ -213,16 +255,39 @@ func (m Model) ShortHelp() []string {
 	return []string{"enter select"}
 }
 
-func renderGradientLogo(logoText string, compact bool, width int) string {
+func renderGradientLogo(logoText string, compact bool, width int, revealFrac float64) string {
 	lines := strings.Split(logoText, "\n")
 	gradient := theme.Current.LogoGradient
+
+	// Apply reveal mask: replace unrevealed characters with spaces
+	if revealFrac < 1.0 {
+		totalChars := 0
+		for _, line := range lines {
+			totalChars += len([]rune(line))
+		}
+		revealCount := int(float64(totalChars) * revealFrac)
+
+		charsSoFar := 0
+		for i, line := range lines {
+			runes := []rune(line)
+			for j := range runes {
+				if charsSoFar >= revealCount {
+					runes[j] = ' '
+				}
+				charsSoFar++
+			}
+			lines[i] = string(runes)
+		}
+	}
+
 	if len(gradient) == 0 {
 		// Fallback: single color
+		text := strings.Join(lines, "\n")
 		return lipgloss.NewStyle().
 			Foreground(lipgloss.Color(theme.Current.Primary)).
 			Width(width).
 			Align(lipgloss.Center).
-			Render(logoText)
+			Render(text)
 	}
 
 	var coloredLines []string
@@ -270,12 +335,13 @@ func buildSysLine(shared *state.Shared) string {
 		}
 	}
 
-	// Build with better spacing using dots
-	parts := []string{shared.Distro.Name}
+	// Build with icons and dot separators
+	sep := "  " + theme.Icons.Dot + "  "
+	parts := []string{theme.Icons.Distro + " " + shared.Distro.Name}
 	if kernel != "" {
-		parts = append(parts, kernel)
+		parts = append(parts, theme.Icons.Kernel+" "+kernel)
 	}
-	parts = append(parts, shell)
+	parts = append(parts, theme.Icons.Shell+" "+shell)
 
-	return strings.Join(parts, "  " + theme.Icons.Dot + "  ")
+	return strings.Join(parts, sep)
 }

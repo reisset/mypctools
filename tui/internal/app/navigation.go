@@ -29,6 +29,9 @@ type ToastMsg struct {
 	IsError bool
 }
 
+// fadeToastMsg dims the toast before clearing.
+type fadeToastMsg struct{}
+
 // clearToastMsg is sent when the toast should be dismissed.
 type clearToastMsg struct{}
 
