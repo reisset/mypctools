@@ -19,9 +19,8 @@ type ListItem struct {
 
 // ListConfig configures list rendering.
 type ListConfig struct {
-	Width         int  // Total width for full-width highlights
+	Width         int  // Total width for layout
 	ShowCursor    bool // Show arrow cursor on selected item
-	HighlightFull bool // Use full-width highlight bar
 	MaxInnerWidth int  // Max content width (0 = default 50)
 }
 
@@ -108,33 +107,17 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 
 		var line string
 		if isSelected {
-			if cfg.HighlightFull {
-				// Full-width highlight bar style
-				highlight := theme.ListHighlightStyle()
-				if cfg.ShowCursor {
-					cursorStr := lipgloss.NewStyle().
-						Width(cursorWidth).
-						Foreground(lipgloss.Color(theme.Current.Primary)).
-						Render(theme.Icons.Cursor)
-					line = cursorStr + highlight.Render(label)
-				} else {
-					spacer := strings.Repeat(" ", cursorWidth)
-					line = spacer + highlight.Render(label)
-				}
+			selected := theme.MenuSelectedStyle().Width(innerWidth)
+			if cfg.ShowCursor {
+				cursorStr := lipgloss.NewStyle().
+					Width(cursorWidth).
+					Foreground(lipgloss.Color(theme.Current.Primary)).
+					Render(theme.Icons.Cursor)
+				line = cursorStr + selected.Render(label)
 			} else {
-				// Simple bold style
-				if cfg.ShowCursor {
-					cursorStr := lipgloss.NewStyle().
-						Width(cursorWidth).
-						Foreground(lipgloss.Color(theme.Current.Primary)).
-						Render(">")
-					line = cursorStr + theme.MenuSelectedStyle().Render(label)
-				} else {
-					spacer := strings.Repeat(" ", cursorWidth)
-					line = spacer + theme.MenuSelectedStyle().Render(label)
-				}
+				spacer := strings.Repeat(" ", cursorWidth)
+				line = spacer + selected.Render(label)
 			}
-
 		} else {
 			spacer := strings.Repeat(" ", cursorWidth)
 			if item.Dimmed {

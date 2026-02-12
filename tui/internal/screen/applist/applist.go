@@ -144,9 +144,8 @@ func (m Model) View() string {
 	}
 
 	list := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:         width,
-		ShowCursor:    true,
-		HighlightFull: true,
+		Width:      width,
+		ShowCursor: true,
 	})
 
 	listBlock := lipgloss.NewStyle().
