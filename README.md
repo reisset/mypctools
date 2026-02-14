@@ -147,8 +147,9 @@ The installer stops at the first method that succeeds.
 ```bash
 git clone https://github.com/reisset/mypctools.git
 cd mypctools/tui
-go build -o mypctools ./main.go
-./mypctools
+mkdir -p ~/.local/bin
+go build -o ~/.local/bin/mypctools ./main.go
+mypctools
 ```
 
 </details>

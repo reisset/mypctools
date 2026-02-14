@@ -123,7 +123,7 @@ The primary TUI implementation in Go using Bubble Tea.
 **Building**: User compiles manually. Claude provides commands but does not run `go build` directly (slow in sandboxed environments).
 
 ```bash
-cd ~/mypctools/tui && go build -o mypctools ./main.go
+cd ~/mypctools/tui && go build -o ~/.local/bin/mypctools ./main.go
 ```
 
 **Structure**:
