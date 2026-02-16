@@ -6,7 +6,6 @@
 
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
-[![Version](https://img.shields.io/badge/version-0.26.1-00c896?style=for-the-badge&labelColor=0a0a0c)](https://github.com/reisset/mypctools/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0a0a0c)](LICENSE)
 [![Go](https://img.shields.io/badge/go-1.23%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0a0a0c)](https://go.dev)
 [![Bubble Tea](https://img.shields.io/badge/bubble%20tea-TUI-ff75b5?style=for-the-badge&labelColor=0a0a0c)](https://github.com/charmbracelet/bubbletea)
