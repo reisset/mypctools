@@ -136,8 +136,6 @@ func RebuildStyles() {
 
 // Style accessors return cached styles.
 
-func PrimaryStyle() lipgloss.Style   { return styles.primary }
-func SecondaryStyle() lipgloss.Style { return styles.secondary }
 func MutedStyle() lipgloss.Style     { return styles.muted }
 func SuccessStyle() lipgloss.Style   { return styles.success }
 func WarningStyle() lipgloss.Style   { return styles.warning }
