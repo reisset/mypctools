@@ -7,7 +7,7 @@
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0a0a0c)](LICENSE)
-[![Go](https://img.shields.io/badge/go-1.23%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0a0a0c)](https://go.dev)
+[![Go](https://img.shields.io/badge/go-1.22%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0a0a0c)](https://go.dev)
 [![Bubble Tea](https://img.shields.io/badge/bubble%20tea-TUI-ff75b5?style=for-the-badge&labelColor=0a0a0c)](https://github.com/charmbracelet/bubbletea)
 
 </div>
@@ -76,7 +76,7 @@ Script bundles you can install or uninstall:
 - **Fastfetch** — Tree-style layout with nerd font icons and compact distro logo.
 - **Screensaver** — Terminal screensaver via hypridle and Terminal Text Effects. Hyprland only.
 - **Spicetify** — StarryNight theme for native Spotify.
-- **Claude Setup** — Claude Code skills (pdf, docx, xlsx, pptx, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline.
+- **Claude Setup** — Claude Code skills (pdf-expert, docx-expert, xlsx-expert, pptx-expert, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline.
 
 ---
 

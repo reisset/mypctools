@@ -4,6 +4,27 @@ All notable changes to mypctools.
 
 ---
 
+## [0.28.0] - 2026-03-14
+
+### Fixed
+- **tldr (tealdeer) download broken**: Raw binary release pattern couldn't distinguish binary from `.sha256` checksum file — gave tldr a dedicated install function with proper filtering
+- **Silent extraction failures**: `tar`/`unzip` errors in `tools-install.sh` now abort instead of continuing silently
+- **VS Code fallback**: Switched from `wget` + hardcoded `/tmp` to `curl` + `mktemp` for consistency and safety
+- **Redundant sed**: Removed no-op `s/x86_64/x86_64/` from lazydocker and lazygit fallback commands
+- **Stale app install status**: App list now refreshes installed status when returning from installation screen
+- **foot default theme**: Changed from `hackthebox` to `catppuccin-mocha` to align with alacritty, ghostty, and kitty defaults
+- **README**: Fixed Go version badge (1.23 → 1.22), fixed Claude skill names to match actual directory names
+
+### Added
+- **GitHub API rate-limit detection**: `tools-install.sh` now detects rate limiting and shows a clear error message instead of cryptic "Could not find release"
+- **GITHUB_TOKEN support**: Tool installs use `GITHUB_TOKEN` env var for authenticated API calls when available (raises rate limit from 60 to 5,000 req/hr)
+
+### Changed
+- **LiteBash config handling**: Switched from copying config files to symlinks (matching litezsh), so configs stay in sync with repo updates
+- Removed unused `running` field from appinstall and `started` field from exec screen models
+
+---
+
 ## [0.27.0] - 2026-02-12
 
 ### Added

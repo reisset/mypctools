@@ -77,18 +77,27 @@ main() {
     create_debian_symlinks
     install_all_tools
 
-    # Copy config files (aliases and TOOLS.md are shared)
+    # Symlink config files (source of truth in repo, aliases and TOOLS.md are shared)
     print_status "Installing LiteBash config..."
-    local copy_errors=0
-    cp "$SCRIPT_DIR/litebash.sh" "$LITEBASH_DIR/" || ((copy_errors++))
-    cp "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEBASH_DIR/" || ((copy_errors++))
-    cp "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/" || ((copy_errors++))
-    cp "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEBASH_DIR/" || ((copy_errors++))
+    local symlink_errors=0
+    safe_symlink "$SCRIPT_DIR/litebash.sh" "$LITEBASH_DIR/litebash.sh" "litebash.sh" || ((symlink_errors++))
+    safe_symlink "$SCRIPT_DIR/../shared/shell/aliases.sh" "$LITEBASH_DIR/aliases.sh" "aliases.sh" || ((symlink_errors++))
+    safe_symlink "$SCRIPT_DIR/functions.sh" "$LITEBASH_DIR/functions.sh" "functions.sh" || ((symlink_errors++))
+    safe_symlink "$SCRIPT_DIR/../shared/shell/TOOLS.md" "$LITEBASH_DIR/TOOLS.md" "TOOLS.md" || ((symlink_errors++))
 
-    if [[ $copy_errors -eq 0 ]]; then
-        print_success "LiteBash config installed"
+    # Verify ALL symlinks were created and point to valid targets
+    local expected_links=("litebash.sh" "aliases.sh" "functions.sh" "TOOLS.md")
+    local verified=0
+    for link in "${expected_links[@]}"; do
+        if [[ -L "$LITEBASH_DIR/$link" ]] && [[ -e "$LITEBASH_DIR/$link" ]]; then
+            ((verified++))
+        fi
+    done
+
+    if [[ $verified -eq ${#expected_links[@]} ]]; then
+        print_success "LiteBash config installed ($verified/${#expected_links[@]} symlinks verified)"
     else
-        print_warning "Some config files failed to copy ($copy_errors errors)"
+        print_warning "Only $verified/${#expected_links[@]} symlinks verified - check permissions"
     fi
 
     # Install starship config (shared location)

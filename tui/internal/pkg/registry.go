@@ -200,7 +200,7 @@ var apps = []App{
 		Category:     CategoryDevTools,
 		PacmanPkg:    "lazydocker",
 		CommandCheck: "lazydocker",
-		FallbackCmd:  `VERSION=$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep -Po '"tag_name": "v\K[^"]*') && ARCH=$(uname -m | sed 's/x86_64/x86_64/;s/aarch64/arm64/') && TMP=$(mktemp -d) && curl -fsSL -o "$TMP/lazydocker.tar.gz" "https://github.com/jesseduffield/lazydocker/releases/download/v${VERSION}/lazydocker_${VERSION}_Linux_${ARCH}.tar.gz" && tar -xzf "$TMP/lazydocker.tar.gz" -C "$TMP" && sudo mv "$TMP/lazydocker" /usr/local/bin/ && rm -rf "$TMP"`,
+		FallbackCmd:  `VERSION=$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep -Po '"tag_name": "v\K[^"]*') && ARCH=$(uname -m | sed 's/aarch64/arm64/') && TMP=$(mktemp -d) && curl -fsSL -o "$TMP/lazydocker.tar.gz" "https://github.com/jesseduffield/lazydocker/releases/download/v${VERSION}/lazydocker_${VERSION}_Linux_${ARCH}.tar.gz" && tar -xzf "$TMP/lazydocker.tar.gz" -C "$TMP" && sudo mv "$TMP/lazydocker" /usr/local/bin/ && rm -rf "$TMP"`,
 	},
 	{
 		ID:           "lazygit",
@@ -208,7 +208,7 @@ var apps = []App{
 		Category:     CategoryDevTools,
 		PacmanPkg:    "lazygit",
 		CommandCheck: "lazygit",
-		FallbackCmd:  `VERSION=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": "v\K[^"]*') && ARCH=$(uname -m | sed 's/x86_64/x86_64/;s/aarch64/arm64/') && mkdir -p ~/.local/bin && TMP=$(mktemp -d) && curl -fsSL -o "$TMP/lazygit.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_${ARCH}.tar.gz" && tar -xzf "$TMP/lazygit.tar.gz" -C "$TMP" && mv "$TMP/lazygit" ~/.local/bin/ && rm -rf "$TMP"`,
+		FallbackCmd:  `VERSION=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": "v\K[^"]*') && ARCH=$(uname -m | sed 's/aarch64/arm64/') && mkdir -p ~/.local/bin && TMP=$(mktemp -d) && curl -fsSL -o "$TMP/lazygit.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_${ARCH}.tar.gz" && tar -xzf "$TMP/lazygit.tar.gz" -C "$TMP" && mv "$TMP/lazygit" ~/.local/bin/ && rm -rf "$TMP"`,
 	},
 	{
 		ID:           "vscode",
@@ -217,7 +217,7 @@ var apps = []App{
 		PacmanPkg:    "code",
 		FlatpakID:    "com.visualstudio.code",
 		CommandCheck: "code",
-		FallbackCmd:  "wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg && sudo install -D -o root -g root -m 644 /tmp/microsoft.gpg /usr/share/keyrings/microsoft.gpg && echo 'deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main' | sudo tee /etc/apt/sources.list.d/vscode.list && sudo apt-get update && sudo apt-get install -y code",
+		FallbackCmd:  `TMP=$(mktemp) && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > "$TMP" && sudo install -D -o root -g root -m 644 "$TMP" /usr/share/keyrings/microsoft.gpg && rm -f "$TMP" && echo 'deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main' | sudo tee /etc/apt/sources.list.d/vscode.list && sudo apt-get update && sudo apt-get install -y code`,
 	},
 	{
 		ID:           "cursor",

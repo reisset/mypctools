@@ -26,8 +26,7 @@ type Model struct {
 	current   int  // Index of app being installed
 	succeeded int  // Count of successful installs
 	failed    int  // Count of failed installs
-	done      bool // All installations complete
-	running   bool // Currently running an install
+	done bool // All installations complete
 }
 
 // New creates an app installation screen.

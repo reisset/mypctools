@@ -43,7 +43,7 @@ create_config() {
         hackthebox) config_file="foot-hackthebox.ini" ;;
         catppuccin-mocha) config_file="foot-catppuccin-mocha.ini" ;;
         tokyo-night) config_file="foot-tokyo-night.ini" ;;
-        *) config_file="foot-hackthebox.ini" ;;
+        *) config_file="foot-catppuccin-mocha.ini" ;;
     esac
 
     safe_symlink "$SCRIPT_DIR/configs/$config_file" "$config_dir/foot.ini" "foot.ini ($config_file)"
