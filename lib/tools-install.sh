@@ -34,8 +34,19 @@ _tools_install_from_github() {
     print_status "Installing $binary from GitHub ($repo)..."
 
     local api_url="https://api.github.com/repos/$repo/releases/latest"
+    local auth_header=()
+    [ -n "${GITHUB_TOKEN:-}" ] && auth_header=(-H "Authorization: token $GITHUB_TOKEN")
+    local api_response
+    api_response=$(curl -fsSL "${auth_header[@]}" "$api_url" 2>/dev/null)
+
+    # Check for GitHub API rate limiting
+    if echo "$api_response" | grep -q '"rate limit"' 2>/dev/null || [ -z "$api_response" ]; then
+        print_warning "GitHub API rate limit hit — try again later or set GITHUB_TOKEN"
+        return 1
+    fi
+
     local download_url
-    download_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP "\"browser_download_url\":\s*\"\K[^\"]*${pattern}[^\"]*" | head -1)
+    download_url=$(echo "$api_response" | grep -oP "\"browser_download_url\":\s*\"\K[^\"]*${pattern}[^\"]*" | head -1)
 
     if [ -z "$download_url" ]; then
         print_warning "Could not find release for $binary (pattern: $pattern)"
@@ -57,13 +68,13 @@ _tools_install_from_github() {
     # Extract based on file type
     case "$filename" in
         *.tar.gz|*.tgz)
-            tar xzf "$filename"
+            tar xzf "$filename" || exit 1
             ;;
         *.tar.xz)
-            tar xJf "$filename"
+            tar xJf "$filename" || exit 1
             ;;
         *.zip)
-            unzip -q "$filename"
+            unzip -q "$filename" || exit 1
             ;;
         *)
             # Assume raw binary
@@ -99,6 +110,39 @@ _tools_install_from_github() {
         print_warning "Failed to install $binary"
     fi
     return $rc
+}
+
+# Install tldr/tealdeer (raw binary, no extension — needs special handling to skip .sha256)
+_tools_install_tldr() {
+    if command -v tldr &>/dev/null; then
+        print_success "tldr already installed"
+        return 0
+    fi
+
+    print_status "Installing tldr from GitHub..."
+    local api_url="https://api.github.com/repos/tealdeer-rs/tealdeer/releases/latest"
+    local auth_header=()
+    [ -n "${GITHUB_TOKEN:-}" ] && auth_header=(-H "Authorization: token $GITHUB_TOKEN")
+    local download_url
+    download_url=$(curl -fsSL "${auth_header[@]}" "$api_url" 2>/dev/null \
+        | grep -o '"browser_download_url": "[^"]*"' \
+        | grep "linux-${ARCH}-musl" \
+        | grep -v "\.sha256" \
+        | head -1 \
+        | grep -o 'https://[^"]*')
+
+    if [ -z "$download_url" ]; then
+        print_warning "Could not find tldr release"
+        return 1
+    fi
+
+    if curl -fsSL -o "$LOCAL_BIN/tldr" "$download_url"; then
+        chmod +x "$LOCAL_BIN/tldr"
+        print_success "Installed tldr"
+    else
+        print_warning "Failed to install tldr"
+        return 1
+    fi
 }
 
 # Install dysk (single zip, no arch-specific builds)
@@ -234,7 +278,7 @@ install_all_tools() {
     _tools_install_from_github "jesseduffield/lazygit" "lazygit" "linux_${ARCH}\.tar\.gz"
 
     _show_step "Installing tldr..."
-    _tools_install_from_github "tealdeer-rs/tealdeer" "tldr" "linux-${ARCH}-musl$"
+    _tools_install_tldr
 
     _show_step "Installing glow..."
     _tools_install_from_github "charmbracelet/glow" "glow" "Linux_${ARCH}\.tar\.gz"

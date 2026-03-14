@@ -26,9 +26,8 @@ type Model struct {
 	shared  *state.Shared
 	bundle  bundle.Bundle
 	action  string // "install" or "uninstall"
-	done    bool
-	err     error
-	started bool
+	done bool
+	err  error
 }
 
 // New creates an exec screen for the given bundle and action.

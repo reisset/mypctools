@@ -44,11 +44,20 @@ func New(shared *state.Shared, category string) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	// Refresh installed status (called on screen return after pop)
+	return func() tea.Msg { return refreshInstalledMsg{} }
 }
+
+type refreshInstalledMsg struct{}
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
+	case refreshInstalledMsg:
+		for _, a := range m.apps {
+			m.installed[a.ID] = pkg.IsAppInstalled(&a, m.shared.Distro.Type)
+		}
+		m.selected = make(map[string]bool)
+		return m, nil
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "down", "j":
