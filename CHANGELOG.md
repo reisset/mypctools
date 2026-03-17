@@ -4,6 +4,25 @@ All notable changes to mypctools.
 
 ---
 
+## [0.29.1] - 2026-03-17
+
+### Added
+- **Auto-sync config bundles on update**: After a successful pull update, `install.sh` is automatically re-run for all installed config-only bundles (foot terminal, alacritty, ghostty, kitty, fastfetch, claude). Tool-installer bundles (litebash, litezsh) and side-effect bundles (screensaver, spicetify) are skipped. Toast and done screen report which configs were synced.
+- **`AutoSync` field on Bundle**: New boolean field in the bundle registry marks bundles safe for automatic re-install after a repo update.
+- **`bundle.SyncInstalled()`**: New function that iterates all installed AutoSync bundles and silently re-runs their `install.sh`.
+
+---
+
+## [0.29.0] - 2026-03-17
+
+### Changed
+- **Statusline context bar**: Replaced numeric `CTX: 34%` with a 10-block Unicode bar (`CTX: ▓▓▓░░░░░░░`). Filled blocks are color-coded green/yellow/red by usage threshold; empty blocks render in muted gray.
+
+### Removed
+- **Brainstorming skill**: Dropped from the claude bundle — superseded by the `superpowers:brainstorming` skill from the official superpowers plugin.
+
+---
+
 ## [0.28.0] - 2026-03-14
 
 ### Fixed
