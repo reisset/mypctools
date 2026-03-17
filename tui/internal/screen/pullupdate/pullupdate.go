@@ -1,11 +1,14 @@
 package pullupdate
 
 import (
+	"fmt"
 	"os/exec"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
+	"github.com/reisset/mypctools/tui/internal/bundle"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
@@ -15,11 +18,18 @@ type execDoneMsg struct {
 	err error
 }
 
+// syncDoneMsg is sent when config bundle syncing finishes.
+type syncDoneMsg struct {
+	synced []string
+}
+
 // Model handles pulling updates from the remote repository.
 type Model struct {
-	shared *state.Shared
-	done   bool
-	err    error
+	shared  *state.Shared
+	syncing bool
+	done    bool
+	err     error
+	synced  []string
 }
 
 // New creates a new pull update screen.
@@ -39,16 +49,30 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case execDoneMsg:
-		m.done = true
-		m.err = msg.err
-		if msg.err == nil {
-			// Clear update count and toast on success
-			return m, tea.Batch(
-				func() tea.Msg { return state.UpdateCountMsg{Count: 0} },
-				app.Toast(theme.Icons.Check+" Updated! Restart mypctools to use new version.", false),
-			)
+		if msg.err != nil {
+			m.done = true
+			m.err = msg.err
+			return m, nil
 		}
-		return m, nil
+		m.syncing = true
+		return m, func() tea.Msg {
+			synced := bundle.SyncInstalled(m.shared.RootDir)
+			return syncDoneMsg{synced: synced}
+		}
+
+	case syncDoneMsg:
+		m.done = true
+		m.syncing = false
+		m.synced = msg.synced
+		toastText := theme.Icons.Check + " Updated!"
+		if len(msg.synced) > 0 {
+			toastText += fmt.Sprintf(" Synced: %s.", strings.Join(msg.synced, ", "))
+		}
+		toastText += " Restart mypctools."
+		return m, tea.Batch(
+			func() tea.Msg { return state.UpdateCountMsg{Count: 0} },
+			app.Toast(toastText, false),
+		)
 
 	case tea.KeyMsg:
 		if m.done {
@@ -72,7 +96,11 @@ func (m Model) View() string {
 		if m.err != nil {
 			statusLine = theme.ErrorStyle().Render("Failed to pull updates")
 		} else {
-			statusLine = theme.SuccessStyle().Render(theme.Icons.Check + " Updated! Restart mypctools to use new version.")
+			line := theme.Icons.Check + " Updated!"
+			if len(m.synced) > 0 {
+				line += fmt.Sprintf(" Synced: %s.", strings.Join(m.synced, ", "))
+			}
+			statusLine = theme.SuccessStyle().Render(line)
 		}
 
 		prompt := theme.MutedStyle().Render("Press any key to continue...")
@@ -83,6 +111,8 @@ func (m Model) View() string {
 			"",
 			prompt,
 		)
+	} else if m.syncing {
+		content = theme.MutedStyle().Render("Syncing configs...")
 	} else {
 		content = theme.MutedStyle().Render("Pulling updates from origin/main...")
 	}
