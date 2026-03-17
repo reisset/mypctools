@@ -6,6 +6,7 @@ type Bundle struct {
 	Name        string // Display name
 	Description string // Short description
 	MarkerPath  string // Path relative to $HOME that indicates installation
+	AutoSync    bool   // Re-run install.sh automatically after a repo update (config-only bundles only)
 }
 
 // All returns the list of all available bundles in display order.
@@ -28,30 +29,35 @@ func All() []Bundle {
 			Name:        "foot terminal",
 			Description: "foot terminal config (Wayland only)",
 			MarkerPath:  ".config/foot/foot.ini",
+			AutoSync:    true,
 		},
 		{
 			ID:          "alacritty",
 			Name:        "alacritty",
 			Description: "Alacritty terminal config",
 			MarkerPath:  ".config/alacritty/alacritty.toml",
+			AutoSync:    true,
 		},
 		{
 			ID:          "ghostty",
 			Name:        "ghostty",
 			Description: "Ghostty terminal config",
 			MarkerPath:  ".config/ghostty/config",
+			AutoSync:    true,
 		},
 		{
 			ID:          "kitty",
 			Name:        "kitty",
 			Description: "Kitty terminal config",
 			MarkerPath:  ".config/kitty/kitty.conf",
+			AutoSync:    true,
 		},
 		{
 			ID:          "fastfetch",
 			Name:        "fastfetch",
 			Description: "Custom fastfetch with tree-style layout",
 			MarkerPath:  ".config/fastfetch/config.jsonc",
+			AutoSync:    true,
 		},
 		{
 			ID:          "screensaver",
@@ -64,6 +70,7 @@ func All() []Bundle {
 			Name:        "claude",
 			Description: "Claude Code skills and statusline",
 			MarkerPath:  ".claude/statusline.sh",
+			AutoSync:    true,
 		},
 		{
 			ID:          "spicetify",
