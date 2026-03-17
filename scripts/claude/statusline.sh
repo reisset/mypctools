@@ -94,10 +94,17 @@ if [ -n "$used_pct" ]; then
     else
         CTX_COLOR="$GREEN"    # Low: <50%
     fi
-    ctx_display="CTX: ${used_int}%"
+    filled=$(( used_int / 10 ))
+    [ "$filled" -gt 10 ] && filled=10
+    empty=$(( 10 - filled ))
+    bar_filled=""
+    bar_empty=""
+    [ "$filled" -gt 0 ] && bar_filled=$(printf '▓%.0s' $(seq 1 $filled))
+    [ "$empty" -gt 0 ] && bar_empty=$(printf '░%.0s' $(seq 1 $empty))
 else
     CTX_COLOR="$GRAY"
-    ctx_display="CTX: --"
+    bar_filled=""
+    bar_empty="░░░░░░░░░░"
 fi
 
 # Build output
@@ -108,7 +115,7 @@ output+="${PURPLE}◆ ${model}${RESET}"
 output+=" ${GRAY}│${RESET} "
 
 # Context usage
-output+="${CTX_COLOR}${ctx_display}${RESET}"
+output+="${CTX_COLOR}CTX: ${bar_filled}${GRAY}${bar_empty}${RESET}"
 output+=" ${GRAY}│${RESET} "
 
 # Session duration
