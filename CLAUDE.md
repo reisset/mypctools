@@ -70,7 +70,7 @@ The installer:
 
 **Package installation** is handled by the Go TUI in `tui/internal/pkg/`. Apps are registered in `registry.go` with native package names (`AptPkg`, `PacmanPkg`, `DnfPkg`), `FlatpakID`, and `FallbackCmd`. Install priority: native PM → flatpak → fallback command.
 
-**Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Register in `tui/internal/bundle/registry.go`.
+**Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Register in `tui/internal/bundle/registry.go`. Set `AutoSync: true` if the bundle is config-only (safe to re-run silently on every update) — leave it false for bundles that install system packages or have side-effects.
 
 **Shared CLI tool installation** uses `lib/tools-install.sh`. Both litebash and litezsh source this lib to avoid duplicating GitHub-release download logic. Key functions:
 - `install_all_tools` - installs zoxide, lazygit, tldr, glow, dysk, dust, yazi, starship

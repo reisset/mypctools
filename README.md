@@ -76,7 +76,7 @@ Script bundles you can install or uninstall:
 - **Fastfetch** — Tree-style layout with nerd font icons and compact distro logo.
 - **Screensaver** — Terminal screensaver via hypridle and Terminal Text Effects. Hyprland only.
 - **Spicetify** — StarryNight theme for native Spotify.
-- **Claude Setup** — Claude Code skills (pdf-expert, docx-expert, xlsx-expert, pptx-expert, bloat-remover, brainstorming, writing-clearly-and-concisely) and statusline.
+- **Claude Setup** — Claude Code skills (pdf-expert, docx-expert, xlsx-expert, pptx-expert, bloat-remover, writing-clearly-and-concisely) and statusline.
 
 ---
 
