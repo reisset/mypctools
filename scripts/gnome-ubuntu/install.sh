@@ -32,9 +32,8 @@ if ! command_exists paru; then
     exit 1
 fi
 
-init_sudo
-
 # ---- Step 1: Install AUR packages ----
+# No init_sudo — paru handles sudo prompts internally
 print_status "Installing packages via paru..."
 
 PACKAGES=(
