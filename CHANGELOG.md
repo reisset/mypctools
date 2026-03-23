@@ -9,6 +9,10 @@ All notable changes to mypctools.
 ### Added
 - **GNOME Ubuntu bundle**: Reproduces Ubuntu's GNOME defaults on Arch (Yaru-dark theme, Ubuntu fonts, dash-to-dock, window button layout). Installs via paru, discovers extension UUIDs at runtime.
 
+### Fixed
+- **Terminal bundle sudo during auto-sync**: Terminal install scripts (alacritty, foot, ghostty, kitty) no longer prompt for sudo when the terminal is already installed, fixing broken auto-sync after pull updates.
+- **paru sudo prompt in TUI**: Pre-cache sudo credentials before paru runs in gnome-ubuntu installer so the password prompt works correctly inside the TUI.
+
 ---
 
 ## [0.29.1] - 2026-03-17

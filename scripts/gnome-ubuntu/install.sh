@@ -32,8 +32,10 @@ if ! command_exists paru; then
     exit 1
 fi
 
+# Pre-cache sudo so paru doesn't prompt inside the TUI
+init_sudo
+
 # ---- Step 1: Install AUR packages ----
-# No init_sudo — paru handles sudo prompts internally
 print_status "Installing packages via paru..."
 
 PACKAGES=(
