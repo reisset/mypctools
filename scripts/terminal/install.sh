@@ -5,7 +5,10 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../lib/terminal-install.sh"
 
-init_sudo
+# Only need sudo for first-time package install; skip during config-only re-sync
+if ! command -v foot &>/dev/null; then
+    init_sudo
+fi
 
 # Wayland check
 if [ -z "$WAYLAND_DISPLAY" ]; then
