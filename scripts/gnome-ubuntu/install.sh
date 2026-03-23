@@ -53,38 +53,23 @@ paru -S --noconfirm --needed "${PACKAGES[@]}" || {
 }
 print_success "Packages installed"
 
-# ---- Step 2: Enable extensions by UUID discovery ----
-# NOTE: Extension UUIDs are discovered from `gnome-extensions list` after install,
-# NOT hardcoded from Ubuntu docs. Arch AUR packages may use different UUIDs than
-# Ubuntu's system packages. The patterns below match the UUID prefix.
-print_status "Discovering and enabling extensions..."
+# ---- Step 2: Enable extensions ----
+# UUIDs verified from Arch AUR packages via `gnome-extensions list` after install.
+# These match the AUR package builds, not Ubuntu system package UUIDs.
+# Ensure GNOME Shell allows user extensions
+gsettings set org.gnome.shell disable-user-extensions false
+print_status "Enabling extensions..."
 
-declare -A EXT_PATTERNS=(
-    ["dash-to-dock"]="dash-to-dock@"
-    ["appindicator"]="appindicatorsupport@"
-    ["desktop-icons-ng"]="ding@"
+EXTENSION_UUIDS=(
+    "dash-to-dock@micxgx.gmail.com"
+    "appindicatorsupport@rgcjonas.gmail.com"
+    "ding@rastersoft.com"
 )
 
-INSTALLED_EXTS="$(gnome-extensions list 2>/dev/null)"
-
-declare -A DISCOVERED_UUIDS=()
-for key in "${!EXT_PATTERNS[@]}"; do
-    pattern="${EXT_PATTERNS[$key]}"
-    uuid="$(echo "$INSTALLED_EXTS" | grep -i "$pattern" | head -1)"
-    if [[ -n "$uuid" ]]; then
-        DISCOVERED_UUIDS["$key"]="$uuid"
-        print_success "Found extension: $uuid"
-    else
-        print_warning "Extension matching '$pattern' not found in gnome-extensions list"
-    fi
-done
-
-# Enable discovered extensions
-for key in "${!DISCOVERED_UUIDS[@]}"; do
-    uuid="${DISCOVERED_UUIDS[$key]}"
+for uuid in "${EXTENSION_UUIDS[@]}"; do
     print_status "Enabling $uuid..."
     gnome-extensions enable "$uuid" 2>/dev/null || {
-        print_warning "Failed to enable $uuid"
+        print_warning "Failed to enable $uuid (may need log out/in first)"
     }
 done
 
@@ -92,16 +77,15 @@ done
 print_status "Validating enabled extensions..."
 ENABLED_EXTS="$(gnome-extensions list --enabled 2>/dev/null)"
 VALIDATED=0
-for key in "${!DISCOVERED_UUIDS[@]}"; do
-    uuid="${DISCOVERED_UUIDS[$key]}"
+for uuid in "${EXTENSION_UUIDS[@]}"; do
     if echo "$ENABLED_EXTS" | grep -q "$uuid"; then
         print_success "Verified: $uuid is enabled"
         ((VALIDATED++))
     else
-        print_warning "Extension $uuid was not enabled successfully"
+        print_warning "$uuid not active yet (will activate after log out/in)"
     fi
 done
-print_status "Validated $VALIDATED/${#DISCOVERED_UUIDS[@]} extensions"
+print_status "Validated $VALIDATED/${#EXTENSION_UUIDS[@]} extensions"
 
 # ---- Step 3: Apply gsettings (Ubuntu defaults) ----
 print_status "Applying Ubuntu GNOME defaults..."
@@ -120,19 +104,15 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Ubuntu Bold 11'
 # Window button layout
 gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
 
-# Dash-to-dock settings (only if extension was discovered)
-if [[ -n "${DISCOVERED_UUIDS[dash-to-dock]:-}" ]]; then
-    DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
-    gsettings set "$DOCK_SCHEMA" dock-position 'BOTTOM'
-    gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48
-    gsettings set "$DOCK_SCHEMA" autohide true
-    gsettings set "$DOCK_SCHEMA" intellihide true
-    gsettings set "$DOCK_SCHEMA" show-trash true
-    gsettings set "$DOCK_SCHEMA" show-mounts true
-    print_success "Dock configured (bottom, icon size 48, autohide)"
-else
-    print_warning "Skipping dock settings (dash-to-dock not found)"
-fi
+# Dash-to-dock settings
+DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
+gsettings set "$DOCK_SCHEMA" dock-position 'BOTTOM'
+gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48
+gsettings set "$DOCK_SCHEMA" autohide true
+gsettings set "$DOCK_SCHEMA" intellihide true
+gsettings set "$DOCK_SCHEMA" show-trash true
+gsettings set "$DOCK_SCHEMA" show-mounts true
+print_success "Dock configured (bottom, icon size 48, autohide)"
 
 print_success "GNOME settings applied"
 
@@ -140,11 +120,6 @@ print_success "GNOME settings applied"
 mkdir -p "$MARKER_DIR"
 touch "$MARKER_DIR/installed"
 
-# Save discovered UUIDs for uninstall
-: > "$MARKER_DIR/enabled-extensions.txt"
-for key in "${!DISCOVERED_UUIDS[@]}"; do
-    echo "${DISCOVERED_UUIDS[$key]}" >> "$MARKER_DIR/enabled-extensions.txt"
-done
 
 # ---- Done ----
 echo ""

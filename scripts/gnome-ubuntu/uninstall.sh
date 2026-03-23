@@ -14,18 +14,20 @@ print_header "GNOME Ubuntu Defaults Uninstaller"
 echo ""
 
 # ---- Step 1: Disable extensions ----
+# UUIDs match the Arch AUR package builds
 print_status "Disabling extensions..."
 
-if [[ -f "$MARKER_DIR/enabled-extensions.txt" ]]; then
-    while IFS= read -r uuid; do
-        [[ -z "$uuid" ]] && continue
-        print_status "Disabling $uuid..."
-        gnome-extensions disable "$uuid" 2>/dev/null || print_warning "Failed to disable $uuid"
-    done < "$MARKER_DIR/enabled-extensions.txt"
-    print_success "Extensions disabled"
-else
-    print_warning "No extension record found, skipping"
-fi
+EXTENSION_UUIDS=(
+    "dash-to-dock@micxgx.gmail.com"
+    "appindicatorsupport@rgcjonas.gmail.com"
+    "ding@rastersoft.com"
+)
+
+for uuid in "${EXTENSION_UUIDS[@]}"; do
+    print_status "Disabling $uuid..."
+    gnome-extensions disable "$uuid" 2>/dev/null || print_warning "Failed to disable $uuid"
+done
+print_success "Extensions disabled"
 
 # ---- Step 2: Reset gsettings to defaults ----
 print_status "Resetting GNOME settings to defaults..."
