@@ -40,6 +40,9 @@ gsettings reset org.gnome.desktop.interface document-font-name
 gsettings reset org.gnome.desktop.interface monospace-font-name
 gsettings reset org.gnome.desktop.wm.preferences titlebar-font
 gsettings reset org.gnome.desktop.wm.preferences button-layout
+gsettings reset org.gnome.desktop.interface color-scheme
+gsettings reset org.gnome.desktop.interface enable-hot-corners
+gsettings reset org.gnome.desktop.peripherals.touchpad tap-to-click
 
 DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
 gsettings reset "$DOCK_SCHEMA" dock-position 2>/dev/null
@@ -48,6 +51,8 @@ gsettings reset "$DOCK_SCHEMA" autohide 2>/dev/null
 gsettings reset "$DOCK_SCHEMA" intellihide 2>/dev/null
 gsettings reset "$DOCK_SCHEMA" show-trash 2>/dev/null
 gsettings reset "$DOCK_SCHEMA" show-mounts 2>/dev/null
+gsettings reset "$DOCK_SCHEMA" show-apps-at-top 2>/dev/null
+gsettings reset "$DOCK_SCHEMA" click-action 2>/dev/null
 
 print_success "GNOME settings reset to defaults"
 
