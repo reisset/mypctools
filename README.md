@@ -75,6 +75,7 @@ Script bundles you can install or uninstall:
 - **Terminal — kitty** — X11/Wayland terminal config. Same themes.
 - **Fastfetch** — Tree-style layout with nerd font icons and compact distro logo.
 - **Screensaver** — Terminal screensaver via hypridle and Terminal Text Effects. Hyprland only.
+- **GNOME Ubuntu** — Ubuntu GNOME defaults (Yaru theme, dock, fonts) for Arch.
 - **Spicetify** — StarryNight theme for native Spotify.
 - **Claude Setup** — Claude Code skills (pdf-expert, docx-expert, xlsx-expert, pptx-expert, bloat-remover, writing-clearly-and-concisely) and statusline.
 
