@@ -53,6 +53,8 @@ gsettings reset "$DOCK_SCHEMA" show-trash 2>/dev/null
 gsettings reset "$DOCK_SCHEMA" show-mounts 2>/dev/null
 gsettings reset "$DOCK_SCHEMA" show-apps-at-top 2>/dev/null
 gsettings reset "$DOCK_SCHEMA" click-action 2>/dev/null
+gsettings reset "$DOCK_SCHEMA" hot-keys 2>/dev/null
+gsettings reset "$DOCK_SCHEMA" shortcut 2>/dev/null
 
 print_success "GNOME settings reset to defaults"
 
