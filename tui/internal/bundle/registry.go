@@ -66,6 +66,12 @@ func All() []Bundle {
 			MarkerPath:  ".local/bin/mypctools-screensaver-launch",
 		},
 		{
+			ID:          "gnome-ubuntu",
+			Name:        "gnome ubuntu",
+			Description: "Ubuntu GNOME defaults for Arch",
+			MarkerPath:  ".local/share/gnome-ubuntu/installed",
+		},
+		{
 			ID:          "claude",
 			Name:        "claude",
 			Description: "Claude Code skills and statusline",
