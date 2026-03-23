@@ -26,7 +26,7 @@ if [[ "$XDG_CURRENT_DESKTOP" != *"GNOME"* ]]; then
     exit 1
 fi
 
-# ---- Guard: yay ----
+# ---- Guard: paru ----
 if ! command_exists paru; then
     print_error "paru is required but not installed."
     exit 1
@@ -94,6 +94,7 @@ print_status "Applying Ubuntu GNOME defaults..."
 gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
 gsettings set org.gnome.desktop.interface icon-theme 'Yaru'
 gsettings set org.gnome.desktop.interface cursor-theme 'Yaru'
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 
 # Fonts
 gsettings set org.gnome.desktop.interface font-name 'Ubuntu 11'
@@ -101,17 +102,23 @@ gsettings set org.gnome.desktop.interface document-font-name 'Ubuntu 11'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Ubuntu Mono 13'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Ubuntu Bold 11'
 
+# UX defaults
+gsettings set org.gnome.desktop.interface enable-hot-corners false
+gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
+
 # Window button layout
 gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
 
 # Dash-to-dock settings
 DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
-gsettings set "$DOCK_SCHEMA" dock-position 'BOTTOM'
-gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48
-gsettings set "$DOCK_SCHEMA" autohide true
-gsettings set "$DOCK_SCHEMA" intellihide true
-gsettings set "$DOCK_SCHEMA" show-trash true
-gsettings set "$DOCK_SCHEMA" show-mounts true
+gsettings set "$DOCK_SCHEMA" dock-position 'BOTTOM' 2>/dev/null
+gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48 2>/dev/null
+gsettings set "$DOCK_SCHEMA" autohide true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" intellihide true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" show-trash true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" show-mounts true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" show-apps-at-top true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" click-action 'minimize' 2>/dev/null
 print_success "Dock configured (bottom, icon size 48, autohide)"
 
 print_success "GNOME settings applied"
