@@ -40,6 +40,7 @@ mypctools/
 │   ├── kitty/                  # kitty terminal config (shell-agnostic, X11 + Wayland)
 │   ├── fastfetch/              # Custom fastfetch config with tree-style layout
 │   ├── screensaver/            # Terminal screensaver via hypridle + tte (Hyprland only)
+│   ├── gnome-ubuntu/             # Ubuntu GNOME defaults (Arch only, uses paru)
 │   ├── claude/                 # Claude Code skills and statusline
 │   └── spicetify/              # Spotify theming
 ├── lib/                        # Bash libraries (for script bundles)
@@ -94,6 +95,7 @@ The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles
 - `scripts/kitty/` - kitty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
 - `scripts/fastfetch/` - Custom fastfetch config with tree-style layout, nerd font icons, color-coded sections, small distro logo.
 - `scripts/screensaver/` - Omarchy-style terminal screensaver using tte (Terminal Text Effects) with hypridle integration. Hyprland only.
+- `scripts/gnome-ubuntu/` - Ubuntu GNOME defaults (Yaru theme, dash-to-dock, Ubuntu fonts) for Arch. Uses paru.
 - `scripts/claude/` - Claude Code skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
 - `scripts/spicetify/` - Spicetify + StarryNight theme for native Spotify installs
 
