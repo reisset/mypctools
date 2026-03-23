@@ -10,6 +10,9 @@ All notable changes to mypctools.
 - **GNOME Ubuntu bundle**: Reproduces Ubuntu's GNOME defaults on Arch (Yaru-dark theme, Ubuntu fonts, dash-to-dock, window button layout). Installs via paru, discovers extension UUIDs at runtime.
 
 ### Fixed
+- **Missing Ubuntu defaults**: Added `color-scheme prefer-dark` (libadwaita apps), hot corners off, tap-to-click, dock show-apps-at-top, and click-to-minimize.
+- **Dash-to-dock hotkey conflict**: Disabled dock hot-keys and shortcut that stole Super+Q from custom GNOME keybindings.
+- **Dock gsettings errors**: Added stderr suppression for dock settings that fail when the extension schema isn't loaded yet.
 - **Terminal bundle sudo during auto-sync**: Terminal install scripts (alacritty, foot, ghostty, kitty) no longer prompt for sudo when the terminal is already installed, fixing broken auto-sync after pull updates.
 - **paru sudo prompt in TUI**: Pre-cache sudo credentials before paru runs in gnome-ubuntu installer so the password prompt works correctly inside the TUI.
 
