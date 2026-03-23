@@ -119,6 +119,8 @@ gsettings set "$DOCK_SCHEMA" show-trash true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-mounts true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-apps-at-top true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" click-action 'minimize' 2>/dev/null
+gsettings set "$DOCK_SCHEMA" hot-keys false 2>/dev/null
+gsettings set "$DOCK_SCHEMA" shortcut "['']" 2>/dev/null
 print_success "Dock configured (bottom, icon size 48, autohide)"
 
 print_success "GNOME settings applied"
