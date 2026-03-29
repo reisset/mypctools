@@ -83,14 +83,20 @@ func (m Model) View() string {
 		}
 	}
 
+	boxWidth := theme.ClampBoxWidth(theme.WideBoxWidth, width)
+	listHeight := m.shared.ContentHeight - 6
+	if listHeight < 5 {
+		listHeight = 5
+	}
+
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:         theme.WideBoxWidth,
-		ShowCursor:    true,
-		MaxInnerWidth: 76,
+		Width:      boxWidth,
+		ShowCursor: true,
+		Height:     listHeight,
 	})
 
 	menuBox := ui.Box(menu, ui.BoxConfig{
-		Width:  theme.WideBoxWidth,
+		Width:  boxWidth,
 		Active: true,
 	})
 

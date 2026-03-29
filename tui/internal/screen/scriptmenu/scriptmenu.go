@@ -99,7 +99,7 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	boxWidth := theme.SubMenuBoxWidth
+	boxWidth := theme.ClampBoxWidth(theme.SubMenuBoxWidth, width)
 
 	// Title with bundle name
 	title := theme.SubheaderStyle().Render(m.bundle.Name)
