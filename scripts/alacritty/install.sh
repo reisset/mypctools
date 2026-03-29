@@ -47,6 +47,7 @@ create_config() {
 # Main
 main() {
     detect_distro
+    THEME_FILE="$HOME/.config/alacritty/.theme"
     select_theme
 
     install_alacritty

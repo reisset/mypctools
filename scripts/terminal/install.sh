@@ -10,13 +10,13 @@ if ! command -v foot &>/dev/null; then
     init_sudo
 fi
 
-# Wayland check
-if [ -z "$WAYLAND_DISPLAY" ]; then
+# Wayland check - only block first-time install; config-only re-sync doesn't need Wayland
+if [ -z "$WAYLAND_DISPLAY" ] && ! command -v foot &>/dev/null; then
     print_error "Wayland not detected. foot is Wayland-only."
     echo "If you're on X11, foot will not work."
     exit 1
 fi
-print_success "Wayland detected"
+[ -n "$WAYLAND_DISPLAY" ] && print_success "Wayland detected"
 
 # Install foot
 install_foot() {
@@ -55,6 +55,7 @@ create_config() {
 # Main
 main() {
     detect_distro
+    THEME_FILE="$HOME/.config/foot/.theme"
     select_theme
 
     install_foot

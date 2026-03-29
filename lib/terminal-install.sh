@@ -12,7 +12,21 @@ source "$_TERMINAL_INSTALL_DIR/symlink.sh"
 source "$_TERMINAL_INSTALL_DIR/distro-detect.sh"
 
 # Theme selection
+# Reads THEME_FILE var (set by caller) to persist/restore theme across AutoSync runs.
 select_theme() {
+    local theme_file="${THEME_FILE:-}"
+
+    if [ ! -t 0 ]; then
+        # Non-interactive (AutoSync): restore persisted theme or use default
+        if [ -n "$theme_file" ] && [ -f "$theme_file" ]; then
+            THEME=$(cat "$theme_file")
+            print_status "Using persisted theme: $THEME"
+        else
+            THEME="catppuccin-mocha"
+        fi
+        return 0
+    fi
+
     local theme_display
     echo ""
     echo "Select theme:"
@@ -33,6 +47,12 @@ select_theme() {
         *) THEME="catppuccin-mocha" ;;
     esac
     print_status "Selected theme: $THEME"
+
+    # Persist for future AutoSync runs
+    if [ -n "$theme_file" ]; then
+        mkdir -p "$(dirname "$theme_file")"
+        echo "$THEME" > "$theme_file"
+    fi
 }
 
 # Install Iosevka Nerd Font

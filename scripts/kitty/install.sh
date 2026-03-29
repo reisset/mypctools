@@ -47,6 +47,7 @@ create_config() {
 # Main
 main() {
     detect_distro
+    THEME_FILE="$HOME/.config/kitty/.theme"
     select_theme
 
     install_kitty
