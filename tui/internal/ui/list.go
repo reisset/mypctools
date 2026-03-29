@@ -22,6 +22,7 @@ type ListConfig struct {
 	Width         int  // Total width for layout
 	ShowCursor    bool // Show arrow cursor on selected item
 	MaxInnerWidth int  // Max content width (0 = default 50)
+	Height        int  // Max visible items (0 = unlimited); windows around cursor when set
 }
 
 // RenderList renders a list of items with the cursor at the given position.
@@ -29,6 +30,25 @@ type ListConfig struct {
 func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 	if len(items) == 0 {
 		return ""
+	}
+
+	// Window the visible items around cursor when height is constrained
+	if cfg.Height > 0 && len(items) > cfg.Height {
+		half := cfg.Height / 2
+		start := cursor - half
+		if start < 0 {
+			start = 0
+		}
+		end := start + cfg.Height
+		if end > len(items) {
+			end = len(items)
+			start = end - cfg.Height
+			if start < 0 {
+				start = 0
+			}
+		}
+		items = items[start:end]
+		cursor = cursor - start
 	}
 
 	// Calculate the maximum label width for alignment

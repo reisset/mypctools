@@ -172,38 +172,17 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Choose logo based on width and apply gradient
-	currentLogo := logo
-	compact := width < theme.MainMenuLogoBreak
-	if compact {
-		currentLogo = logoCompact
+	height := m.shared.TerminalHeight
+	if height == 0 {
+		height = 24
 	}
 
-	revealFrac := 1.0
-	if m.revealProgress >= 0 {
-		revealFrac = float64(m.revealProgress) / float64(logoRevealTicks)
-	}
-	renderedLogo := renderGradientLogo(currentLogo, compact, width, revealFrac)
+	// Height thresholds for progressive logo/info hiding
+	compact := width < theme.MainMenuLogoBreak || height < 22
+	hideLogo := height < 18
+	hideInfo := height < 14
 
-	// Update badge
-	var updateBadge string
-	if m.shared.UpdateCount > 0 {
-		updateBadge = lipgloss.NewStyle().
-			Foreground(lipgloss.Color(theme.Current.Accent)).
-			Width(width).
-			Align(lipgloss.Center).
-			Render(fmt.Sprintf("%s Update available (%d new)", theme.Icons.Update, m.shared.UpdateCount))
-	}
-
-	// System info line with better spacing
-	sysLine := buildSysLine(m.shared)
-	sysLineRendered := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Muted)).
-		Width(width).
-		Align(lipgloss.Center).
-		Render(sysLine)
-
-	// Menu items using new list component
+	// Menu items
 	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
 		items[i] = ui.ListItem{
@@ -213,35 +192,61 @@ func (m Model) View() string {
 		}
 	}
 
+	menuBoxWidth := theme.ClampBoxWidth(theme.MainMenuBoxWidth, width)
+
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
+		Width:      menuBoxWidth,
 		ShowCursor: true,
 	})
 
-	// Wrap menu in a box with active border
 	menuBox := ui.Box(menu, ui.BoxConfig{
-		Width:  theme.MainMenuBoxWidth,
+		Width:  menuBoxWidth,
 		Active: true,
 	})
 
-	// Center the menu
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
 		Render(menuBox)
 
-	// Tagline below system info
-	tagline := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Current.Muted)).
-		Width(width).
-		Align(lipgloss.Center).
-		Render("linux toolkit")
+	parts := []string{}
 
-	parts := []string{renderedLogo}
-	if updateBadge != "" {
-		parts = append(parts, updateBadge)
+	if !hideLogo {
+		currentLogo := logo
+		if compact {
+			currentLogo = logoCompact
+		}
+		revealFrac := 1.0
+		if m.revealProgress >= 0 {
+			revealFrac = float64(m.revealProgress) / float64(logoRevealTicks)
+		}
+		parts = append(parts, renderGradientLogo(currentLogo, compact, width, revealFrac))
 	}
-	parts = append(parts, sysLineRendered, tagline, "", menuBlock)
+
+	if !hideInfo {
+		if m.shared.UpdateCount > 0 {
+			updateBadge := lipgloss.NewStyle().
+				Foreground(lipgloss.Color(theme.Current.Accent)).
+				Width(width).
+				Align(lipgloss.Center).
+				Render(fmt.Sprintf("%s Update available (%d new)", theme.Icons.Update, m.shared.UpdateCount))
+			parts = append(parts, updateBadge)
+		}
+		sysLine := buildSysLine(m.shared)
+		sysLineRendered := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Current.Muted)).
+			Width(width).
+			Align(lipgloss.Center).
+			Render(sysLine)
+		tagline := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Current.Muted)).
+			Width(width).
+			Align(lipgloss.Center).
+			Render("linux toolkit")
+		parts = append(parts, sysLineRendered, tagline)
+	}
+
+	parts = append(parts, "", menuBlock)
 
 	return lipgloss.JoinVertical(lipgloss.Left, parts...)
 }

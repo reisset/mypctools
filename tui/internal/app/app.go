@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -44,6 +45,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.shared.TerminalWidth = msg.Width
 		m.shared.TerminalHeight = msg.Height
+		ch := msg.Height - 8
+		if ch < 5 {
+			ch = 5
+		}
+		m.shared.ContentHeight = ch
 
 	case state.UpdateCountMsg:
 		m.shared.UpdateCount = msg.Count
@@ -113,6 +119,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	if len(m.stack) == 0 {
 		return ""
+	}
+
+	// Guard: terminal too small to render anything useful
+	if m.width > 0 && m.height > 0 && (m.width < theme.MinWidth || m.height < theme.MinHeight) {
+		text := fmt.Sprintf("Terminal too small (%dx%d)\nResize to at least %dx%d",
+			m.width, m.height, theme.MinWidth, theme.MinHeight)
+		return lipgloss.NewStyle().
+			Width(m.width).Height(m.height).
+			Align(lipgloss.Center, lipgloss.Center).
+			Foreground(lipgloss.Color(theme.Current.Muted)).
+			Render(text)
 	}
 
 	top := m.stack[len(m.stack)-1]

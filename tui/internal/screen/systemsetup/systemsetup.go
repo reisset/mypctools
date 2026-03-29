@@ -115,13 +115,15 @@ func (m Model) View() string {
 		}
 	}
 
+	boxWidth := theme.ClampBoxWidth(theme.SubMenuBoxWidth, width)
+
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      theme.SubMenuBoxWidth,
+		Width:      boxWidth,
 		ShowCursor: true,
 	})
 
 	menuBox := ui.Box(menu, ui.BoxConfig{
-		Width:  theme.SubMenuBoxWidth,
+		Width:  boxWidth,
 		Active: true,
 	})
 

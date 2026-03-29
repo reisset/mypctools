@@ -1,7 +1,23 @@
 package theme
 
+// ClampBoxWidth returns the smaller of preferred and termWidth-4, with a minimum of 10.
+// Use this in screen View() methods to prevent box overflow on narrow terminals.
+func ClampBoxWidth(preferred, termWidth int) int {
+	max := termWidth - 4
+	if max < 10 {
+		max = 10
+	}
+	if preferred <= max {
+		return preferred
+	}
+	return max
+}
+
 // Layout constants for consistent sizing across screens.
 const (
+	// Minimum terminal dimensions — below these, the "too small" guard fires.
+	MinWidth  = 40
+	MinHeight = 10
 	// List rendering
 	ListWidthDefault  = 60 // Default total width when none provided
 	ListInnerWidthMax = 50 // Max content width for menus

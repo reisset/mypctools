@@ -4,6 +4,15 @@ All notable changes to mypctools.
 
 ---
 
+## [0.31.0] - 2026-03-29
+
+### Fixed
+- **Responsive TUI on small terminals**: Boxes (menus, script lists, app lists) now clamp their width to the terminal width, preventing text wrap and garbled layouts on narrow windows.
+- **Vertical overflow / items disappearing at top**: Long lists are now windowed to the available height — the visible slice stays centered on the cursor, so items never render off-screen. The main menu progressively hides the logo and system info lines on short terminals.
+- **"Terminal too small" guard**: Terminals narrower than 40 columns or shorter than 10 rows show a centered resize prompt instead of a broken layout.
+
+---
+
 ## [0.29.4] - 2026-03-29
 
 ### Added
