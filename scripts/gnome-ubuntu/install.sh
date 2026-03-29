@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# GNOME Ubuntu Defaults Installer v1.0.0
+# GNOME Ubuntu Defaults Installer v2.0.0
 # Applies Ubuntu's GNOME look and feel on Arch-based systems
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -42,6 +42,7 @@ PACKAGES=(
     gnome-shell-extension-dash-to-dock
     gnome-shell-extension-appindicator
     gnome-shell-extension-desktop-icons-ng
+    gnome-shell-extension-tiling-assistant
     yaru-gtk-theme
     yaru-icon-theme
     ttf-ubuntu-font-family
@@ -65,6 +66,7 @@ EXTENSION_UUIDS=(
     "dash-to-dock@micxgx.gmail.com"
     "appindicatorsupport@rgcjonas.gmail.com"
     "ding@rastersoft.com"
+    "tiling-assistant@leleat-on-github"
 )
 
 for uuid in "${EXTENSION_UUIDS[@]}"; do
@@ -96,19 +98,61 @@ gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
 gsettings set org.gnome.desktop.interface icon-theme 'Yaru'
 gsettings set org.gnome.desktop.interface cursor-theme 'Yaru'
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+gsettings set org.gnome.desktop.interface accent-color 'orange' 2>/dev/null
 
 # Fonts
 gsettings set org.gnome.desktop.interface font-name 'Ubuntu 11'
 gsettings set org.gnome.desktop.interface document-font-name 'Ubuntu 11'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Ubuntu Mono 13'
+gsettings set org.gnome.desktop.interface font-antialiasing 'rgba'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Ubuntu Bold 11'
+gsettings set org.gnome.desktop.wm.preferences titlebar-uses-system-font false
 
 # UX defaults
 gsettings set org.gnome.desktop.interface enable-hot-corners false
 gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
 
-# Window button layout
-gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
+# Window button layout (no appmenu on left, matches Ubuntu)
+gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'
+gsettings set org.gnome.desktop.wm.preferences action-middle-click-titlebar 'lower'
+
+# Shell
+gsettings set org.gnome.shell always-show-log-out true 2>/dev/null
+
+# Mutter (window manager core)
+gsettings set org.gnome.mutter edge-tiling true
+gsettings set org.gnome.mutter dynamic-workspaces true
+gsettings set org.gnome.mutter workspaces-only-on-primary true
+
+# Keybindings — Alt+Tab switches individual windows (not app groups), Super+D shows desktop
+gsettings set org.gnome.desktop.wm.keybindings switch-applications "['<Super>Tab']"
+gsettings set org.gnome.desktop.wm.keybindings switch-applications-backward "['<Shift><Super>Tab']"
+gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
+gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Shift><Alt>Tab']"
+gsettings set org.gnome.desktop.wm.keybindings show-desktop "['<Super>d']"
+
+# Tiling assistant keybindings (Super+arrows for half/full tiling)
+TILING_SCHEMA="org.gnome.shell.extensions.tiling-assistant"
+gsettings set "$TILING_SCHEMA" tile-maximize "['<Super>Up']" 2>/dev/null
+gsettings set "$TILING_SCHEMA" restore-window "['<Super>Down']" 2>/dev/null
+gsettings set "$TILING_SCHEMA" tile-left-half "['<Super>Left']" 2>/dev/null
+gsettings set "$TILING_SCHEMA" tile-right-half "['<Super>Right']" 2>/dev/null
+print_success "Window tiling configured (Super+arrows)"
+
+# Power — never sleep on AC (Ubuntu default)
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0 2>/dev/null
+gsettings set org.gnome.settings-daemon.plugins.power power-button-action 'interactive' 2>/dev/null
+
+# Nautilus
+gsettings set org.gnome.nautilus.preferences sort-directories-first true 2>/dev/null
+gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small' 2>/dev/null
+gsettings set org.gtk.gtk4.Settings.FileChooser sort-directories-first true 2>/dev/null
+
+# Desktop icons (ding extension) — no trash/volumes on desktop, icons in bottom-right
+DING_SCHEMA="org.gnome.shell.extensions.ding"
+gsettings set "$DING_SCHEMA" show-trash false 2>/dev/null
+gsettings set "$DING_SCHEMA" show-volumes false 2>/dev/null
+gsettings set "$DING_SCHEMA" start-corner 'bottom-right' 2>/dev/null
 
 # Dash-to-dock settings (matches Ubuntu defaults)
 DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
@@ -137,5 +181,5 @@ echo ""
 print_success "Ubuntu GNOME defaults applied!"
 echo ""
 print_info "You may need to log out and log back in for all changes to take effect."
-print_info "Use GNOME Tweaks for further customization."
+print_info "Use GNOME Tweaks or GNOME Extensions for further customization."
 echo ""
