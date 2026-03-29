@@ -4,6 +4,16 @@ All notable changes to mypctools.
 
 ---
 
+## [0.29.3] - 2026-03-29
+
+### Fixed
+- **gnome-ubuntu dash-to-dock config**: Updated dock defaults to match Ubuntu's actual behavior — left-side, full-height, always-visible dock (`extend-height true`, `autohide false`, `intellihide false`, `show-apps-at-top false`). Previous config used bottom/autohide which did not match Ubuntu.
+
+### Added
+- **gnome-ubuntu bundle**: Installs `gnome-extensions-app` for GUI extension management.
+
+---
+
 ## [0.29.2] - 2026-03-23
 
 ### Added

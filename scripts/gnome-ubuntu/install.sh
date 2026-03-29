@@ -46,6 +46,7 @@ PACKAGES=(
     yaru-icon-theme
     ttf-ubuntu-font-family
     gnome-tweaks
+    gnome-extensions-app
 )
 
 paru -S --noconfirm --needed "${PACKAGES[@]}" || {
@@ -109,19 +110,20 @@ gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
 # Window button layout
 gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
 
-# Dash-to-dock settings
+# Dash-to-dock settings (matches Ubuntu defaults)
 DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
-gsettings set "$DOCK_SCHEMA" dock-position 'BOTTOM' 2>/dev/null
+gsettings set "$DOCK_SCHEMA" dock-position 'LEFT' 2>/dev/null
+gsettings set "$DOCK_SCHEMA" extend-height true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" autohide false 2>/dev/null
+gsettings set "$DOCK_SCHEMA" intellihide false 2>/dev/null
 gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48 2>/dev/null
-gsettings set "$DOCK_SCHEMA" autohide true 2>/dev/null
-gsettings set "$DOCK_SCHEMA" intellihide true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-trash true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-mounts true 2>/dev/null
-gsettings set "$DOCK_SCHEMA" show-apps-at-top true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" show-apps-at-top false 2>/dev/null
 gsettings set "$DOCK_SCHEMA" click-action 'minimize' 2>/dev/null
 gsettings set "$DOCK_SCHEMA" hot-keys false 2>/dev/null
 gsettings set "$DOCK_SCHEMA" shortcut "['']" 2>/dev/null
-print_success "Dock configured (bottom, icon size 48, autohide)"
+print_success "Dock configured (left, full-height, always-visible, icon size 48)"
 
 print_success "GNOME settings applied"
 
