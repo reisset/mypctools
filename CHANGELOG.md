@@ -6,11 +6,22 @@ All notable changes to mypctools.
 
 ## [0.29.3] - 2026-03-29
 
-### Fixed
-- **gnome-ubuntu dash-to-dock config**: Updated dock defaults to match Ubuntu's actual behavior — left-side, full-height, always-visible dock (`extend-height true`, `autohide false`, `intellihide false`, `show-apps-at-top false`). Previous config used bottom/autohide which did not match Ubuntu.
-
 ### Added
-- **gnome-ubuntu bundle**: Installs `gnome-extensions-app` for GUI extension management.
+- **gnome-ubuntu bundle**: Installs `gnome-shell-extension-tiling-assistant` and `gnome-extensions-app`.
+- **Window tiling (Super+arrows)**: Tiling-assistant extension enabled with Ubuntu-style keybindings — `Super+Left/Right` for half-tiling, `Super+Up` to maximize, `Super+Down` to restore.
+- **Mutter defaults**: `edge-tiling`, `dynamic-workspaces`, and `workspaces-only-on-primary` now set to match Ubuntu.
+- **Alt+Tab window switching**: `switch-windows` bound to `Alt+Tab` (individual windows, not app groups), `Super+Tab` for app switching — matches Ubuntu's feel vs stock GNOME.
+- **Super+D show desktop**: Added keybinding Ubuntu ships by default.
+- **Never sleep on AC**: `sleep-inactive-ac-timeout 0` — Ubuntu's default, stock GNOME sleeps after 15 min.
+- **Nautilus defaults**: Sort directories first, small icon zoom level.
+- **Desktop icons defaults**: No trash/volumes on desktop, icons anchor to bottom-right corner.
+- **Orange accent color**: Ubuntu's brand accent (`org.gnome.desktop.interface accent-color 'orange'`).
+
+### Fixed
+- **gnome-ubuntu dash-to-dock config**: Updated dock defaults to match Ubuntu's actual behavior — left-side, full-height, always-visible dock. Previous config used bottom/autohide.
+- **button-layout**: Removed `appmenu` from left side of titlebar (now `:minimize,maximize,close`).
+- **Font antialiasing**: Added `rgba` subpixel antialiasing to match Ubuntu.
+- **action-middle-click-titlebar**: Set to `lower` (Ubuntu default).
 
 ---
 
