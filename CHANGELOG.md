@@ -13,7 +13,7 @@ All notable changes to mypctools.
 - **Alt+Tab window switching**: `switch-windows` bound to `Alt+Tab` (individual windows, not app groups), `Super+Tab` for app switching — matches Ubuntu's feel vs stock GNOME.
 - **Super+D show desktop**: Added keybinding Ubuntu ships by default.
 - **Never sleep on AC**: `sleep-inactive-ac-timeout 0` — Ubuntu's default, stock GNOME sleeps after 15 min.
-- **Nautilus defaults**: Sort directories first, small icon zoom level.
+- **Nautilus defaults**: Small icon zoom level (sort-directories-first was removed in GNOME 43+).
 - **Desktop icons defaults**: No trash/volumes on desktop, icons anchor to bottom-right corner.
 - **Orange accent color**: Ubuntu's brand accent (`org.gnome.desktop.interface accent-color 'orange'`).
 

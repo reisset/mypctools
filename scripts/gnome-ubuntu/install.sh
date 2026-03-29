@@ -144,9 +144,7 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 
 gsettings set org.gnome.settings-daemon.plugins.power power-button-action 'interactive' 2>/dev/null
 
 # Nautilus
-gsettings set org.gnome.nautilus.preferences sort-directories-first true 2>/dev/null
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small' 2>/dev/null
-gsettings set org.gtk.gtk4.Settings.FileChooser sort-directories-first true 2>/dev/null
 
 # Desktop icons (ding extension) — no trash/volumes on desktop, icons in bottom-right
 DING_SCHEMA="org.gnome.shell.extensions.ding"
