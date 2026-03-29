@@ -4,6 +4,24 @@ All notable changes to mypctools.
 
 ---
 
+## [0.29.4] - 2026-03-29
+
+### Added
+- **gnome-ubuntu: CachyOS Show Apps icon**: The "Show Apps" button in the dock now shows the CachyOS logo. dash-to-dock uses `view-app-grid-{session-mode}-symbolic` — on a standard GNOME session the mode is `user`, so we install `/usr/share/icons/cachyos.svg` as a user Yaru icon override. Uninstall cleans it up.
+- **gnome-ubuntu: One-shot autostart for extension settings**: On a fresh install, tiling-assistant and dash-to-dock run first-time initialization on the first login and reset keys to schema defaults. A one-shot autostart script re-applies all extension settings ~8s after login and removes itself.
+
+### Fixed
+- **gnome-ubuntu: tiling-assistant popup not appearing**: `org.gnome.mutter edge-tiling` was set to `true`, causing mutter to handle drag-to-edge events and bypass tiling-assistant's popup entirely. Set to `false` so tiling-assistant owns all edge tiling.
+- **gnome-ubuntu: tiling-assistant focus hint**: Enabled `focus-hint 1` with border style — subtle colored outline on focused tiled windows matching Ubuntu's behavior (uses orange accent color already configured).
+- **gnome-ubuntu: tiling popup across workspaces**: Added `tiling-popup-all-workspace true` so the tile-selection popup appears regardless of which workspace windows are on.
+- **gnome-ubuntu: dock running indicators**: Added `running-indicator-style DOTS` — Ubuntu uses dots under running app icons, not the default style.
+- **gnome-ubuntu: dock background shape**: Added `custom-theme-shrink true` — pill-shaped dock background around icon groups instead of a full rectangle.
+- **gnome-ubuntu: dock always-visible panel mode**: Added `dock-fixed true` for true panel behavior (was relying only on autohide/intellihide false).
+- **gnome-ubuntu: dock transparency**: Added `transparency-mode FIXED` and `background-opacity 0.8` — Ubuntu's semi-transparent dock style.
+- **gnome-ubuntu: tiling-assistant not in uninstall**: tiling-assistant was never disabled by the uninstaller. Added to the disabled-extensions list.
+
+---
+
 ## [0.29.3] - 2026-03-29
 
 ### Added
