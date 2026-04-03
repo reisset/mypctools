@@ -162,9 +162,9 @@ gsettings set "$DING_SCHEMA" start-corner 'bottom-right' 2>/dev/null
 DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
 gsettings set "$DOCK_SCHEMA" dock-position 'LEFT' 2>/dev/null
 gsettings set "$DOCK_SCHEMA" extend-height true 2>/dev/null
-gsettings set "$DOCK_SCHEMA" dock-fixed true 2>/dev/null
-gsettings set "$DOCK_SCHEMA" autohide false 2>/dev/null
-gsettings set "$DOCK_SCHEMA" intellihide false 2>/dev/null
+gsettings set "$DOCK_SCHEMA" dock-fixed false 2>/dev/null
+gsettings set "$DOCK_SCHEMA" autohide true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" intellihide true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-trash true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-mounts true 2>/dev/null
