@@ -56,6 +56,7 @@ create_config() {
         hackthebox) config_file="ghostty-hackthebox" ;;
         catppuccin-mocha) config_file="ghostty-catppuccin-mocha" ;;
         tokyo-night) config_file="ghostty-tokyo-night" ;;
+        ubuntu) config_file="ghostty-ubuntu" ;;
         *) config_file="ghostty-catppuccin-mocha" ;;
     esac
 

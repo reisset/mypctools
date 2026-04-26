@@ -1,0 +1,38 @@
+# Ghostty config: Ubuntu theme
+
+font-family = IosevkaTerm Nerd Font
+font-size = 15
+
+window-padding-x = 10
+window-padding-y = 10
+
+scrollback-limit = 10000
+
+cursor-style = block
+cursor-style-blink = true
+
+mouse-hide-while-typing = true
+
+# Ubuntu colors
+background = #300a24
+foreground = #ffffff
+
+# Normal colors
+palette = 0=#2e3436
+palette = 1=#cc0000
+palette = 2=#4e9a06
+palette = 3=#c4a000
+palette = 4=#3465a4
+palette = 5=#75507b
+palette = 6=#06989a
+palette = 7=#d3d7cf
+
+# Bright colors
+palette = 8=#555753
+palette = 9=#ef2929
+palette = 10=#8ae234
+palette = 11=#fce94f
+palette = 12=#729fcf
+palette = 13=#ad7fa8
+palette = 14=#34e2e2
+palette = 15=#eeeeec

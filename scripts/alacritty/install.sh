@@ -38,6 +38,7 @@ create_config() {
         hackthebox) config_file="alacritty-hackthebox.toml" ;;
         catppuccin-mocha) config_file="alacritty-catppuccin-mocha.toml" ;;
         tokyo-night) config_file="alacritty-tokyo-night.toml" ;;
+        ubuntu) config_file="alacritty-ubuntu.toml" ;;
         *) config_file="alacritty-catppuccin-mocha.toml" ;;
     esac
 

@@ -53,6 +53,13 @@ func All() []Bundle {
 			AutoSync:    true,
 		},
 		{
+			ID:          "ptyxis",
+			Name:        "ptyxis",
+			Description: "Ptyxis terminal config (Arch/Fedora)",
+			MarkerPath:  ".local/share/org.gnome.Ptyxis/palettes/mypctools-catppuccin-mocha.palette",
+			AutoSync:    true,
+		},
+		{
 			ID:          "fastfetch",
 			Name:        "fastfetch",
 			Description: "Custom fastfetch with tree-style layout",
