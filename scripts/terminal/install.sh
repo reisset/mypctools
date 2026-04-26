@@ -46,6 +46,7 @@ create_config() {
         hackthebox) config_file="foot-hackthebox.ini" ;;
         catppuccin-mocha) config_file="foot-catppuccin-mocha.ini" ;;
         tokyo-night) config_file="foot-tokyo-night.ini" ;;
+        ubuntu) config_file="foot-ubuntu.ini" ;;
         *) config_file="foot-catppuccin-mocha.ini" ;;
     esac
 

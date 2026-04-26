@@ -38,6 +38,7 @@ create_config() {
         hackthebox) config_file="kitty-hackthebox.conf" ;;
         catppuccin-mocha) config_file="kitty-catppuccin-mocha.conf" ;;
         tokyo-night) config_file="kitty-tokyo-night.conf" ;;
+        ubuntu) config_file="kitty-ubuntu.conf" ;;
         *) config_file="kitty-catppuccin-mocha.conf" ;;
     esac
 

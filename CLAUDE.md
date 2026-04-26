@@ -38,6 +38,7 @@ mypctools/
 │   ├── alacritty/              # alacritty terminal config (shell-agnostic, X11 + Wayland)
 │   ├── ghostty/                # ghostty terminal config (shell-agnostic, X11 + Wayland)
 │   ├── kitty/                  # kitty terminal config (shell-agnostic, X11 + Wayland)
+│   ├── ptyxis/                 # ptyxis terminal config via palettes (GNOME, Arch/Fedora only)
 │   ├── fastfetch/              # Custom fastfetch config with tree-style layout
 │   ├── screensaver/            # Terminal screensaver via hypridle + tte (Hyprland only)
 │   ├── gnome-ubuntu/             # Ubuntu GNOME defaults (Arch only, uses paru)
@@ -89,10 +90,11 @@ The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles
 
 - `scripts/litebash/` - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, lazygit, yazi, starship). Shell config only.
 - `scripts/litezsh/` - Zsh counterpart to litebash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
-- `scripts/terminal/` - foot terminal config (Wayland only). Shell-agnostic. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox.
+- `scripts/terminal/` - foot terminal config (Wayland only). Shell-agnostic. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
 - `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
 - `scripts/ghostty/` - ghostty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
 - `scripts/kitty/` - kitty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
+- `scripts/ptyxis/` - ptyxis terminal config via .palette keyfiles (GNOME, Arch/Fedora only). Same themes. Palettes installed to `~/.local/share/org.gnome.Ptyxis/palettes/`; applied via gsettings.
 - `scripts/fastfetch/` - Custom fastfetch config with tree-style layout, nerd font icons, color-coded sections, small distro logo.
 - `scripts/screensaver/` - Omarchy-style terminal screensaver using tte (Terminal Text Effects) with hypridle integration. Hyprland only.
 - `scripts/gnome-ubuntu/` - Ubuntu GNOME defaults (Yaru theme, dash-to-dock, Ubuntu fonts) for Arch. Uses paru.
@@ -122,11 +124,19 @@ Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial 
 
 The primary TUI implementation in Go using Bubble Tea.
 
-**Building**: User compiles manually. Claude provides commands but does not run `go build` directly (slow in sandboxed environments).
+**Building locally** (testing only): Claude must NOT run `go build` directly — it hangs in sandboxed environments. Provide the command and ask the user to run it.
 
 ```bash
 cd ~/mypctools/tui && go build -o ~/.local/bin/mypctools ./main.go
 ```
+
+**Releasing** (required whenever Go TUI code changes): Push a new semver tag. GitHub Actions builds the binary and publishes a GitHub Release. The in-app self-updater (`mypctools` → Update) downloads the new binary + runs `git pull` so all machines stay in sync without manual recompilation.
+
+```bash
+git tag v0.X.Y && git push origin v0.X.Y
+```
+
+**Rule**: If a change touches any file under `tui/` (Go code), a new release tag MUST be pushed alongside the commit — otherwise the self-updater delivers updated scripts but an old binary that doesn't know about the new features. Script-only changes (under `scripts/`, `lib/`) are safe to push to main without a tag; `git pull` is enough.
 
 **Structure**:
 - `tui/internal/app/` — Root model, screen interface, navigation (Navigate/PopScreen)

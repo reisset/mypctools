@@ -33,17 +33,20 @@ select_theme() {
     echo "  1) Catppuccin Mocha (default)"
     echo "  2) Tokyo Night"
     echo "  3) HackTheBox"
+    echo "  4) Ubuntu"
     echo ""
-    read -rp "[1/2/3]: " theme_choice
+    read -rp "[1/2/3/4]: " theme_choice
     case "$theme_choice" in
         2) theme_display="Tokyo Night" ;;
         3) theme_display="HackTheBox" ;;
+        4) theme_display="Ubuntu" ;;
         *) theme_display="Catppuccin Mocha" ;;
     esac
 
     case "$theme_display" in
         "Tokyo Night") THEME="tokyo-night" ;;
         "HackTheBox") THEME="hackthebox" ;;
+        "Ubuntu") THEME="ubuntu" ;;
         *) THEME="catppuccin-mocha" ;;
     esac
     print_status "Selected theme: $THEME"
