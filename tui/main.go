@@ -21,7 +21,7 @@ func main() {
 		switch os.Args[1] {
 		case "--help", "-h":
 			fmt.Printf("mypctools v%s\n", config.Version)
-			fmt.Println("A personal TUI for managing scripts and apps")
+			fmt.Println("A personal TUI for managing scripts and system setup")
 			fmt.Println("Built with Bubble Tea by Charm")
 			fmt.Println()
 			fmt.Println("Usage: mypctools [command] [option]")

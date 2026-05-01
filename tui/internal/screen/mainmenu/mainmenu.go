@@ -10,7 +10,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
 
-	"github.com/reisset/mypctools/tui/internal/screen/apps"
 	"github.com/reisset/mypctools/tui/internal/screen/pullupdate"
 	"github.com/reisset/mypctools/tui/internal/screen/scripts"
 	"github.com/reisset/mypctools/tui/internal/screen/systemsetup"
@@ -72,7 +71,6 @@ func (m *Model) rebuildItemsIfNeeded() {
 	}
 	m.lastUpdateCount = m.shared.UpdateCount
 	m.items = []menuItem{
-		{icon: theme.Icons.Apps, label: "Install Apps", id: "apps"},
 		{icon: theme.Icons.Scripts, label: "My Scripts", id: "scripts"},
 		{icon: theme.Icons.System, label: "System Setup", id: "system"},
 	}
@@ -154,8 +152,6 @@ func (m Model) handleSelection(id string) tea.Cmd {
 	switch id {
 	case "exit":
 		return tea.Quit
-	case "apps":
-		return app.Navigate(apps.New(m.shared))
 	case "scripts":
 		return app.Navigate(scripts.New(m.shared))
 	case "system":

@@ -4,6 +4,14 @@ All notable changes to mypctools.
 
 ---
 
+## [0.32.0] - 2026-05-01
+
+### Removed
+- **Install Apps feature**: Axed the entire "Install Apps" menu item, four screens (apps, applist, appconfirm, appinstall), and the `internal/pkg/` package (~1,420 LOC). Was unused in practice; main menu now focuses on My Scripts, System Setup, and updates.
+- Orphaned UI helpers: `ui.MethodBadge`, `ui/checkbox.go`, and seven icon-set fields (`AI`, `Browser`, `Gaming`, `Media`, `Dev`, `CheckBox`, `CheckBoxOn`).
+
+---
+
 ## [0.31.0] - 2026-03-29
 
 ### Fixed
