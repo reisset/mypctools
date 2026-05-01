@@ -2,7 +2,7 @@
 
 # mypctools
 
-**A TUI for managing scripts and app installations across Linux systems.**
+**A TUI for managing scripts and system setup across Linux systems.**
 
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
@@ -20,7 +20,6 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 |---|---|
 | 🖥️ **Terminal UI** | Navigate with arrow keys or vim bindings — no commands to memorize |
 | 📦 **One-Command Install** | `curl \| bash` to install, same to uninstall |
-| 🔍 **Smart Package Manager** | Tries apt/pacman/dnf first, then Flatpak, then custom fallback |
 | 🛠️ **Script Bundles** | Shell configs, terminal themes, fastfetch, screensaver, and more |
 | ⚙️ **System Tools** | Full system update, cleanup, and systemd service manager |
 | 🎨 **Themes** | Switch between DefaultCyan, CatppuccinMocha, and TokyoNight |
@@ -46,22 +45,6 @@ curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh
 ---
 
 <img width="939" height="643" alt="Screenshot_2026-02-07_21-30-06" src="https://github.com/user-attachments/assets/0c70b9d4-b094-4b5b-90b7-b929b5d17e76" />
-
-## 📦 Install Apps
-
-Install apps from a single menu. The installer tries native package managers first, then Flatpak, then custom fallbacks.
-
-| Category | Apps |
-|----------|------|
-| AI Tools | OpenCode, Claude Code, Mistral Vibe, Ollama, LM Studio |
-| Browsers | Brave, Firefox, Chromium, Zen |
-| Gaming | Steam, Lutris, Heroic, ProtonUp-Qt |
-| Media | Discord, Spotify, VLC, MPV |
-| Dev Tools | Docker, Docker Compose, LazyDocker, Lazygit, VSCode, Cursor, .NET SDK, Python |
-
-> LiteBash and LiteZsh also install these CLI tools: btop, bat, eza, fzf, ripgrep, fd, zoxide, lazygit, dust, dysk, yazi, starship, tldr, glow, micro, and github-cli.
-
----
 
 ## 🛠️ My Scripts
 
@@ -100,38 +83,6 @@ mypctools update      # Update binary and scripts
 ```
 
 The app checks for updates at launch.
-
----
-
-## 🔧 Package Installation Order
-
-```
-Native (apt/pacman/dnf) → Flatpak → Custom fallback
-```
-
-The installer stops at the first method that succeeds.
-
-<details>
-<summary><strong>Custom fallback details</strong></summary>
-
-| App | Fallback Method |
-|-----|-----------------|
-| Brave | Official install script |
-| Zen | Official install script |
-| Discord | .deb download |
-| Spotify | Spotify apt repo |
-| Docker Compose | GitHub binary release |
-| LazyDocker | GitHub binary release |
-| Lazygit | GitHub binary release |
-| VSCode | Microsoft apt repo |
-| Cursor | AppImage download |
-| OpenCode | Official install script |
-| Claude Code | Official install script |
-| Mistral Vibe | Official install script |
-| Ollama | Official install script |
-| LM Studio | AppImage download |
-
-</details>
 
 ---
 

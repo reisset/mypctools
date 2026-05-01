@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-mypctools is a personal TUI (Terminal User Interface) for managing scripts and app installations across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
+mypctools is a personal TUI (Terminal User Interface) for managing scripts and system setup across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
 See README.md for user documentation and quick start.
 
@@ -69,8 +69,6 @@ The installer:
 2. Downloads the pre-built binary to `~/.local/bin/mypctools`
 
 ## Key Patterns
-
-**Package installation** is handled by the Go TUI in `tui/internal/pkg/`. Apps are registered in `registry.go` with native package names (`AptPkg`, `PacmanPkg`, `DnfPkg`), `FlatpakID`, and `FallbackCmd`. Install priority: native PM → flatpak → fallback command.
 
 **Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Register in `tui/internal/bundle/registry.go`. Set `AutoSync: true` if the bundle is config-only (safe to re-run silently on every update) — leave it false for bundles that install system packages or have side-effects.
 
@@ -140,17 +138,16 @@ git tag v0.X.Y && git push origin v0.X.Y
 
 **Structure**:
 - `tui/internal/app/` — Root model, screen interface, navigation (Navigate/PopScreen)
-- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, apps, applist, appconfirm, appinstall, pullupdate, systemsetup, themepicker)
+- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, pullupdate, systemsetup, themepicker)
 - `tui/internal/bundle/` — Script bundle registry and installation detection
 - `tui/internal/theme/` — Color palettes, gradient logo, Lip Gloss styles, icons
-- `tui/internal/ui/` — Shared UI components (list rendering, badges, header, footer, box, checkbox)
+- `tui/internal/ui/` — Shared UI components (list rendering, badges, header, footer, box)
 - `tui/internal/state/` — Shared state (distro info, terminal size, update count)
 - `tui/internal/config/` — User configuration (theme persistence)
 - `tui/internal/cmd/` — CLI argument handling
 - `tui/internal/logging/` — Operation logging to ~/.local/share/mypctools/mypctools.log
 - `tui/internal/selfupdate/` — Binary self-update with SHA256 verification
 - `tui/internal/system/` — System operations (update, cleanup, services, notifications)
-- `tui/internal/pkg/` — Package installation with apt/pacman/dnf/flatpak support
 
 **Patterns**:
 - Screens implement `app.Screen` interface: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`
