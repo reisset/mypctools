@@ -2,23 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Overview
-
-mypctools is a personal TUI (Terminal User Interface) for managing scripts and system setup across Linux systems. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
-
-See README.md for user documentation and quick start.
-
 ## Project Context
 
-This is a Go TUI project. Use Bubble Tea / Lip Gloss patterns. When researching UI inspiration, produce concrete implementation plans with specific styling values (colors, padding, borders) rather than vague suggestions.
+mypctools is a personal Go TUI for managing scripts and system setup across Linux systems. Built with Bubble Tea / Lip Gloss. When researching UI inspiration, produce concrete implementation plans with specific styling values (colors, padding, borders) rather than vague suggestions.
 
 ## UI/UX Principles
 
-When adding text/descriptions to UI elements, default to minimal and concise. Never add verbose descriptions to standard menu items — only add short descriptions for user-created/custom items. Less is more for TUI interfaces.
+Default to minimal and concise for all UI text. Never add verbose descriptions to standard menu items — only short descriptions for user-created/custom items. Less is more.
 
 ## Workflow
 
-When implementing UI changes from a plan, show a preview or summary of text content (labels, descriptions, menu items) BEFORE writing the code. Ask for approval on copy/wording before implementing.
+When implementing UI changes from a plan, show a preview of text content (labels, menu items, copy) BEFORE writing code. Ask for approval on wording before implementing.
 
 ## Architecture
 
@@ -29,94 +23,51 @@ mypctools/
 │   ├── go.mod
 │   └── internal/
 ├── scripts/                    # Script bundles with install/uninstall.sh each
-│   ├── shared/                 # Shared assets used by multiple bundles
-│   │   ├── prompt/             # starship.toml (shared prompt config)
-│   │   └── shell/              # aliases.sh, TOOLS.md (shared by litebash & litezsh)
+│   ├── shared/                 # starship.toml, aliases.sh, TOOLS.md
 │   ├── litebash/               # Speed-focused bash (shell config only)
 │   ├── litezsh/                # Speed-focused zsh (syntax highlighting, autosuggestions)
-│   ├── alacritty/              # alacritty terminal config (shell-agnostic, X11 + Wayland)
-│   ├── kitty/                  # kitty terminal config (shell-agnostic, X11 + Wayland)
+│   ├── alacritty/              # alacritty terminal config (X11 + Wayland)
+│   ├── kitty/                  # kitty terminal config (X11 + Wayland)
 │   ├── ptyxis/                 # ptyxis terminal config via palettes (GNOME, Arch only)
-│   ├── fastfetch/              # Custom fastfetch config with tree-style layout
-│   ├── screensaver/            # Terminal screensaver via hypridle + tte (Hyprland only)
-│   ├── gnome-ubuntu/             # Ubuntu GNOME defaults (Arch only, uses paru)
+│   ├── fastfetch/              # Custom fastfetch config
+│   ├── screensaver/            # hypridle + tte screensaver (Hyprland only)
+│   ├── gnome-ubuntu/           # Ubuntu GNOME defaults for Arch (uses paru)
 │   ├── claude/                 # Claude Code skills and statusline
 │   └── spicetify/              # Spotify theming
-├── lib/                        # Bash libraries (for script bundles)
+├── lib/                        # Bash libraries
 │   ├── print.sh                # Zero-dependency print functions (pure ANSI)
-│   ├── distro-detect.sh        # Sets DISTRO_TYPE, DISTRO_NAME, PKG_MGR, PKG_INSTALL, PKG_UPDATE
+│   ├── distro-detect.sh        # Sets DISTRO_TYPE (arch|debian), PKG_MGR, PKG_INSTALL, PKG_UPDATE
 │   ├── tools-install.sh        # Shared CLI tool install/uninstall for litebash & litezsh
-│   ├── shell-setup.sh          # Parametric set_default_shell shared by litebash & litezsh
-│   ├── symlink.sh              # safe_symlink() with path resolution, backup, idempotency
+│   ├── shell-setup.sh          # set_default_shell shared by litebash & litezsh
+│   ├── symlink.sh              # safe_symlink() with backup and idempotency
 │   └── terminal-install.sh     # Shared lib for terminal emulator installers
-├── .github/workflows/          # CI/CD
-│   └── release.yml             # Binary releases on tag push
-├── install.sh                  # curl|bash installer (downloads binary + clones repo)
-├── uninstall.sh                # Removes binary and ~/.local/share/mypctools
-└── README.md
+├── .github/workflows/release.yml  # Binary releases on tag push
+├── install.sh                  # curl|bash installer
+└── uninstall.sh
 ```
-
-## Installation
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh | bash
-```
-
-The installer:
-1. Clones the repo to `~/.local/share/mypctools` (for script bundles)
-2. Downloads the pre-built binary to `~/.local/bin/mypctools`
 
 ## Key Patterns
 
-**Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Register in `tui/internal/bundle/registry.go`. Set `AutoSync: true` if the bundle is config-only (safe to re-run silently on every update) — leave it false for bundles that install system packages or have side-effects.
+**Adding a new script bundle**: Create `scripts/<name>/` with `install.sh` and optionally `uninstall.sh`. Register in `tui/internal/bundle/registry.go`. Set `AutoSync: true` for config-only bundles (safe to re-run silently) — leave false for bundles that install packages or have side-effects.
 
-**Shared CLI tool installation** uses `lib/tools-install.sh`. Both litebash and litezsh source this lib to avoid duplicating GitHub-release download logic. Key functions:
-- `install_all_tools` - installs zoxide, lazygit, tldr, glow, dysk, dust, yazi, starship
-- `create_debian_symlinks` - creates bat/fd symlinks on Debian
-- `uninstall_local_tools` - removes all tools from `~/.local/bin`
-- `install_starship_config` / `uninstall_starship_config` - manages the shared starship.toml symlink
-
-The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles symlink to it.
-
-**Shared shell assets** live in `scripts/shared/shell/`:
-- `aliases.sh` - 26 aliases shared by litebash and litezsh
-- `TOOLS.md` - quick reference for all CLI tools (includes zsh features section)
-
-## Included Script Bundles
-
-- `scripts/litebash/` - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, lazygit, yazi, starship). Shell config only.
-- `scripts/litezsh/` - Zsh counterpart to litebash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
-- `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
-- `scripts/kitty/` - kitty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
-- `scripts/ptyxis/` - ptyxis terminal config via .palette keyfiles (GNOME, Arch only). Same themes. Palettes installed to `~/.local/share/org.gnome.Ptyxis/palettes/`; applied via gsettings.
-- `scripts/fastfetch/` - Custom fastfetch config with tree-style layout, nerd font icons, color-coded sections, small distro logo.
-- `scripts/screensaver/` - Omarchy-style terminal screensaver using tte (Terminal Text Effects) with hypridle integration. Hyprland only.
-- `scripts/gnome-ubuntu/` - Ubuntu GNOME defaults (Yaru theme, dash-to-dock, Ubuntu fonts) for Arch. Uses paru.
-- `scripts/claude/` - Claude Code skills (pdf, docx, xlsx, pptx, bloat-remover) and statusline
-- `scripts/spicetify/` - Spicetify + StarryNight theme for native Spotify installs
+**Shared tooling**: `lib/tools-install.sh` is sourced by both litebash and litezsh for CLI tool installs (zoxide, lazygit, yazi, starship, etc.). The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles symlink to it. Shared aliases live in `scripts/shared/shell/aliases.sh`.
 
 ## Distro Support
 
-Targets **CachyOS** (primary Arch flavor) and **Debian/Ubuntu**. Fedora has been intentionally removed and will not be re-added.
-`DISTRO_TYPE` is exported by `lib/distro-detect.sh` (values: `arch`, `debian`) and used throughout.
+Targets **CachyOS** (primary Arch flavor) and **Debian/Ubuntu**. Fedora is intentionally removed and will not be re-added. `DISTRO_TYPE` values: `arch`, `debian`.
 
 ## Code Style
 
 - Simple bash over clever one-liners
 - Comments only where code isn't self-explanatory
 - On failure, return to menu — don't exit the entire app
-- Use `lib/print.sh` for colored output in standalone script installers
+- Use `lib/print.sh` for colored output in script installers
 
 ## Design Decisions
 
-**curl|bash fallback installers**: The fallback functions for Ollama, OpenCode, Claude Code, and Mistral Vibe pipe directly from official vendor URLs (`curl ... | bash`). This is intentional:
-- These are official installers from trusted vendors
-- Simplifies code vs download-then-execute pattern
-- Acceptable tradeoff for a personal tool
+**curl|bash fallback installers**: Fallbacks for Ollama, OpenCode, Claude Code, and Mistral Vibe pipe directly from official vendor URLs (`curl ... | bash`). Intentional — official trusted installers, simplifies code, acceptable for a personal tool.
 
 ## Go TUI (tui/)
-
-The primary TUI implementation in Go using Bubble Tea.
 
 **Building locally** (testing only): Claude must NOT run `go build` directly — it hangs in sandboxed environments. Provide the command and ask the user to run it.
 
@@ -124,34 +75,34 @@ The primary TUI implementation in Go using Bubble Tea.
 cd ~/mypctools/tui && go build -o ~/.local/bin/mypctools ./main.go
 ```
 
-**Releasing** (required whenever Go TUI code changes): Push a new semver tag. GitHub Actions builds the binary and publishes a GitHub Release. The in-app self-updater (`mypctools` → Update) downloads the new binary + runs `git pull` so all machines stay in sync without manual recompilation.
+**Releasing**: Any change under `tui/` requires a new semver tag. GitHub Actions builds and publishes the binary. The in-app self-updater downloads the new binary + runs `git pull`.
 
 ```bash
 git tag v0.X.Y && git push origin v0.X.Y
 ```
 
-**Rule**: If a change touches any file under `tui/` (Go code), a new release tag MUST be pushed alongside the commit — otherwise the self-updater delivers updated scripts but an old binary that doesn't know about the new features. Script-only changes (under `scripts/`, `lib/`) are safe to push to main without a tag; `git pull` is enough.
+Script-only changes (`scripts/`, `lib/`) are safe to push to main without a tag.
 
 **Structure**:
 - `tui/internal/app/` — Root model, screen interface, navigation (Navigate/PopScreen)
-- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, pullupdate, systemsetup, themepicker)
+- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, pullupdate, systemsetup)
 - `tui/internal/bundle/` — Script bundle registry and installation detection
-- `tui/internal/theme/` — Color palettes, gradient logo, Lip Gloss styles, icons
-- `tui/internal/ui/` — Shared UI components (list rendering, badges, header, footer, box)
+- `tui/internal/theme/` — Single DefaultCyan palette, gradient logo, Lip Gloss styles
+- `tui/internal/ui/` — Shared components (list, badges, header, footer, shimmer, fadeup)
 - `tui/internal/state/` — Shared state (distro info, terminal size, update count)
-- `tui/internal/config/` — User configuration (theme persistence)
+- `tui/internal/config/` — Version, log path, config dir constants
 - `tui/internal/cmd/` — CLI argument handling
-- `tui/internal/logging/` — Operation logging to ~/.local/share/mypctools/mypctools.log
+- `tui/internal/logging/` — Operation logging to `~/.local/share/mypctools/mypctools.log`
 - `tui/internal/selfupdate/` — Binary self-update with SHA256 verification
 - `tui/internal/system/` — System operations (update, cleanup, services, notifications)
 
 **Patterns**:
-- Screens implement `app.Screen` interface: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`
-- Navigation: `app.Navigate(screen)` pushes, `app.PopScreen()` pops, `j/k` vim keys alongside arrows
-- Menu rendering: `ui.RenderList()` handles cursors, highlight bars, suffixes, separators, dimming
+- Screens implement `app.Screen`: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`
+- Navigation: `app.Navigate(screen)` pushes, `app.PopScreen()` pops
+- Menu rendering: `ui.RenderList()` — cyan `│` bar highlight, separators, suffixes
 - List width: `ListConfig.MaxInnerWidth` controls max content width (default 50, scripts uses 80)
-- Script descriptions: Shown as muted right-side suffix in scripts screen (from `bundle.Description`)
+- Separator-injected cursor offset: when a visual separator precedes the last item (Back), use `listCursor = m.cursor + 1`
 - Script execution: `tea.ExecProcess()` suspends TUI, gives script full terminal control
-- Toast messages: Auto-dismissing notifications after operations (install, update, cleanup)
-- Logging: `logging.LogAction()` for all operations (installs, updates, service actions)
-- Notifications: `system.Notify()` for long operations (update, cleanup, batch installs)
+- Animations: `ui.Shimmer` for loading states, `ui.FadeUp` for staggered completion reveals
+- Toast messages: `app.Toast()` for auto-dismissing post-operation notifications
+- Logging: `logging.LogAction()` for all operations; `system.Notify()` for long operations
