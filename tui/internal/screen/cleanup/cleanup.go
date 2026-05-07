@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/reisset/mypctools/tui/internal/app"
@@ -24,15 +23,8 @@ const (
 	phaseDone
 )
 
-// execDoneMsg is sent when a command finishes.
-type execDoneMsg struct {
-	err error
-}
-
-// cacheClearDoneMsg is sent when cache clearing finishes.
-type cacheClearDoneMsg struct {
-	err error
-}
+type execDoneMsg struct{ err error }
+type cacheClearDoneMsg struct{ err error }
 
 type action int
 
@@ -49,19 +41,16 @@ type Model struct {
 	pkgErr       error
 	cacheCleared bool
 	cacheErr     error
-	spinner      spinner.Model
+	shimmer      ui.Shimmer
+	fadeup       ui.FadeUp
 }
 
-// New creates a new cleanup screen.
 func New(shared *state.Shared) Model {
-	s := spinner.New()
-	s.Spinner = spinner.Dot
-	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Current.Primary))
 	return Model{
 		shared:  shared,
 		phase:   phasePackageCleanup,
 		cursor:  actionYes,
-		spinner: s,
+		shimmer: ui.Shimmer{Text: "Clearing user caches..."},
 	}
 }
 
@@ -72,32 +61,31 @@ func (m Model) Init() tea.Cmd {
 			return execDoneMsg{err: fmt.Errorf("unsupported distro: %s", m.shared.Distro.Type)}
 		}
 	}
-
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
 		return execDoneMsg{err: err}
 	})
 }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
-	// Forward spinner ticks during cache-clearing phase
+	// Handle shimmer ticks during cache clearing.
 	if m.phase == phaseClearingCache {
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		// Check for completion message first, then return spinner cmd
-		switch msg := msg.(type) {
-		case cacheClearDoneMsg:
-			m.cacheErr = msg.err
-			m.cacheCleared = true
-			m.phase = phaseDone
-			m.logAndNotify()
-			if m.pkgErr == nil && m.cacheErr == nil {
-				return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
+		if cmd := (&m.shimmer).Update(msg); cmd != nil {
+			if done, ok := msg.(cacheClearDoneMsg); ok {
+				return m.finishCacheClean(done)
 			}
-			return m, nil
-		default:
-			_ = msg
+			return m, cmd
 		}
-		return m, cmd
+		if done, ok := msg.(cacheClearDoneMsg); ok {
+			return m.finishCacheClean(done)
+		}
+		return m, nil
+	}
+
+	// Handle fade-up ticks on done screen.
+	if m.phase == phaseDone {
+		if cmd := (&m.fadeup).Update(msg); cmd != nil {
+			return m, cmd
+		}
 	}
 
 	switch msg := msg.(type) {
@@ -107,20 +95,13 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		return m, nil
 
 	case cacheClearDoneMsg:
-		m.cacheErr = msg.err
-		m.cacheCleared = true
-		m.phase = phaseDone
-		m.logAndNotify()
-		if m.pkgErr == nil && m.cacheErr == nil {
-			return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
-		}
-		return m, nil
+		return m.finishCacheClean(msg)
 
 	case tea.KeyMsg:
 		switch m.phase {
 		case phaseAskUserCache:
 			switch msg.String() {
-			case "down", "up", "tab", "j", "k":
+			case "down", "up", "tab":
 				if m.cursor == actionYes {
 					m.cursor = actionNo
 				} else {
@@ -129,24 +110,14 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 			case "enter", " ":
 				if m.cursor == actionYes {
 					m.phase = phaseClearingCache
-					return m, tea.Batch(m.spinner.Tick, m.clearCaches())
+					return m, tea.Batch(m.shimmer.Tick(), m.clearCaches())
 				}
-				m.phase = phaseDone
-				m.logAndNotify()
-				if m.pkgErr == nil {
-					return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
-				}
-				return m, nil
+				return m.skipCache()
 			case "y":
 				m.phase = phaseClearingCache
-				return m, tea.Batch(m.spinner.Tick, m.clearCaches())
+				return m, tea.Batch(m.shimmer.Tick(), m.clearCaches())
 			case "n":
-				m.phase = phaseDone
-				m.logAndNotify()
-				if m.pkgErr == nil {
-					return m, app.Toast(theme.Icons.Check+" System cleanup completed", false)
-				}
-				return m, nil
+				return m.skipCache()
 			}
 		case phaseDone:
 			return m, app.PopScreen()
@@ -155,10 +126,51 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	return m, nil
 }
 
+// finishCacheClean transitions to phaseDone after cache clearing completes.
+func (m Model) finishCacheClean(msg cacheClearDoneMsg) (app.Screen, tea.Cmd) {
+	m.cacheErr = msg.err
+	m.cacheCleared = true
+	m.phase = phaseDone
+	m.logAndNotify()
+	m.fadeup = buildFadeup(m.pkgErr, true, m.cacheErr == nil, m.cacheErr)
+	return m, tea.Batch(m.fadeup.Start(), m.toastCmd())
+}
+
+// skipCache transitions to phaseDone without clearing caches.
+func (m Model) skipCache() (app.Screen, tea.Cmd) {
+	m.phase = phaseDone
+	m.logAndNotify()
+	m.fadeup = buildFadeup(m.pkgErr, false, false, nil)
+	return m, tea.Batch(m.fadeup.Start(), m.toastCmd())
+}
+
+func (m Model) toastCmd() tea.Cmd {
+	if m.pkgErr == nil && m.cacheErr == nil {
+		return app.Toast("✓ System cleanup completed", false)
+	}
+	return nil
+}
+
+func buildFadeup(pkgErr error, cacheRan, cacheOK bool, cacheErr error) ui.FadeUp {
+	var lines []string
+	if pkgErr != nil {
+		lines = append(lines, theme.WarningStyle().Render("⚠  Package cleanup had issues"))
+	} else {
+		lines = append(lines, theme.SuccessStyle().Render("✓  Package cleanup"))
+	}
+	if cacheRan {
+		if cacheOK {
+			lines = append(lines, theme.SuccessStyle().Render("✓  User caches cleared"))
+		} else {
+			lines = append(lines, theme.WarningStyle().Render(fmt.Sprintf("⚠  User caches: %v", cacheErr)))
+		}
+	}
+	return ui.FadeUp{Lines: lines, Visible: 0}
+}
+
 func (m Model) clearCaches() tea.Cmd {
 	return func() tea.Msg {
-		err := system.ClearUserCaches()
-		return cacheClearDoneMsg{err: err}
+		return cacheClearDoneMsg{err: system.ClearUserCaches()}
 	}
 }
 
@@ -177,128 +189,68 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	var content string
+	center := func(s string) string {
+		return lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(s)
+	}
+	muted := theme.MutedStyle()
 
 	switch m.phase {
 	case phasePackageCleanup:
-		content = theme.MutedStyle().Render("Running package cleanup...")
+		return center(muted.Render("Running package cleanup..."))
 
 	case phaseAskUserCache:
-		// Show package cleanup result
 		var pkgStatus string
 		if m.pkgErr != nil {
-			pkgStatus = theme.WarningStyle().Render(fmt.Sprintf("Package cleanup had issues: %v", m.pkgErr))
+			pkgStatus = theme.WarningStyle().Render("⚠  Package cleanup had issues")
 		} else {
-			pkgStatus = theme.SuccessStyle().Render(theme.Icons.Check + " Package cleanup completed")
+			pkgStatus = theme.SuccessStyle().Render("✓  Package cleanup")
 		}
+		sep := "   " + theme.HelpDividerStyle().Render(strings.Repeat("─", 36))
+		question := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#ffffff")).Render("Clear user caches?")
+		hint := muted.Render("thumbnails, trash, temp files")
 
-		pkgStatusBlock := lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(pkgStatus)
-
-		// Question
-		question := theme.SubheaderStyle().Render("Clear user caches (thumbnails, trash)?")
-		questionBlock := lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(question)
-
-		// Action buttons using list component
 		items := []ui.ListItem{
-			{Icon: theme.Icons.Check, Label: "Yes"},
-			{Icon: theme.Icons.Back, Label: "No"},
+			{Icon: "✓", Label: "Yes, clear"},
+			{Icon: "—", Label: "Skip"},
 		}
 		cursor := 0
 		if m.cursor == actionNo {
 			cursor = 1
 		}
+		menu := ui.RenderList(items, cursor, ui.ListConfig{Width: 40, MaxInnerWidth: 40})
 
-		buttons := ui.RenderList(items, cursor, ui.ListConfig{
-			Width:      width,
-			ShowCursor: true,
-		})
-
-		buttonsBlock := lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(buttons)
-
-		content = lipgloss.JoinVertical(lipgloss.Left,
-			pkgStatusBlock,
+		return lipgloss.JoinVertical(lipgloss.Left,
+			center(pkgStatus),
+			sep,
 			"",
-			questionBlock,
+			center(question),
+			center(hint),
 			"",
-			buttonsBlock,
+			lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(menu),
 		)
 
 	case phaseClearingCache:
-		content = m.spinner.View() + " Clearing user caches..."
+		return center(m.shimmer.View())
 
 	case phaseDone:
-		var lines []string
-
-		// Package cleanup result
-		if m.pkgErr != nil {
-			lines = append(lines, theme.WarningStyle().Render(fmt.Sprintf("Package cleanup: had issues (%v)", m.pkgErr)))
-		} else {
-			lines = append(lines, theme.SuccessStyle().Render(theme.Icons.Check+" Package cleanup: completed"))
+		title := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#ffffff")).Render("Cleanup Complete")
+		prompt := muted.Render("press any key to continue")
+		parts := []string{center(title), ""}
+		for _, l := range m.fadeup.VisibleLines() {
+			parts = append(parts, "   "+l)
 		}
-
-		// Cache cleanup result
-		if m.cacheCleared {
-			if m.cacheErr != nil {
-				lines = append(lines, theme.WarningStyle().Render(fmt.Sprintf("User caches: had issues (%v)", m.cacheErr)))
-			} else {
-				lines = append(lines, theme.SuccessStyle().Render(theme.Icons.Check+" User caches: cleared"))
-			}
-		} else {
-			lines = append(lines, theme.MutedStyle().Render("User caches: skipped"))
-		}
-
-		summary := strings.Join(lines, "\n")
-		summaryBlock := lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(summary)
-
-		title := theme.SubheaderStyle().Render("Cleanup Complete")
-		titleBlock := lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(title)
-
-		prompt := theme.MutedStyle().Render("Press any key to continue...")
-		promptBlock := lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(prompt)
-
-		content = lipgloss.JoinVertical(lipgloss.Left,
-			"",
-			titleBlock,
-			"",
-			summaryBlock,
-			"",
-			promptBlock,
-		)
+		parts = append(parts, "", center(prompt))
+		return lipgloss.JoinVertical(lipgloss.Left, parts...)
 	}
 
-	return lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(content)
+	return ""
 }
 
-func (m Model) Title() string {
-	return "System Cleanup"
-}
+func (m Model) Title() string { return "System Cleanup" }
 
 func (m Model) ShortHelp() []string {
-	switch m.phase {
-	case phaseAskUserCache:
+	if m.phase == phaseAskUserCache {
 		return []string{"y yes", "n no"}
-	default:
-		return []string{}
 	}
+	return []string{}
 }

@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -30,12 +31,11 @@ type actionItem struct {
 	action detailAction
 }
 
-// execDoneMsg is sent when a service action finishes.
 type execDoneMsg struct {
 	err error
 }
 
-// ServiceDetailModel shows actions for a single service.
+// ServiceDetailModel shows stats and actions for a single service.
 type ServiceDetailModel struct {
 	shared      *state.Shared
 	serviceName string
@@ -47,10 +47,8 @@ type ServiceDetailModel struct {
 	lastAction  detailAction
 }
 
-// NewServiceDetail creates a new service detail screen.
 func NewServiceDetail(shared *state.Shared, serviceName string) ServiceDetailModel {
 	status := system.GetServiceStatus(serviceName)
-
 	return ServiceDetailModel{
 		shared:      shared,
 		serviceName: serviceName,
@@ -60,48 +58,33 @@ func NewServiceDetail(shared *state.Shared, serviceName string) ServiceDetailMod
 	}
 }
 
-// buildMenuItems creates context-aware menu items based on service state.
 func buildMenuItems(status system.ServiceStatus) []actionItem {
 	var items []actionItem
-
-	// Running toggle: show Start if stopped, Stop if running
 	if status.Active == "active" {
-		items = append(items, actionItem{icon: theme.Icons.Cleanup, label: "Stop", action: actionStop})
+		items = append(items, actionItem{icon: "■", label: "Stop", action: actionStop})
 	} else {
-		items = append(items, actionItem{icon: theme.Icons.Update, label: "Start", action: actionStart})
+		items = append(items, actionItem{icon: "▶", label: "Start", action: actionStart})
 	}
-
-	// Restart always available
-	items = append(items, actionItem{icon: theme.Icons.Update, label: "Restart", action: actionRestart})
-
-	// Boot toggle: show Disable if enabled, Enable if disabled
+	items = append(items, actionItem{icon: "⟳", label: "Restart", action: actionRestart})
 	if status.Enabled == "enabled" {
-		items = append(items, actionItem{icon: theme.Icons.Cleanup, label: "Disable", action: actionDisable})
+		items = append(items, actionItem{icon: "○", label: "Disable", action: actionDisable})
 	} else {
-		items = append(items, actionItem{icon: theme.Icons.Check, label: "Enable", action: actionEnable})
+		items = append(items, actionItem{icon: "●", label: "Enable", action: actionEnable})
 	}
-
-	// Back
-	items = append(items, actionItem{icon: theme.Icons.Back, label: "Back", action: actionBack})
-
+	items = append(items, actionItem{icon: "←", label: "Back", action: actionBack})
 	return items
 }
 
-func (m ServiceDetailModel) Init() tea.Cmd {
-	return nil
-}
+func (m ServiceDetailModel) Init() tea.Cmd { return nil }
 
 func (m ServiceDetailModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case execDoneMsg:
 		m.actionDone = true
 		m.actionErr = msg.err
-		// Log the action
 		m.logServiceAction()
-		// Refresh status and rebuild menu items
 		m.status = system.GetServiceStatus(m.serviceName)
 		m.items = buildMenuItems(m.status)
-		// Reset cursor if it's now out of bounds
 		if m.cursor >= len(m.items) {
 			m.cursor = len(m.items) - 1
 		}
@@ -109,19 +92,17 @@ func (m ServiceDetailModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if m.actionDone {
-			// Any key clears the action done state
 			m.actionDone = false
 			m.actionErr = nil
 			return m, nil
 		}
-
 		switch msg.String() {
-		case "down", "j":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up", "k":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
@@ -140,29 +121,19 @@ func (m ServiceDetailModel) handleAction(action detailAction) tea.Cmd {
 		return app.PopScreen()
 	case actionStart:
 		cmd := system.ServiceActionCmd(m.serviceName, "start")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg {
-			return execDoneMsg{err: err}
-		})
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
 	case actionStop:
 		cmd := system.ServiceActionCmd(m.serviceName, "stop")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg {
-			return execDoneMsg{err: err}
-		})
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
 	case actionRestart:
 		cmd := system.ServiceActionCmd(m.serviceName, "restart")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg {
-			return execDoneMsg{err: err}
-		})
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
 	case actionEnable:
 		cmd := system.ServiceActionCmd(m.serviceName, "enable")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg {
-			return execDoneMsg{err: err}
-		})
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
 	case actionDisable:
 		cmd := system.ServiceActionCmd(m.serviceName, "disable")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg {
-			return execDoneMsg{err: err}
-		})
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
 	}
 	return nil
 }
@@ -183,7 +154,6 @@ func (m ServiceDetailModel) logServiceAction() {
 	default:
 		return
 	}
-
 	if m.actionErr != nil {
 		logging.LogAction(fmt.Sprintf("Service %s %s failed", m.serviceName, actionName))
 	} else {
@@ -197,76 +167,84 @@ func (m ServiceDetailModel) View() string {
 		width = 80
 	}
 
-	// Title
-	title := theme.SubheaderStyle().Render("Service: " + m.serviceName)
-	titleBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(title)
+	muted := theme.MutedStyle()
+	sep := "  " + theme.HelpDividerStyle().Render(strings.Repeat("─", 40))
 
-	// Status info with badges
-	statusBadge := ui.StatusBadge(m.status.Active)
-	enabledBadge := ui.EnabledBadge(m.status.Enabled)
+	// Status row
+	var activeStr string
+	if m.status.Active == "active" {
+		activeStr = theme.SuccessStyle().Render("● active")
+	} else {
+		activeStr = theme.ErrorStyle().Render("○ " + m.status.Active)
+	}
 
-	statusLine := fmt.Sprintf("Status: %s   Enabled: %s", statusBadge, enabledBadge)
+	var enabledStr string
+	if m.status.Enabled == "enabled" {
+		enabledStr = theme.SuccessStyle().Render("yes")
+	} else {
+		enabledStr = muted.Render(m.status.Enabled)
+	}
 
-	statusBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(statusLine)
+	col := func(label, value string) string {
+		return lipgloss.JoinVertical(lipgloss.Left,
+			muted.Render(label),
+			value,
+		)
+	}
 
-	// Action result if any
+	statusRow := lipgloss.JoinHorizontal(lipgloss.Top,
+		lipgloss.NewStyle().Width(20).Render(col("STATUS", activeStr)),
+		lipgloss.NewStyle().Width(20).Render(col("ENABLED", enabledStr)),
+	)
+
+	statsBlock := lipgloss.NewStyle().Width(width).PaddingLeft(2).Render(statusRow)
+
+	// Action result
 	var resultBlock string
 	if m.actionDone {
-		var resultLine string
+		var line string
 		if m.actionErr != nil {
-			resultLine = theme.ErrorStyle().Render(fmt.Sprintf("Error: %v", m.actionErr))
+			line = theme.ErrorStyle().Render(fmt.Sprintf("Error: %v", m.actionErr))
 		} else {
-			resultLine = theme.SuccessStyle().Render(theme.Icons.Check + " Action completed successfully")
+			line = theme.SuccessStyle().Render("✓ Action completed")
 		}
-		prompt := theme.MutedStyle().Render("Press any key to continue...")
-		resultBlock = lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(resultLine+"\n"+prompt) + "\n"
+		resultBlock = lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(line) +
+			"\n" + lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(muted.Render("press any key to continue"))
 	}
 
-	// Build list items
-	items := make([]ui.ListItem, len(m.items))
+	// Action menu — insert separator before the last item (Back)
+	listItems := make([]ui.ListItem, 0, len(m.items)+1)
 	for i, item := range m.items {
-		items[i] = ui.ListItem{
-			Icon:  item.icon,
-			Label: item.label,
+		if i == len(m.items)-1 {
+			listItems = append(listItems, ui.ListItem{Separator: true})
 		}
+		listItems = append(listItems, ui.ListItem{Icon: item.icon, Label: item.label})
 	}
 
-	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
-		ShowCursor: true,
+	// Shift cursor past separator (separator is before last item, Back).
+	listCursor := m.cursor
+	if m.cursor == len(m.items)-1 {
+		listCursor = m.cursor + 1
+	}
+	menu := ui.RenderList(listItems, listCursor, ui.ListConfig{
+		Width:         48,
+		MaxInnerWidth: 48,
 	})
+	menuBlock := lipgloss.NewStyle().Width(width).PaddingLeft(2).Render(menu)
 
-	menuBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(menu)
-
-	return lipgloss.JoinVertical(lipgloss.Left,
-		titleBlock,
-		"",
-		statusBlock,
-		"",
-		resultBlock,
-		menuBlock,
-	)
+	parts := []string{"", statsBlock, sep}
+	if resultBlock != "" {
+		parts = append(parts, resultBlock)
+	}
+	parts = append(parts, "", menuBlock)
+	return lipgloss.JoinVertical(lipgloss.Left, parts...)
 }
 
-func (m ServiceDetailModel) Title() string {
-	return m.serviceName
-}
+func (m ServiceDetailModel) Title() string { return m.serviceName }
 
 func (m ServiceDetailModel) ShortHelp() []string {
 	if m.actionDone {
 		return []string{"any key continue"}
 	}
-	return []string{"enter select"}
+	return []string{"enter confirm"}
 }

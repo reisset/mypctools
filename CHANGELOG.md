@@ -4,10 +4,27 @@ All notable changes to mypctools.
 
 ---
 
-## [Unreleased]
+## [0.36.0] - 2026-05-07
+
+### Changed
+- **Zen UI redesign**: Complete visual overhaul. Single DefaultCyan palette (all other themes removed). Cyan `│` accent bar replaces arrow cursor for selected items. Content floats centered without box wrappers. MYPCTOOLS logo renders with per-character cyan→blue→purple gradient and a character-by-character reveal animation on launch. Loading states use a shimmer scanning-window animation; completion screens use a staggered fade-up reveal.
+- **Header**: Sub-screens show `← Title` (muted arrow + white bold title) instead of breadcrumb pills.
+- **Footer**: Single centered line with ` · ` separator; key in blue bold, description in muted. No divider line.
+- **Service manager**: Context-aware Start/Stop and Enable/Disable actions; Back item fully navigable with separator-offset cursor logic.
+- **Script menu**: Installed state shows Reinstall + Uninstall; Back is navigable.
+- **Main menu**: Added `q` to quit.
 
 ### Removed
-- **Fedora/RHEL support**: Dropped entirely — project now targets CachyOS and Debian/Ubuntu only. Removed all `dnf` code paths from `lib/distro-detect.sh`, `lib/tools-install.sh`, `tui/internal/cmd/distro.go`, `tui/internal/system/update.go`, `tui/internal/system/cleanup.go`, and all script installers. The `DnfPkg` field mentioned in CLAUDE.md was already absent from the Go codebase; docs updated accordingly.
+- **Theme picker**: `screen/themepicker` deleted. All palette variants except DefaultCyan removed from `theme/theme.go`.
+- **Box wrappers**: `ui.Box()` and all `BoxStyle`/`BoxActiveStyle`/`BoxTitleStyle` calls removed.
+- **Spinner**: Replaced with shimmer animation in cleanup and pull-update screens.
+
+---
+
+## [0.35.0] - 2026-05-07
+
+### Removed
+- **Fedora/RHEL support**: Dropped entirely — project now targets CachyOS and Debian/Ubuntu only. Removed all `dnf` code paths from `lib/distro-detect.sh`, `lib/tools-install.sh`, `tui/internal/cmd/distro.go`, `tui/internal/system/update.go`, `tui/internal/system/cleanup.go`, and all script installers.
 
 ### Fixed
 - **gnome-ubuntu**: Added paru install instructions on missing paru, D-Bus session guard (prevents silent gsettings no-ops over SSH/TTY), per-package AUR install loop with failure reporting, python3 guard in enable_extension fallback, idempotency short-circuit (`--force` to re-run), GNOME version detection for GNOME 47+ keys.

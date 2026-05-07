@@ -18,11 +18,10 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
 | | |
 |---|---|
-| 🖥️ **Terminal UI** | Navigate with arrow keys or vim bindings — no commands to memorize |
+| 🖥️ **Terminal UI** | Navigate with arrow keys — no commands to memorize |
 | 📦 **One-Command Install** | `curl \| bash` to install, same to uninstall |
 | 🛠️ **Script Bundles** | Shell configs, terminal themes, fastfetch, screensaver, and more |
 | ⚙️ **System Tools** | Full system update, cleanup, and systemd service manager |
-| 🎨 **Themes** | Switch between DefaultCyan, CatppuccinMocha, and TokyoNight |
 
 ---
 
@@ -68,7 +67,6 @@ Script bundles you can install or uninstall:
 - **Full System Update** — Runs apt or pacman upgrade.
 - **System Cleanup** — Removes orphaned packages, clears caches, empties trash.
 - **Service Manager** — Browse or search systemd services.
-- **Theme** — Switch between DefaultCyan, CatppuccinMocha, and TokyoNight.
 
 ---
 

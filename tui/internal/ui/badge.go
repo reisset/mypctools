@@ -1,21 +1,29 @@
 package ui
 
-import "github.com/reisset/mypctools/tui/internal/theme"
+import (
+	"github.com/charmbracelet/lipgloss"
+	"github.com/reisset/mypctools/tui/internal/theme"
+)
 
-// InstalledBadge returns a green checkmark badge.
+// InstalledBadge returns an "installed" badge with cyan background.
 func InstalledBadge() string {
-	return " " + theme.SuccessStyle().Render(theme.Icons.Check)
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(theme.Current.Primary)).
+		Foreground(lipgloss.Color("#000000")).
+		Bold(true).
+		Padding(0, 1).
+		Render("installed")
 }
 
-// StatusBadge returns a pill-style status indicator.
+// StatusBadge returns a colored status indicator for services.
 func StatusBadge(status string) string {
 	switch status {
 	case "active", "running":
-		return theme.StatusActiveStyle().Render(status)
+		return theme.StatusActiveStyle().Render("● " + status)
 	case "failed", "error":
-		return theme.StatusErrorStyle().Render(status)
+		return theme.StatusErrorStyle().Render("✕ " + status)
 	default:
-		return theme.StatusInactiveStyle().Render(status)
+		return theme.StatusInactiveStyle().Render("○ " + status)
 	}
 }
 

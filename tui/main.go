@@ -12,7 +12,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/screen/mainmenu"
 	"github.com/reisset/mypctools/tui/internal/selfupdate"
 	"github.com/reisset/mypctools/tui/internal/state"
-	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
 func main() {
@@ -59,9 +58,6 @@ func main() {
 
 	// Find the mypctools root directory (parent of tui/)
 	rootDir := findRootDir()
-
-	// Load theme
-	theme.Load()
 
 	// Detect distro
 	distro := cmd.DetectDistro()

@@ -6,7 +6,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/screen/cleanup"
 	"github.com/reisset/mypctools/tui/internal/screen/services"
-	"github.com/reisset/mypctools/tui/internal/screen/themepicker"
 	"github.com/reisset/mypctools/tui/internal/screen/update"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
@@ -16,6 +15,7 @@ import (
 type menuItem struct {
 	icon      string
 	label     string
+	desc      string
 	id        string
 	separator bool
 }
@@ -27,51 +27,41 @@ type Model struct {
 	cursor int
 }
 
-// New creates a new system setup menu.
 func New(shared *state.Shared) Model {
 	items := []menuItem{
-		{icon: theme.Icons.Update, label: "Full System Update", id: "update"},
-		{icon: theme.Icons.Cleanup, label: "System Cleanup", id: "cleanup"},
-		{icon: theme.Icons.Service, label: "Service Manager", id: "services"},
-		{separator: true, label: "Settings"},
-		{icon: theme.Icons.Theme, label: "Theme", id: "theme"},
-		{icon: theme.Icons.Back, label: "Back", id: "back"},
+		{icon: "⟳", label: "Full System Update", desc: "runs pacman / apt upgrade", id: "update"},
+		{icon: "✕", label: "System Cleanup", desc: "orphans, caches, trash", id: "cleanup"},
+		{icon: "◎", label: "Service Manager", desc: "browse systemd services", id: "services"},
+		{separator: true},
+		{icon: "←", label: "Back", id: "back"},
 	}
-	return Model{
-		shared: shared,
-		items:  items,
-		cursor: 0,
-	}
+	return Model{shared: shared, items: items, cursor: 0}
 }
 
-func (m Model) Init() tea.Cmd {
-	return nil
-}
+func (m Model) Init() tea.Cmd { return nil }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down", "j":
-			m.cursor++
-			if m.cursor >= len(m.items) {
-				m.cursor = 0
-			}
-			if m.items[m.cursor].separator {
+		case "down":
+			for range len(m.items) {
 				m.cursor++
 				if m.cursor >= len(m.items) {
 					m.cursor = 0
 				}
+				if !m.items[m.cursor].separator {
+					break
+				}
 			}
-		case "up", "k":
-			m.cursor--
-			if m.cursor < 0 {
-				m.cursor = len(m.items) - 1
-			}
-			if m.items[m.cursor].separator {
+		case "up":
+			for range len(m.items) {
 				m.cursor--
 				if m.cursor < 0 {
 					m.cursor = len(m.items) - 1
+				}
+				if !m.items[m.cursor].separator {
+					break
 				}
 			}
 		case "enter", " ":
@@ -91,8 +81,6 @@ func (m Model) handleSelection(id string) tea.Cmd {
 		return app.Navigate(cleanup.New(m.shared))
 	case "services":
 		return app.Navigate(services.New(m.shared))
-	case "theme":
-		return app.Navigate(themepicker.New(m.shared))
 	case "back":
 		return app.PopScreen()
 	}
@@ -105,34 +93,37 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Build list items
+	subtitle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(theme.Current.Muted)).
+		Width(width).
+		Align(lipgloss.Center).
+		Render("system maintenance and configuration")
+
 	items := make([]ui.ListItem, len(m.items))
 	for i, item := range m.items {
 		items[i] = ui.ListItem{
-			Icon:      item.icon,
-			Label:     item.label,
-			Separator: item.separator,
+			Icon:        item.icon,
+			Label:       item.label,
+			Description: item.desc,
+			Separator:   item.separator,
 		}
 	}
 
-	boxWidth := theme.ClampBoxWidth(theme.SubMenuBoxWidth, width)
-
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      boxWidth,
-		ShowCursor: true,
-	})
-
-	menuBox := ui.Box(menu, ui.BoxConfig{
-		Width:  boxWidth,
-		Active: true,
+		Width:         60,
+		MaxInnerWidth: 60,
 	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
-		Render(menuBox)
+		Render(menu)
 
-	return menuBlock
+	return lipgloss.JoinVertical(lipgloss.Left,
+		subtitle,
+		"",
+		menuBlock,
+	)
 }
 
 func (m Model) Title() string {
@@ -140,5 +131,5 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{"enter select"}
+	return []string{"↑↓ navigate", "enter select"}
 }

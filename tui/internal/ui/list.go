@@ -11,28 +11,29 @@ import (
 type ListItem struct {
 	Icon        string // Icon to display before label
 	Label       string // Main text
-	Suffix      string // Additional text (badges, hints) - already styled
-	Description string // Rendered as dimmed second line below label
+	Suffix      string // Pre-styled suffix text (badges, hints) — right-aligned
+	Description string // Dimmed second line below label
 	Dimmed      bool   // Whether item should be dimmed
 	Separator   bool   // Render as a separator line (not selectable)
 }
 
 // ListConfig configures list rendering.
 type ListConfig struct {
-	Width         int  // Total width for layout
-	ShowCursor    bool // Show arrow cursor on selected item
-	MaxInnerWidth int  // Max content width (0 = default 50)
+	Width         int  // Total width for centering/sizing
+	ShowCursor    bool // Retained for compatibility; ignored — the bar is always the cursor
+	MaxInnerWidth int  // Max content line width (0 = default)
 	Height        int  // Max visible items (0 = unlimited); windows around cursor when set
 }
 
-// RenderList renders a list of items with the cursor at the given position.
-// Returns the rendered list and the content width used.
+// RenderList renders a list using the Zen highlight-bar style.
+// Selected items: cyan │ left accent + subtle highlight background.
+// Unselected items: plain text indented to align.
 func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 	if len(items) == 0 {
 		return ""
 	}
 
-	// Window the visible items around cursor when height is constrained
+	// Window items around cursor when height is constrained.
 	if cfg.Height > 0 && len(items) > cfg.Height {
 		half := cfg.Height / 2
 		start := cursor - half
@@ -51,22 +52,11 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		cursor = cursor - start
 	}
 
-	// Calculate the maximum label width for alignment
-	maxLabelWidth := 0
-	for _, item := range items {
-		labelLen := lipgloss.Width(item.Icon + "  " + item.Label)
-		if labelLen > maxLabelWidth {
-			maxLabelWidth = labelLen
-		}
+	// Determine inner line width (total chars per row).
+	innerWidth := cfg.Width
+	if innerWidth == 0 {
+		innerWidth = theme.ListInnerWidthMax
 	}
-
-	// Build content width for highlight bar
-	contentWidth := cfg.Width
-	if contentWidth == 0 {
-		contentWidth = theme.ListWidthDefault
-	}
-	// Limit content width for cleaner appearance
-	innerWidth := contentWidth - 8 // Account for centering margins
 	maxInner := cfg.MaxInnerWidth
 	if maxInner == 0 {
 		maxInner = theme.ListInnerWidthMax
@@ -75,7 +65,36 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 		innerWidth = maxInner
 	}
 
-	const cursorWidth = theme.ListCursorWidth
+	// Content area width = inner width minus padding.
+	// Selected:    │ (1) + PadL(1) + content + PadR(1) = innerWidth  → content = innerWidth-3
+	// Not selected: PadL(2) + content + PadR(1)         = innerWidth  → content = innerWidth-3
+	contentWidth := innerWidth - 3
+	if contentWidth < 10 {
+		contentWidth = 10
+	}
+
+	bar := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Current.Border)).Render("│")
+
+	selectedBg := lipgloss.NewStyle().
+		Background(lipgloss.Color(theme.Current.Highlight)).
+		Foreground(lipgloss.Color("#ffffff")).
+		Bold(true).
+		PaddingLeft(1).
+		PaddingRight(1)
+
+	normalFg := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#d4d4d4")).
+		PaddingLeft(2).
+		PaddingRight(1)
+
+	dimmedFg := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(theme.Current.Muted)).
+		PaddingLeft(2).
+		PaddingRight(1)
+
+	descStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(theme.Current.Muted)).
+		PaddingLeft(2)
 
 	var sb strings.Builder
 	for i, item := range items {
@@ -83,81 +102,55 @@ func RenderList(items []ListItem, cursor int, cfg ListConfig) string {
 			sb.WriteByte('\n')
 		}
 
-		// Separator items render as a thin muted line, optionally with a label
 		if item.Separator {
-			var sepLine string
-			if item.Label != "" {
-				label := theme.MutedStyle().Render(item.Label)
-				labelWidth := lipgloss.Width(label)
-				rightDash := innerWidth - labelWidth - 5 // 3 left dashes + 2 spaces
-				if rightDash < 2 {
-					rightDash = 2
-				}
-				sepLine = strings.Repeat(" ", cursorWidth) +
-					theme.MutedStyle().Render("─── ") + label +
-					theme.MutedStyle().Render(" "+strings.Repeat("─", rightDash))
-			} else {
-				sepLine = strings.Repeat(" ", cursorWidth) +
-					theme.MutedStyle().Render(theme.ListSeparator)
+			sepLen := innerWidth - 4
+			if sepLen < 4 {
+				sepLen = 4
 			}
-			sb.WriteString(sepLine)
+			sep := "  " + theme.HelpDividerStyle().Render(strings.Repeat("─", sepLen))
+			sb.WriteString(sep)
 			continue
 		}
 
 		isSelected := i == cursor
 
-		// Build the label with icon
+		// Build label string with icon prefix.
 		label := item.Label
 		if item.Icon != "" {
 			label = item.Icon + "  " + item.Label
 		}
 
-		// Add suffix if present
+		// Right-align suffix within content area.
 		if item.Suffix != "" {
-			// Pad label for alignment before adding suffix
-			padded := label
-			currentLen := lipgloss.Width(label)
-			if currentLen < maxLabelWidth+2 {
-				padded += strings.Repeat(" ", maxLabelWidth+2-currentLen)
+			labelLen := lipgloss.Width(label)
+			suffixLen := lipgloss.Width(item.Suffix)
+			gap := contentWidth - labelLen - suffixLen
+			if gap < 2 {
+				gap = 2
 			}
-			label = padded + item.Suffix
+			label = label + strings.Repeat(" ", gap) + item.Suffix
 		}
-
-		hasDesc := item.Description != ""
 
 		var line string
 		if isSelected {
-			selected := theme.MenuSelectedStyle().Width(innerWidth)
-			if cfg.ShowCursor {
-				cursorStr := lipgloss.NewStyle().
-					Width(cursorWidth).
-					Foreground(lipgloss.Color(theme.Current.Primary)).
-					Render(theme.Icons.Cursor)
-				line = cursorStr + selected.Render(label)
-			} else {
-				spacer := strings.Repeat(" ", cursorWidth)
-				line = spacer + selected.Render(label)
-			}
+			content := selectedBg.Width(innerWidth - 1).Render(label)
+			line = bar + content
 		} else {
-			spacer := strings.Repeat(" ", cursorWidth)
+			style := normalFg
 			if item.Dimmed {
-				line = spacer + theme.ListDimmedStyle().Width(innerWidth).Render(label)
-			} else {
-				line = spacer + theme.ListNormalStyle().Width(innerWidth).Render(label)
+				style = dimmedFg
 			}
+			line = style.Width(innerWidth).Render(label)
 		}
 
 		sb.WriteString(line)
 
-		// Render description as a dimmed second line, indented to match label
-		if hasDesc {
-			descLine := strings.Repeat(" ", cursorWidth) +
-				lipgloss.NewStyle().Width(innerWidth).PaddingLeft(theme.PadItemH).
-					Render(theme.MutedStyle().Render(item.Description))
-			sb.WriteString("\n" + descLine)
+		// Description as indented second line.
+		if item.Description != "" {
+			desc := descStyle.Width(innerWidth).Render(item.Description)
+			sb.WriteString("\n" + desc)
 		}
 	}
 
 	return sb.String()
 }
-
