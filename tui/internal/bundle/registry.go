@@ -2,11 +2,12 @@ package bundle
 
 // Bundle describes a script bundle that can be installed/uninstalled.
 type Bundle struct {
-	ID          string // Directory name under scripts/
-	Name        string // Display name
-	Description string // Short description
-	MarkerPath  string // Path relative to $HOME that indicates installation
-	AutoSync    bool   // Re-run install.sh automatically after a repo update (config-only bundles only)
+	ID             string // Directory name under scripts/
+	Name           string // Display name
+	Description    string // Short description
+	PlatformSuffix string // Platform hint shown in the list (e.g. "arch", "hyprland")
+	MarkerPath     string // Path relative to $HOME that indicates installation
+	AutoSync       bool   // Re-run install.sh automatically after a repo update (config-only bundles only)
 }
 
 // All returns the list of all available bundles in display order.
@@ -14,67 +15,70 @@ func All() []Bundle {
 	return []Bundle{
 		{
 			ID:          "litebash",
-			Name:        "litebash",
-			Description: "Speed-focused bash with modern CLI tools",
+			Name:        "LiteBash",
+			Description: "bash with modern CLI tools (eza, bat, ripgrep, fd, zoxide)",
 			MarkerPath:  ".local/share/litebash/litebash.sh",
 		},
 		{
 			ID:          "litezsh",
-			Name:        "litezsh",
-			Description: "Zsh with syntax highlighting and autosuggestions",
+			Name:        "LiteZsh",
+			Description: "zsh with syntax highlighting and autosuggestions",
 			MarkerPath:  ".local/share/litezsh/litezsh.zsh",
 		},
 		{
 			ID:          "alacritty",
-			Name:        "alacritty",
-			Description: "Alacritty terminal config",
+			Name:        "Alacritty",
+			Description: "X11/Wayland terminal config",
 			MarkerPath:  ".config/alacritty/alacritty.toml",
 			AutoSync:    true,
 		},
 		{
 			ID:          "kitty",
-			Name:        "kitty",
-			Description: "Kitty terminal config",
+			Name:        "Kitty",
+			Description: "X11/Wayland terminal config",
 			MarkerPath:  ".config/kitty/kitty.conf",
 			AutoSync:    true,
 		},
 		{
-			ID:          "ptyxis",
-			Name:        "ptyxis",
-			Description: "Ptyxis terminal config (Arch only)",
-			MarkerPath:  ".local/share/org.gnome.Ptyxis/palettes/mypctools-catppuccin-mocha.palette",
-			AutoSync:    true,
+			ID:             "ptyxis",
+			Name:           "Ptyxis",
+			Description:    "GNOME terminal config via palettes",
+			PlatformSuffix: "arch",
+			MarkerPath:     ".local/share/org.gnome.Ptyxis/palettes/mypctools-catppuccin-mocha.palette",
+			AutoSync:       true,
 		},
 		{
 			ID:          "fastfetch",
-			Name:        "fastfetch",
-			Description: "Custom fastfetch with tree-style layout",
+			Name:        "Fastfetch",
+			Description: "tree-style layout with nerd font icons",
 			MarkerPath:  ".config/fastfetch/config.jsonc",
 			AutoSync:    true,
 		},
 		{
-			ID:          "screensaver",
-			Name:        "screensaver",
-			Description: "Terminal screensaver via hypridle + tte",
-			MarkerPath:  ".local/bin/mypctools-screensaver-launch",
+			ID:             "screensaver",
+			Name:           "Screensaver",
+			Description:    "terminal screensaver via hypridle + tte",
+			PlatformSuffix: "hyprland",
+			MarkerPath:     ".local/bin/mypctools-screensaver-launch",
 		},
 		{
-			ID:          "gnome-ubuntu",
-			Name:        "gnome ubuntu",
-			Description: "Ubuntu GNOME defaults for Arch",
-			MarkerPath:  ".local/share/gnome-ubuntu/installed",
+			ID:             "gnome-ubuntu",
+			Name:           "GNOME Ubuntu",
+			Description:    "Ubuntu GNOME defaults for Arch",
+			PlatformSuffix: "arch",
+			MarkerPath:     ".local/share/gnome-ubuntu/installed",
 		},
 		{
 			ID:          "claude",
-			Name:        "claude",
+			Name:        "Claude",
 			Description: "Claude Code skills and statusline",
 			MarkerPath:  ".claude/statusline.sh",
 			AutoSync:    true,
 		},
 		{
 			ID:          "spicetify",
-			Name:        "spicetify",
-			Description: "Spotify theming with StarryNight",
+			Name:        "Spicetify",
+			Description: "StarryNight theme for Spotify",
 			MarkerPath:  ".config/spicetify/config-xpui.ini",
 		},
 	}

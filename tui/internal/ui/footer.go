@@ -13,7 +13,7 @@ type HelpKey struct {
 	Desc string
 }
 
-// ParseHelpString splits a help string like "j/k navigate" into key and description.
+// ParseHelpString splits a help string like "↑↓ navigate" into key and description.
 func ParseHelpString(s string) HelpKey {
 	idx := strings.Index(s, " ")
 	if idx == -1 {
@@ -25,41 +25,31 @@ func ParseHelpString(s string) HelpKey {
 	}
 }
 
-// Footer renders a help key bar with a divider above.
-// Keys are rendered as pill badges with subtle backgrounds.
+// Footer renders a single centered line of key hints separated by ·
+// No divider line above — just floating muted text.
 func Footer(keys []HelpKey, width int) string {
+	if len(keys) == 0 {
+		return ""
+	}
+
 	keyStyle := theme.HelpKeyStyle()
 	descStyle := theme.HelpDescStyle()
-	dividerStyle := theme.HelpDividerStyle()
+	dotStyle := theme.HelpDividerStyle()
+	dot := dotStyle.Render(" · ")
 
-	// Build help text with pill-style keys
 	var parts []string
 	for _, k := range keys {
-		parts = append(parts, keyStyle.Render(k.Key)+" "+descStyle.Render(k.Desc))
+		if k.Desc != "" {
+			parts = append(parts, keyStyle.Render(k.Key)+" "+descStyle.Render(k.Desc))
+		} else {
+			parts = append(parts, keyStyle.Render(k.Key))
+		}
 	}
 
-	helpText := strings.Join(parts, "  ")
+	helpText := strings.Join(parts, dot)
 
-	// Create divider line
-	dividerWidth := width - 4
-	if dividerWidth > theme.FooterDividerMax {
-		dividerWidth = theme.FooterDividerMax
-	}
-	if dividerWidth < theme.FooterDividerMin {
-		dividerWidth = theme.FooterDividerMin
-	}
-	divider := dividerStyle.Render(strings.Repeat("─", dividerWidth))
-
-	// Center both
-	dividerCentered := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(divider)
-
-	helpCentered := lipgloss.NewStyle().
+	return lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
 		Render(helpText)
-
-	return dividerCentered + "\n" + helpCentered
 }

@@ -21,28 +21,38 @@ type menuItem struct {
 type Model struct {
 	shared     *state.Shared
 	bundle     bundle.Bundle
+	installed  bool
 	items      []menuItem
 	cursor     int
-	confirming bool // true when showing uninstall confirmation
+	confirming bool
 }
 
-// New creates a script menu for the given bundle.
 func New(shared *state.Shared, b bundle.Bundle) Model {
+	installed := bundle.IsInstalled(&b)
 	return Model{
-		shared: shared,
-		bundle: b,
-		items: []menuItem{
-			{icon: theme.Icons.Apps, label: "Install", id: "install"},
-			{icon: theme.Icons.Cleanup, label: "Uninstall", id: "uninstall"},
-			{icon: theme.Icons.Back, label: "Back", id: "back"},
-		},
-		cursor: 0,
+		shared:    shared,
+		bundle:    b,
+		installed: installed,
+		items:     buildItems(installed),
+		cursor:    0,
 	}
 }
 
-func (m Model) Init() tea.Cmd {
-	return nil
+func buildItems(installed bool) []menuItem {
+	if installed {
+		return []menuItem{
+			{icon: "⟳", label: "Reinstall", id: "install"},
+			{icon: "✕", label: "Uninstall", id: "uninstall"},
+			{icon: "←", label: "Back", id: "back"},
+		}
+	}
+	return []menuItem{
+		{icon: "+", label: "Install", id: "install"},
+		{icon: "←", label: "Back", id: "back"},
+	}
 }
+
+func (m Model) Init() tea.Cmd { return nil }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -59,22 +69,25 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		}
 
 		switch msg.String() {
-		case "down", "j":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up", "k":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
 			}
 		case "enter", " ":
-			if m.items[m.cursor].id == "uninstall" {
-				m.confirming = true
-				return m, nil
+			if m.cursor < len(m.items) {
+				id := m.items[m.cursor].id
+				if id == "uninstall" {
+					m.confirming = true
+					return m, nil
+				}
+				return m, m.handleSelection(id)
 			}
-			return m, m.handleSelection(m.items[m.cursor].id)
 		}
 	}
 	return m, nil
@@ -84,9 +97,6 @@ func (m Model) handleSelection(id string) tea.Cmd {
 	switch id {
 	case "install":
 		return app.Navigate(exec.New(m.shared, m.bundle, "install"))
-	case "uninstall":
-		// Handled in Update via confirming state
-		return nil
 	case "back":
 		return app.PopScreen()
 	}
@@ -99,65 +109,62 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	boxWidth := theme.ClampBoxWidth(theme.SubMenuBoxWidth, width)
-
-	// Title with bundle name
-	title := theme.SubheaderStyle().Render(m.bundle.Name)
-
-	// Description
-	desc := theme.MutedStyle().Render(m.bundle.Description)
-
-	// Status
-	var status string
-	if bundle.IsInstalled(&m.bundle) {
-		status = theme.SuccessStyle().Render("Installed") + ui.InstalledBadge()
+	// Title + description block (centered)
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#ffffff"))
+	var titleLine string
+	if m.installed {
+		badge := ui.InstalledBadge()
+		titleLine = titleStyle.Render(m.bundle.Name) + "  " + badge
 	} else {
-		status = theme.MutedStyle().Render("Not installed")
+		titleLine = titleStyle.Render(m.bundle.Name)
 	}
 
-	info := title + "\n" + desc + "\n" + status
+	titleBlock := lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(titleLine)
+	descBlock := lipgloss.NewStyle().
+		Width(width).
+		Align(lipgloss.Center).
+		Foreground(lipgloss.Color(theme.Current.Muted)).
+		Render(m.bundle.Description)
 
 	if m.confirming {
 		confirmMsg := theme.WarningStyle().Render("Uninstall " + m.bundle.Name + "?")
-		confirmHint := theme.MutedStyle().Render("y to confirm, n to cancel")
-		content := info + "\n\n" + confirmMsg + "\n" + confirmHint
-
-		menuBox := ui.Box(content, ui.BoxConfig{
-			Width:  boxWidth,
-			Active: true,
-		})
-
-		return lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(menuBox)
+		hint := theme.MutedStyle().Render("y confirm · n cancel")
+		return lipgloss.JoinVertical(lipgloss.Left,
+			titleBlock,
+			descBlock,
+			"",
+			lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(confirmMsg),
+			lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(hint),
+		)
 	}
 
-	// Build list items
-	items := make([]ui.ListItem, len(m.items))
+	// Build list: insert separator before last item (Back).
+	listItems := make([]ui.ListItem, 0, len(m.items)+1)
 	for i, item := range m.items {
-		items[i] = ui.ListItem{
-			Icon:  item.icon,
-			Label: item.label,
+		if i == len(m.items)-1 {
+			listItems = append(listItems, ui.ListItem{Separator: true})
 		}
+		listItems = append(listItems, ui.ListItem{Icon: item.icon, Label: item.label})
 	}
 
-	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      boxWidth,
-		ShowCursor: true,
+	// The separator is before the last item (Back), so shift cursor past it.
+	listCursor := m.cursor
+	if m.cursor == len(m.items)-1 {
+		listCursor = m.cursor + 1
+	}
+	menu := ui.RenderList(listItems, listCursor, ui.ListConfig{
+		Width:         48,
+		MaxInnerWidth: 48,
 	})
 
-	content := info + "\n\n" + menu
+	menuBlock := lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(menu)
 
-	menuBox := ui.Box(content, ui.BoxConfig{
-		Width:  boxWidth,
-		Active: true,
-	})
-
-	return lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(menuBox)
+	return lipgloss.JoinVertical(lipgloss.Left,
+		titleBlock,
+		descBlock,
+		"",
+		menuBlock,
+	)
 }
 
 func (m Model) Title() string {
@@ -168,5 +175,5 @@ func (m Model) ShortHelp() []string {
 	if m.confirming {
 		return []string{"y confirm", "n cancel"}
 	}
-	return []string{"enter select"}
+	return []string{"enter confirm"}
 }

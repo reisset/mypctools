@@ -18,7 +18,6 @@ type Model struct {
 	cursor  int
 }
 
-// New creates a new scripts list screen.
 func New(shared *state.Shared) Model {
 	return Model{
 		shared:  shared,
@@ -35,20 +34,19 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down", "j":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.bundles) {
 				m.cursor = 0
 			}
-		case "up", "k":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.bundles) - 1
 			}
 		case "enter", " ":
 			if m.cursor < len(m.bundles) {
-				b := m.bundles[m.cursor]
-				return m, app.Navigate(scriptmenu.New(m.shared, b))
+				return m, app.Navigate(scriptmenu.New(m.shared, m.bundles[m.cursor]))
 			}
 		}
 	}
@@ -61,49 +59,41 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Subtitle
 	subtitle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(theme.Current.Muted)).
 		Width(width).
-		Align(lipgloss.Center).
-		Render("Personal script bundles and configs")
+		Render("  Personal script bundles and configs")
 
-	// Build list items
 	items := make([]ui.ListItem, len(m.bundles))
 	for i, b := range m.bundles {
 		var suffix string
 		if bundle.IsInstalled(&b) {
 			suffix = ui.InstalledBadge()
+		} else if b.PlatformSuffix != "" {
+			suffix = theme.MutedStyle().Render(b.PlatformSuffix)
 		}
 		items[i] = ui.ListItem{
-			Icon:        theme.Icons.Scripts,
+			Icon:        "◇",
 			Label:       b.Name,
 			Suffix:      suffix,
 			Description: b.Description,
 		}
 	}
 
-	boxWidth := theme.ClampBoxWidth(theme.WideBoxWidth, width)
-	listHeight := m.shared.ContentHeight - 6
+	listHeight := m.shared.ContentHeight - 4
 	if listHeight < 5 {
 		listHeight = 5
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      boxWidth,
-		ShowCursor: true,
-		Height:     listHeight,
-	})
-
-	menuBox := ui.Box(menu, ui.BoxConfig{
-		Width:  boxWidth,
-		Active: true,
+		Width:         width,
+		MaxInnerWidth: 80,
+		Height:        listHeight,
 	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
-		Align(lipgloss.Center).
-		Render(menuBox)
+		Render(menu)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		subtitle,
@@ -117,5 +107,5 @@ func (m Model) Title() string {
 }
 
 func (m Model) ShortHelp() []string {
-	return []string{"enter select"}
+	return []string{"↑↓ navigate", "enter select"}
 }

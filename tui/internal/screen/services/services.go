@@ -28,34 +28,27 @@ type Model struct {
 	cursor int
 }
 
-// New creates a new service manager menu.
 func New(shared *state.Shared) Model {
 	items := []menuItem{
-		{icon: theme.Icons.Service, label: "Common Services", id: "common"},
-		{icon: theme.Icons.Info, label: "All Services", id: "all"},
-		{icon: theme.Icons.Back, label: "Back", id: "back"},
+		{icon: "◎", label: "Common Services", id: "common"},
+		{icon: "◎", label: "All Services", id: "all"},
+		{icon: "←", label: "Back", id: "back"},
 	}
-	return Model{
-		shared: shared,
-		items:  items,
-		cursor: 0,
-	}
+	return Model{shared: shared, items: items, cursor: 0}
 }
 
-func (m Model) Init() tea.Cmd {
-	return nil
-}
+func (m Model) Init() tea.Cmd { return nil }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "down", "j":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.items) {
 				m.cursor = 0
 			}
-		case "up", "k":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.items) - 1
@@ -85,35 +78,35 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Build list items
-	items := make([]ui.ListItem, len(m.items))
+	// Build list: separator before last item (Back).
+	listItems := make([]ui.ListItem, 0, len(m.items)+1)
 	for i, item := range m.items {
-		items[i] = ui.ListItem{
-			Icon:  item.icon,
-			Label: item.label,
+		if i == len(m.items)-1 {
+			listItems = append(listItems, ui.ListItem{Separator: true})
 		}
+		listItems = append(listItems, ui.ListItem{Icon: item.icon, Label: item.label})
 	}
-
-	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:      width,
-		ShowCursor: true,
+	listCursor := m.cursor
+	if m.cursor == len(m.items)-1 {
+		listCursor = m.cursor + 1
+	}
+	menu := ui.RenderList(listItems, listCursor, ui.ListConfig{
+		Width:         50,
+		MaxInnerWidth: 50,
 	})
 
-	menuBlock := lipgloss.NewStyle().
+	return lipgloss.NewStyle().
 		Width(width).
 		Align(lipgloss.Center).
 		Render(menu)
-
-	return menuBlock
 }
 
-func (m Model) Title() string {
-	return "Service Manager"
-}
-
+func (m Model) Title() string { return "Service Manager" }
 func (m Model) ShortHelp() []string {
 	return []string{"enter select"}
 }
+
+// ─── Service List ───────────────────────────────────────────────────────────
 
 // ServiceListModel shows a list of services with their status.
 type ServiceListModel struct {
@@ -125,14 +118,11 @@ type ServiceListModel struct {
 	viewport viewport.Model
 }
 
-// servicesLoadedMsg is sent when service list is loaded.
 type servicesLoadedMsg struct {
 	services []system.ServiceStatus
 }
 
-// NewServiceList creates a new service list screen.
 func NewServiceList(shared *state.Shared, showAll bool) ServiceListModel {
-	// Initialize viewport with current terminal size (will be resized on WindowSizeMsg)
 	width := shared.TerminalWidth
 	height := shared.TerminalHeight
 	if width == 0 {
@@ -161,11 +151,11 @@ func (m ServiceListModel) loadServices() tea.Cmd {
 			if err != nil {
 				return servicesLoadedMsg{services: nil}
 			}
-			var services []system.ServiceStatus
+			var svcs []system.ServiceStatus
 			for _, name := range names {
-				services = append(services, system.GetServiceStatus(name))
+				svcs = append(svcs, system.GetServiceStatus(name))
 			}
-			return servicesLoadedMsg{services: services}
+			return servicesLoadedMsg{services: svcs}
 		}
 		return servicesLoadedMsg{services: system.GetKnownServices()}
 	}
@@ -174,8 +164,7 @@ func (m ServiceListModel) loadServices() tea.Cmd {
 func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		headerHeight := 6 // header + separator + padding + footer
-		m.viewport = viewport.New(msg.Width, msg.Height-headerHeight)
+		m.viewport = viewport.New(msg.Width, msg.Height-6)
 		m.viewport.SetContent(m.renderRows())
 		return m, nil
 
@@ -189,16 +178,15 @@ func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		if m.loading {
 			return m, nil
 		}
-
 		switch msg.String() {
-		case "down", "j":
+		case "down":
 			m.cursor++
 			if m.cursor >= len(m.services) {
 				m.cursor = 0
 			}
 			m.scrollToCursor()
 			m.viewport.SetContent(m.renderRows())
-		case "up", "k":
+		case "up":
 			m.cursor--
 			if m.cursor < 0 {
 				m.cursor = len(m.services) - 1
@@ -214,59 +202,55 @@ func (m ServiceListModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	return m, nil
 }
 
-// scrollToCursor adjusts viewport offset to keep cursor visible.
 func (m *ServiceListModel) scrollToCursor() {
-	visibleHeight := m.viewport.Height
-	if visibleHeight <= 0 {
+	visH := m.viewport.Height
+	if visH <= 0 {
 		return
 	}
-
-	topLine := m.viewport.YOffset
-	bottomLine := topLine + visibleHeight - 1
-
-	if m.cursor < topLine {
+	top := m.viewport.YOffset
+	bottom := top + visH - 1
+	if m.cursor < top {
 		m.viewport.SetYOffset(m.cursor)
-	} else if m.cursor > bottomLine {
-		m.viewport.SetYOffset(m.cursor - visibleHeight + 1)
+	} else if m.cursor > bottom {
+		m.viewport.SetYOffset(m.cursor - visH + 1)
 	}
 }
 
-// renderRows builds the table content for the viewport with enhanced styling.
 func (m ServiceListModel) renderRows() string {
 	if len(m.services) == 0 {
 		return ""
 	}
 
+	bar := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Current.Border)).Render("│")
+	selectedBg := lipgloss.NewStyle().
+		Background(lipgloss.Color(theme.Current.Highlight)).
+		Foreground(lipgloss.Color("#ffffff")).
+		Bold(true)
+
 	var rows []string
 	for i, svc := range m.services {
-		// Format service name
-		name := fmt.Sprintf("%-*s", theme.ServiceColName, truncate(svc.Name, theme.ServiceColName))
+		name := truncate(svc.Name, 26)
+		nameCol := fmt.Sprintf("%-26s", name)
 
-		// Status badge with colors - use lipgloss.Width for ANSI-aware padding
-		status := ui.StatusBadge(svc.Active)
-		statusWidth := lipgloss.Width(status)
-		if statusWidth < theme.ServiceColStatus {
-			status = status + strings.Repeat(" ", theme.ServiceColStatus-statusWidth)
+		var statusCol string
+		switch svc.Active {
+		case "active":
+			statusCol = theme.SuccessStyle().Render("● up  ")
+		case "inactive":
+			statusCol = theme.ErrorStyle().Render("○ down")
+		default:
+			statusCol = theme.MutedStyle().Render("○ " + truncate(svc.Active, 4))
 		}
 
-		// Enabled badge - use lipgloss.Width for ANSI-aware padding
-		enabled := ui.EnabledBadge(svc.Enabled)
-		enabledWidth := lipgloss.Width(enabled)
-		if enabledWidth < theme.ServiceColEnabled {
-			enabled = enabled + strings.Repeat(" ", theme.ServiceColEnabled-enabledWidth)
-		}
-
-		row := name + "  " + status + "  " + enabled
+		row := nameCol + "  " + statusCol
 
 		if i == m.cursor {
-			// Full-width highlight for selected row
-			row = theme.TableRowSelectedStyle().Render(theme.Icons.Cursor + " " + row)
+			content := selectedBg.Render("  " + row + "  ")
+			rows = append(rows, bar+content)
 		} else {
-			row = "  " + theme.TableRowStyle().Render(row)
+			rows = append(rows, "   "+theme.MutedStyle().Render(row))
 		}
-		rows = append(rows, row)
 	}
-
 	return strings.Join(rows, "\n")
 }
 
@@ -278,62 +262,49 @@ func (m ServiceListModel) View() string {
 
 	if m.loading {
 		loading := theme.MutedStyle().Render("Loading services...")
-		return lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(loading)
+		return lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(loading)
 	}
 
 	if len(m.services) == 0 {
-		noServices := theme.WarningStyle().Render("No services found")
-		prompt := theme.MutedStyle().Render("Press esc to go back")
-		content := lipgloss.JoinVertical(lipgloss.Center, noServices, "", prompt)
-		return lipgloss.NewStyle().
-			Width(width).
-			Align(lipgloss.Center).
-			Render(content)
+		msg := theme.WarningStyle().Render("No services found")
+		return lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(msg)
 	}
 
-	// Table header with styling
-	header := fmt.Sprintf("%-*s  %-*s  %-*s", theme.ServiceColName, "Service", theme.ServiceColStatus, "Status", theme.ServiceColEnabled, "Enabled")
-	headerLine := theme.TableHeaderStyle().Render(header)
+	// Column header
+	header := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(theme.Current.Muted)).
+		PaddingLeft(3).
+		Render(fmt.Sprintf("%-26s  %s", "SERVICE", "STATUS"))
 
-	// Separator using theme color
-	separator := theme.HelpDividerStyle().Render(strings.Repeat("─", theme.ServiceTableWidth))
-
-	// Scroll indicator
-	scrollInfo := ""
+	// Scroll count hint
+	var countHint string
 	if len(m.services) > m.viewport.Height {
-		scrollInfo = theme.MutedStyle().Render(fmt.Sprintf(" [%d/%d]", m.cursor+1, len(m.services)))
+		countHint = "  " + theme.MutedStyle().Render(fmt.Sprintf("[%d/%d]", m.cursor+1, len(m.services)))
 	}
 
-	headerBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(headerLine + scrollInfo + "\n" + separator)
-
-	// Viewport content (scrollable)
-	viewportBlock := lipgloss.NewStyle().
-		Width(width).
-		Align(lipgloss.Center).
-		Render(m.viewport.View())
+	sep := "   " + theme.HelpDividerStyle().Render(strings.Repeat("─", 36))
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		"",
-		headerBlock,
-		viewportBlock,
+		header+countHint,
+		sep,
+		m.viewport.View(),
 	)
 }
 
 func (m ServiceListModel) Title() string {
+	label := "Common Services"
 	if m.showAll {
-		return "All Services"
+		label = "All Services"
 	}
-	return "Common Services"
+	if !m.loading && len(m.services) > 0 {
+		return fmt.Sprintf("%s (%d)", label, len(m.services))
+	}
+	return label
 }
 
 func (m ServiceListModel) ShortHelp() []string {
-	return []string{"enter details"}
+	return []string{"↑↓ navigate", "enter details"}
 }
 
 func truncate(s string, max int) string {

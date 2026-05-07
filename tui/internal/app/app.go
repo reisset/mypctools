@@ -11,19 +11,18 @@ import (
 	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
-// Model is the root Bubble Tea model. It holds a screen stack and shared state.
+// Model is the root Bubble Tea model.
 type Model struct {
 	stack       []Screen
 	shared      *state.Shared
 	width       int
 	height      int
-	toast       string    // Current toast message
-	toastError  bool      // Whether toast is an error
-	toastFading bool      // Toast is dimming before clear
-	toastExpiry time.Time // When toast should be dismissed
+	toast       string
+	toastError  bool
+	toastFading bool
+	toastExpiry time.Time
 }
 
-// NewModel creates the root model with an initial screen.
 func NewModel(initial Screen, shared *state.Shared) Model {
 	return Model{
 		stack:  []Screen{initial},
@@ -70,7 +69,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.toastError = msg.IsError
 		m.toastFading = false
 		m.toastExpiry = time.Now().Add(toastDuration)
-		// Pop back to previous screen
 		if len(m.stack) > 1 {
 			m.stack = m.stack[:len(m.stack)-1]
 		}
@@ -105,14 +103,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	// Delegate to the active screen
 	if len(m.stack) > 0 {
 		top := m.stack[len(m.stack)-1]
 		updated, cmd := top.Update(msg)
 		m.stack[len(m.stack)-1] = updated
 		return m, cmd
 	}
-
 	return m, nil
 }
 
@@ -121,7 +117,6 @@ func (m Model) View() string {
 		return ""
 	}
 
-	// Guard: terminal too small to render anything useful
 	if m.width > 0 && m.height > 0 && (m.width < theme.MinWidth || m.height < theme.MinHeight) {
 		text := fmt.Sprintf("Terminal too small (%dx%d)\nResize to at least %dx%d",
 			m.width, m.height, theme.MinWidth, theme.MinHeight)
@@ -138,17 +133,14 @@ func (m Model) View() string {
 		width = 80
 	}
 
-	// Build header: breadcrumb from stack titles (only for sub-screens)
+	// Header: "← Title" for sub-screens only
 	var header string
 	if len(m.stack) > 1 {
-		titles := make([]string, len(m.stack))
-		for i, s := range m.stack {
-			titles[i] = s.Title()
-		}
-		header = ui.Breadcrumb(titles, width) + "\n\n"
+		title := top.Title()
+		header = ui.ScreenHeader(title, width) + "\n"
 	}
 
-	// Build footer: help keys from active screen + global keys
+	// Build footer keys
 	helpKeys := []ui.HelpKey{}
 	for _, h := range top.ShortHelp() {
 		helpKeys = append(helpKeys, ui.ParseHelpString(h))
@@ -157,7 +149,7 @@ func (m Model) View() string {
 		helpKeys = append(helpKeys, ui.HelpKey{Key: "esc", Desc: "back"})
 	}
 
-	// Toast line above footer
+	// Toast line
 	var toastLine string
 	if m.toast != "" {
 		toastColor := theme.Current.Success
@@ -178,24 +170,18 @@ func (m Model) View() string {
 
 	footer := toastLine + "\n" + ui.Footer(helpKeys, width)
 
-	// Compose view - each component already handles its own centering via Width(width).Align(Center)
 	content := top.View()
 
-	// Calculate vertical centering
-	// Only center if content is less than 70% of screen height (avoids centering scrolling content)
 	contentHeight := lipgloss.Height(header + content + footer)
 	verticalPadding := 0
 	if m.height > contentHeight && contentHeight < (m.height*7/10) {
 		verticalPadding = (m.height - contentHeight) / 2
 	}
 
-	// Simple string concatenation - each part already has full width with centered content
 	combined := header + content + footer
 
 	if verticalPadding > 0 {
-		return lipgloss.NewStyle().
-			MarginTop(verticalPadding).
-			Render(combined)
+		return lipgloss.NewStyle().MarginTop(verticalPadding).Render(combined)
 	}
 	return combined
 }
