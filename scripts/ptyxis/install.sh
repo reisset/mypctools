@@ -51,6 +51,58 @@ install_palettes() {
         "mypctools-ubuntu.palette"
 }
 
+# Configure Ptyxis to use Iosevka Nerd Font at its own font settings
+# (org.gnome.Ptyxis has use-system-font + font-name keys independent of the system font)
+set_ptyxis_font() {
+    command -v gsettings &>/dev/null || return 0
+    command -v fc-list &>/dev/null || return 0
+    local family
+    family=$(fc-list : family | grep -i "IosevkaTerm Nerd Font Mono" | grep -v "Propo\|NFP" \
+        | head -1 | sed 's/,.*//' | xargs 2>/dev/null)
+    if [ -z "$family" ]; then
+        print_warning "IosevkaTerm Nerd Font Mono not found; skipping font config"
+        return 0
+    fi
+    gsettings set org.gnome.Ptyxis use-system-font false 2>/dev/null
+    gsettings set org.gnome.Ptyxis font-name "$family 14" 2>/dev/null
+    print_success "Ptyxis font: $family 14"
+}
+
+# Patch CachyOS Hello's terminal-helper to recognize ptyxis.
+# That script hardcodes a fixed terminal list and ignores xdg-terminals.list.
+patch_cachyos_hello() {
+    local helper="/usr/share/cachyos-hello/scripts/terminal-helper"
+    [ -f "$helper" ] || return 0
+    grep -q '"ptyxis"' "$helper" && {
+        print_success "CachyOS Hello: ptyxis support already present"
+        return 0
+    }
+    print_status "Adding ptyxis to CachyOS Hello terminal list..."
+    local tmp
+    tmp=$(mktemp)
+    python3 - "$helper" "$tmp" << 'PYEOF'
+import sys
+with open(sys.argv[1]) as f:
+    content = f.read()
+content = content.replace(
+    '    ["ghostty"]="ghostty -e $cmd"',
+    '    ["ghostty"]="ghostty -e $cmd"\n    ["ptyxis"]="ptyxis -- $cmd"'
+)
+content = content.replace('    "kgx"', '    "ptyxis"\n    "kgx"', 1)
+with open(sys.argv[2], 'w') as f:
+    f.write(content)
+PYEOF
+    if grep -q '"ptyxis"' "$tmp"; then
+        sudo cp "$tmp" "$helper"
+        sudo chmod 755 "$helper"
+        rm -f "$tmp"
+        print_success "CachyOS Hello: ptyxis support added"
+    else
+        rm -f "$tmp"
+        print_warning "Could not patch CachyOS Hello (pattern mismatch — update it manually)"
+    fi
+}
+
 # Apply the selected palette to the default ptyxis profile via gsettings
 apply_palette() {
     local palette_id="mypctools-$THEME"
@@ -84,8 +136,10 @@ main() {
 
     install_ptyxis
     install_font
+    set_ptyxis_font
     install_palettes
     apply_palette
+    patch_cachyos_hello
     set_default_terminal "ptyxis" "org.gnome.Ptyxis.desktop"
 
     echo ""

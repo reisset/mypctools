@@ -35,25 +35,42 @@ fi
 # Pre-cache sudo so paru doesn't prompt inside the TUI
 init_sudo
 
-# ---- Step 1: Install AUR packages ----
-print_status "Installing packages via paru..."
+# ---- Step 1: Install packages ----
+# Install official-repo deps for yaru first — paru can silently fail building
+# yaru-gtk-theme when these aren't present.
+print_status "Installing system dependencies..."
+sudo pacman -S --noconfirm --needed \
+    gtk-engine-murrine gnome-themes-extra sassc || {
+    print_warning "Some system deps may have failed. Continuing..."
+}
 
-PACKAGES=(
+print_status "Installing AUR packages via paru..."
+
+AUR_PACKAGES=(
     gnome-shell-extension-dash-to-dock
     gnome-shell-extension-appindicator
     gnome-shell-extension-desktop-icons-ng
     gnome-shell-extension-tiling-assistant
     yaru-gtk-theme
+    yaru-gnome-shell-theme
     yaru-icon-theme
     ttf-ubuntu-font-family
     gnome-tweaks
     gnome-extensions-app
 )
 
-paru -S --noconfirm --needed "${PACKAGES[@]}" || {
-    print_warning "Some packages may have failed. Continuing..."
+paru -S --noconfirm --needed "${AUR_PACKAGES[@]}" || {
+    print_warning "Some AUR packages may have failed. Continuing..."
 }
-print_success "Packages installed"
+
+# Report which Yaru packages actually landed
+for pkg in yaru-gtk-theme yaru-gnome-shell-theme yaru-icon-theme; do
+    if paru -Q "$pkg" &>/dev/null; then
+        print_success "$pkg installed"
+    else
+        print_error "$pkg NOT installed — theme may not apply correctly"
+    fi
+done
 
 # ---- Step 2: Enable extensions ----
 # UUIDs verified from Arch AUR packages via `gnome-extensions list` after install.
@@ -69,11 +86,28 @@ EXTENSION_UUIDS=(
     "tiling-assistant@leleat-on-github"
 )
 
+# Try gnome-extensions enable (requires live GNOME Shell); fall back to writing
+# the UUID directly into gsettings so it persists even when run from a TUI/exec context.
+enable_extension() {
+    local uuid="$1"
+    gnome-extensions enable "$uuid" 2>/dev/null && return 0
+    python3 - "$uuid" << 'PYEOF' 2>/dev/null
+import sys, subprocess, re
+uuid = sys.argv[1]
+r = subprocess.run(['gsettings', 'get', 'org.gnome.shell', 'enabled-extensions'],
+                   capture_output=True, text=True)
+current = r.stdout.strip()
+items = re.findall(r"'([^']+)'", current)
+if uuid not in items:
+    items.append(uuid)
+    subprocess.run(['gsettings', 'set', 'org.gnome.shell', 'enabled-extensions',
+                    '[' + ', '.join(f"'{i}'" for i in items) + ']'])
+PYEOF
+}
+
 for uuid in "${EXTENSION_UUIDS[@]}"; do
     print_status "Enabling $uuid..."
-    gnome-extensions enable "$uuid" 2>/dev/null || {
-        print_warning "Failed to enable $uuid (may need log out/in first)"
-    }
+    enable_extension "$uuid" || print_warning "Failed to enable $uuid"
 done
 
 # Post-enable validation
@@ -163,7 +197,7 @@ DOCK_SCHEMA="org.gnome.shell.extensions.dash-to-dock"
 gsettings set "$DOCK_SCHEMA" dock-position 'LEFT' 2>/dev/null
 gsettings set "$DOCK_SCHEMA" extend-height true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" dock-fixed false 2>/dev/null
-gsettings set "$DOCK_SCHEMA" autohide true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" autohide false 2>/dev/null
 gsettings set "$DOCK_SCHEMA" intellihide true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-trash true 2>/dev/null
@@ -178,7 +212,7 @@ gsettings set "$DOCK_SCHEMA" background-opacity 0.8 2>/dev/null
 gsettings set "$DOCK_SCHEMA" disable-overview-on-startup true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" hot-keys false 2>/dev/null
 gsettings set "$DOCK_SCHEMA" shortcut "['']" 2>/dev/null
-print_success "Dock configured (left, full-height, always-visible, DOTS indicators)"
+print_success "Dock configured (left, full-height, intellihide, DOTS indicators)"
 
 print_success "GNOME settings applied"
 
@@ -229,10 +263,12 @@ gsettings set "$TILING_SCHEMA" focus-hint-outline-style 1 2>/dev/null
 
 gsettings set "$DOCK_SCHEMA" dock-position 'LEFT' 2>/dev/null
 gsettings set "$DOCK_SCHEMA" extend-height true 2>/dev/null
-gsettings set "$DOCK_SCHEMA" dock-fixed true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" dock-fixed false 2>/dev/null
 gsettings set "$DOCK_SCHEMA" autohide false 2>/dev/null
-gsettings set "$DOCK_SCHEMA" intellihide false 2>/dev/null
+gsettings set "$DOCK_SCHEMA" intellihide true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" dash-max-icon-size 48 2>/dev/null
+gsettings set "$DOCK_SCHEMA" show-trash true 2>/dev/null
+gsettings set "$DOCK_SCHEMA" show-mounts true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-apps-at-top false 2>/dev/null
 gsettings set "$DOCK_SCHEMA" show-show-apps-button true 2>/dev/null
 gsettings set "$DOCK_SCHEMA" click-action 'minimize' 2>/dev/null
