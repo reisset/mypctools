@@ -58,35 +58,45 @@ select_theme() {
     fi
 }
 
-# Install Iosevka Nerd Font
+# Install Ubuntu Mono Nerd Font
 install_font() {
-    if fc-list | grep -qi "iosevka.*nerd"; then
-        print_success "Iosevka Nerd Font already installed"
+    if fc-list | grep -qi "ubuntumono.*nerd"; then
+        print_success "UbuntuMono Nerd Font already installed"
         return 0
     fi
 
-    print_status "Installing Iosevka Nerd Font..."
+    print_status "Installing UbuntuMono Nerd Font..."
+
+    # On Arch-based systems, prefer the packaged version
+    if [ "$PKG_MGR" = "pacman" ]; then
+        if $PKG_INSTALL ttf-ubuntu-mono-nerd 2>/dev/null; then
+            print_success "Installed UbuntuMono Nerd Font via pacman"
+            return 0
+        fi
+        print_warning "pacman install failed, falling back to GitHub download..."
+    fi
 
     mkdir -p "$FONT_DIR"
 
     local api_url="https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest"
     local download_url
-    download_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP '"browser_download_url":\s*"\K[^"]*IosevkaTerm\.zip[^"]*' | head -1)
+    download_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP '"browser_download_url":\s*"\K[^"]*UbuntuMono\.zip[^"]*' | head -1)
 
     if [ -z "$download_url" ]; then
-        print_warning "Could not find IosevkaTerm font download URL"
-        print_warning "Please install Iosevka Nerd Font manually"
+        print_warning "Could not find UbuntuMono font download URL"
+        print_warning "Please install a Nerd Font manually (e.g. ttf-ubuntu-mono-nerd on Arch)"
         return 1
     fi
 
-    local tmp_dir=$(mktemp -d)
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
 
     (
         cd "$tmp_dir" || exit 1
         print_status "Downloading font..."
-        curl -fsSL -o "IosevkaTerm.zip" "$download_url" || exit 1
+        curl -fsSL -o "UbuntuMono.zip" "$download_url" || exit 1
         print_status "Extracting font..."
-        unzip -q "IosevkaTerm.zip" -d "$FONT_DIR"
+        unzip -q "UbuntuMono.zip" -d "$FONT_DIR"
     )
     local rc=$?
 
@@ -100,7 +110,7 @@ install_font() {
     print_status "Updating font cache..."
     fc-cache -fv >/dev/null 2>&1
 
-    print_success "Installed Iosevka Nerd Font"
+    print_success "Installed UbuntuMono Nerd Font"
 }
 
 # Set terminal as default

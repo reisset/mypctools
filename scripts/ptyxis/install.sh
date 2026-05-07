@@ -51,21 +51,21 @@ install_palettes() {
         "mypctools-ubuntu.palette"
 }
 
-# Configure Ptyxis to use Iosevka Nerd Font at its own font settings
+# Configure Ptyxis to use UbuntuMono Nerd Font at its own font settings
 # (org.gnome.Ptyxis has use-system-font + font-name keys independent of the system font)
 set_ptyxis_font() {
     command -v gsettings &>/dev/null || return 0
     command -v fc-list &>/dev/null || return 0
     local family
-    family=$(fc-list : family | grep -i "IosevkaTerm Nerd Font Mono" | grep -v "Propo\|NFP" \
+    family=$(fc-list : family | grep -i "UbuntuMono Nerd Font Mono" | grep -v "Propo\|NFP" \
         | head -1 | sed 's/,.*//' | xargs 2>/dev/null)
     if [ -z "$family" ]; then
-        print_warning "IosevkaTerm Nerd Font Mono not found; skipping font config"
+        print_warning "UbuntuMono Nerd Font Mono not found; skipping font config"
         return 0
     fi
     gsettings set org.gnome.Ptyxis use-system-font false 2>/dev/null
-    gsettings set org.gnome.Ptyxis font-name "$family 14" 2>/dev/null
-    print_success "Ptyxis font: $family 14"
+    gsettings set org.gnome.Ptyxis font-name "$family 15" 2>/dev/null
+    print_success "Ptyxis font: $family 15"
 }
 
 # Patch CachyOS Hello's terminal-helper to recognize ptyxis.

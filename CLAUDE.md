@@ -34,9 +34,7 @@ mypctools/
 │   │   └── shell/              # aliases.sh, TOOLS.md (shared by litebash & litezsh)
 │   ├── litebash/               # Speed-focused bash (shell config only)
 │   ├── litezsh/                # Speed-focused zsh (syntax highlighting, autosuggestions)
-│   ├── terminal/               # foot terminal config (shell-agnostic, Wayland only)
 │   ├── alacritty/              # alacritty terminal config (shell-agnostic, X11 + Wayland)
-│   ├── ghostty/                # ghostty terminal config (shell-agnostic, X11 + Wayland)
 │   ├── kitty/                  # kitty terminal config (shell-agnostic, X11 + Wayland)
 │   ├── ptyxis/                 # ptyxis terminal config via palettes (GNOME, Arch/Fedora only)
 │   ├── fastfetch/              # Custom fastfetch config with tree-style layout
@@ -88,9 +86,7 @@ The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles
 
 - `scripts/litebash/` - Speed-focused bash environment with modern CLI tools (eza, bat, ripgrep, fd, zoxide, lazygit, yazi, starship). Shell config only.
 - `scripts/litezsh/` - Zsh counterpart to litebash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
-- `scripts/terminal/` - foot terminal config (Wayland only). Shell-agnostic. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
-- `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
-- `scripts/ghostty/` - ghostty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
+- `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
 - `scripts/kitty/` - kitty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
 - `scripts/ptyxis/` - ptyxis terminal config via .palette keyfiles (GNOME, Arch/Fedora only). Same themes. Palettes installed to `~/.local/share/org.gnome.Ptyxis/palettes/`; applied via gsettings.
 - `scripts/fastfetch/` - Custom fastfetch config with tree-style layout, nerd font icons, color-coded sections, small distro logo.
