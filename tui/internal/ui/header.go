@@ -14,5 +14,5 @@ func ScreenHeader(title string, width int) string {
 		Foreground(lipgloss.Color("#ffffff")).
 		Render(title)
 	content := arrow + "  " + titleStr
-	return lipgloss.NewStyle().Width(width).Render(content)
+	return lipgloss.NewStyle().Width(width).PaddingLeft(1).Render(content)
 }

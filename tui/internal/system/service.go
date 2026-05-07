@@ -26,6 +26,7 @@ type ServiceStatus struct {
 	Name    string
 	Active  string // "active", "inactive", "failed", "unknown"
 	Enabled string // "enabled", "disabled", "static", "unknown"
+	PID     string // main PID (empty if not running)
 }
 
 // GetServiceStatus returns the status of a single service.
@@ -58,6 +59,14 @@ func GetServiceStatus(name string) ServiceStatus {
 			if exitErr.ExitCode() == 1 {
 				status.Enabled = "disabled"
 			}
+		}
+	}
+
+	// Get main PID
+	if out, err := exec.Command("systemctl", "show", name, "--property=MainPID", "--value").Output(); err == nil {
+		pid := strings.TrimSpace(string(out))
+		if pid != "" && pid != "0" {
+			status.PID = pid
 		}
 	}
 

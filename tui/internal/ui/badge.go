@@ -5,14 +5,11 @@ import (
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
-// InstalledBadge returns an "installed" badge with cyan background.
+// InstalledBadge returns a subtle green "✓ installed" text indicator.
 func InstalledBadge() string {
 	return lipgloss.NewStyle().
-		Background(lipgloss.Color(theme.Current.Primary)).
-		Foreground(lipgloss.Color("#000000")).
-		Bold(true).
-		Padding(0, 1).
-		Render("installed")
+		Foreground(lipgloss.Color(theme.Current.Success)).
+		Render("✓ installed")
 }
 
 // StatusBadge returns a colored status indicator for services.
