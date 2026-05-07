@@ -248,7 +248,8 @@ func (m ServiceListModel) renderRows() string {
 			content := selectedBg.Render("  " + row + "  ")
 			rows = append(rows, bar+content)
 		} else {
-			rows = append(rows, "   "+theme.MutedStyle().Render(row))
+			normalStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#d4d4d4"))
+			rows = append(rows, "   "+normalStyle.Render(row))
 		}
 	}
 	return strings.Join(rows, "\n")
@@ -271,10 +272,9 @@ func (m ServiceListModel) View() string {
 	}
 
 	// Column header
-	header := lipgloss.NewStyle().
+	headerContent := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(theme.Current.Muted)).
-		PaddingLeft(3).
-		Render(fmt.Sprintf("%-26s  %s", "SERVICE", "STATUS"))
+		Render(fmt.Sprintf("   %-26s  %s", "SERVICE", "STATUS"))
 
 	// Scroll count hint
 	var countHint string
@@ -282,13 +282,17 @@ func (m ServiceListModel) View() string {
 		countHint = "  " + theme.MutedStyle().Render(fmt.Sprintf("[%d/%d]", m.cursor+1, len(m.services)))
 	}
 
-	sep := "   " + theme.HelpDividerStyle().Render(strings.Repeat("─", 36))
+	sepContent := "   " + theme.HelpDividerStyle().Render(strings.Repeat("─", 36))
+
+	headerBlock := lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(headerContent + countHint)
+	sepBlock := lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(sepContent)
+	viewportBlock := lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(m.viewport.View())
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		"",
-		header+countHint,
-		sep,
-		m.viewport.View(),
+		headerBlock,
+		sepBlock,
+		viewportBlock,
 	)
 }
 

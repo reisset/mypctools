@@ -240,9 +240,9 @@ func renderLogo(revealProgress, width int) string {
 				Render(string(ch))
 			sb.WriteString(styled)
 		}
-		// Letter-spacing: space between characters
+		// Letter-spacing: double space between characters for presence
 		if i < len(chars)-1 {
-			sb.WriteString(" ")
+			sb.WriteString("  ")
 		}
 	}
 

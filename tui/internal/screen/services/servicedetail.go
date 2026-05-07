@@ -192,9 +192,15 @@ func (m ServiceDetailModel) View() string {
 		)
 	}
 
+	pidStr := muted.Render("—")
+	if m.status.PID != "" {
+		pidStr = muted.Render(m.status.PID)
+	}
+
 	statusRow := lipgloss.JoinHorizontal(lipgloss.Top,
 		lipgloss.NewStyle().Width(20).Render(col("STATUS", activeStr)),
 		lipgloss.NewStyle().Width(20).Render(col("ENABLED", enabledStr)),
+		lipgloss.NewStyle().Width(16).Render(col("PID", pidStr)),
 	)
 
 	statsBlock := lipgloss.NewStyle().Width(width).PaddingLeft(2).Render(statusRow)

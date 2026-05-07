@@ -4,6 +4,18 @@ All notable changes to mypctools.
 
 ---
 
+## [0.37.0] - 2026-05-07
+
+### Fixed
+- **Scripts list**: Constrained list width to 72 chars (was full terminal width) and centered the content block and subtitle.
+- **Installed badge**: Replaced loud cyan-background pill with a subtle green `✓ installed` text label.
+- **Service list**: Unselected rows now render in normal foreground (`#d4d4d4`) instead of muted; header, separator, and viewport centered.
+- **Service detail**: Added PID column to stats row (reads `MainPID` via `systemctl show`).
+- **Logo**: Double letter-spacing between characters for more visual presence.
+- **Screen header**: Added `PaddingLeft(1)` so `← Title` isn't flush against the terminal edge.
+
+---
+
 ## [0.36.0] - 2026-05-07
 
 ### Changed

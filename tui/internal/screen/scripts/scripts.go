@@ -62,7 +62,8 @@ func (m Model) View() string {
 	subtitle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(theme.Current.Muted)).
 		Width(width).
-		Render("  Personal script bundles and configs")
+		Align(lipgloss.Center).
+		Render("Personal script bundles and configs")
 
 	items := make([]ui.ListItem, len(m.bundles))
 	for i, b := range m.bundles {
@@ -86,13 +87,14 @@ func (m Model) View() string {
 	}
 
 	menu := ui.RenderList(items, m.cursor, ui.ListConfig{
-		Width:         width,
-		MaxInnerWidth: 80,
+		Width:         72,
+		MaxInnerWidth: 72,
 		Height:        listHeight,
 	})
 
 	menuBlock := lipgloss.NewStyle().
 		Width(width).
+		Align(lipgloss.Center).
 		Render(menu)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
