@@ -36,6 +36,13 @@ fi
 init_sudo
 
 # ---- Step 1: Install packages ----
+# gnome-shell-extension-no-overview is in the CachyOS repo; install it via pacman
+# first so paru doesn't need to resolve it through AUR.
+print_status "Installing system packages..."
+sudo pacman -S --noconfirm --needed gnome-shell-extension-no-overview || {
+    print_warning "gnome-shell-extension-no-overview not found in repos — will try via paru"
+}
+
 print_status "Installing AUR packages via paru..."
 
 AUR_PACKAGES=(
@@ -75,6 +82,7 @@ EXTENSION_UUIDS=(
     "appindicatorsupport@rgcjonas.gmail.com"
     "ding@rastersoft.com"
     "tiling-assistant@leleat-on-github"
+    "no-overview@fthx"
 )
 
 # Try gnome-extensions enable (requires live GNOME Shell); fall back to writing
