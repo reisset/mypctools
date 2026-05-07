@@ -4,6 +4,24 @@ All notable changes to mypctools.
 
 ---
 
+## [0.34.0] - 2026-05-07
+
+### Changed
+- **Terminal font**: Switched from IosevkaTerm Nerd Font to UbuntuMono Nerd Font Mono across all alacritty and kitty configs. Installer now uses `ttf-ubuntu-mono-nerd` via pacman on Arch (GitHub zip fallback for non-Arch).
+- **Ptyxis font**: Now delegates to the GNOME system monospace font (`use-system-font true`) instead of managing the font explicitly. The gnome-ubuntu bundle sets this to Ubuntu Mono, which fontconfig satisfies with the installed Nerd Font variant — icons work without any separate font install step.
+
+### Removed
+- **Ghostty and foot (terminal) bundles**: Both script directories and their TUI registry entries removed. Supported terminals are now alacritty, kitty, and ptyxis.
+
+### Fixed
+- **gnome-ubuntu: no-overview extension**: Added `gnome-shell-extension-no-overview` to suppress the Activities overview on login startup.
+- **gnome-ubuntu: removed gnome-extensions-app**: Not available on Arch; removed from AUR package list.
+- **gnome-ubuntu/ptyxis installer bugs**: Various corrections to installer logic.
+- **Ptyxis uninstaller**: Now resets `use-system-font` gsettings key on uninstall.
+- **Uninstaller font hints**: All terminal uninstallers now reference the correct font (`ttf-ubuntu-mono-nerd` / `UbuntuMono*`) instead of the old Iosevka paths.
+
+---
+
 ## [0.33.0] - 2026-05-01
 
 ### Removed
