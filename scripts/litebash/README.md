@@ -47,14 +47,13 @@ mypctools
 
 ## Terminal Config
 
-Terminal theming (foot) is shell-agnostic and lives separately at `../terminal/`.
+Terminal theming is shell-agnostic. Install alacritty, kitty, or ptyxis separately:
 
 ```bash
 # Via mypctools
-mypctools → Scripts → Terminal - foot
-
-# Or manually
-../terminal/install.sh
+mypctools → Scripts → Terminal - alacritty
+mypctools → Scripts → Terminal - kitty
+mypctools → Scripts → Terminal - ptyxis
 ```
 
 ## Customization

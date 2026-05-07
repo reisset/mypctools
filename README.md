@@ -52,9 +52,7 @@ Script bundles you can install or uninstall:
 
 - **LiteBash** — Bash with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi). Fast startup.
 - **LiteZsh** — Zsh with syntax highlighting, autosuggestions, and arrow-key completion. Sets zsh as default shell.
-- **Terminal — foot** — Wayland terminal config. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
-- **Terminal — alacritty** — X11/Wayland terminal config. Same themes.
-- **Terminal — ghostty** — X11/Wayland terminal config. Same themes.
+- **Terminal — alacritty** — X11/Wayland terminal config. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
 - **Terminal — kitty** — X11/Wayland terminal config. Same themes.
 - **Terminal — ptyxis** — GNOME terminal config via palettes. Same themes. Arch/Fedora only.
 - **Fastfetch** — Tree-style layout with nerd font icons and compact distro logo.

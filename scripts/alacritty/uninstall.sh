@@ -76,7 +76,8 @@ main() {
     echo "  Fedora: sudo dnf remove alacritty"
     echo ""
     echo "Fonts were left in place. To remove manually:"
-    echo "  rm -rf ~/.local/share/fonts/Iosevka*"
+    echo "  Arch:     sudo pacman -R ttf-ubuntu-mono-nerd"
+    echo "  Non-Arch: rm -rf ~/.local/share/fonts/UbuntuMono*"
 }
 
 main "$@"
