@@ -13,6 +13,8 @@ ARCH=$(uname -m)
 
 source "$SCRIPT_DIR/../../lib/print.sh"
 
+trap 'print_error "Interrupted — partial install may have occurred."; exit 130' INT TERM
+
 init_sudo
 
 source "$SCRIPT_DIR/../../lib/distro-detect.sh"
@@ -74,13 +76,11 @@ pkg_install() {
     local name="$1"
     local pacman_pkg="$2"
     local apt_pkg="$3"
-    local dnf_pkg="$4"
 
     local pkg=""
     case "$PKG_MGR" in
         pacman) pkg="$pacman_pkg" ;;
         apt) pkg="$apt_pkg" ;;
-        dnf) pkg="$dnf_pkg" ;;
     esac
 
     if [ -n "$pkg" ]; then
@@ -95,6 +95,8 @@ main() {
 
     # Source shared tool installation lib
     source "$SCRIPT_DIR/../../lib/tools-install.sh"
+
+    check_network
 
     # Create directories
     mkdir -p "$LOCAL_BIN"
@@ -111,24 +113,24 @@ main() {
 
     # Install dependencies
     print_status "Installing dependencies..."
-    pkg_install "curl" "curl" "curl" "curl"
-    pkg_install "unzip" "unzip" "unzip" "unzip"
-    pkg_install "tar" "tar" "tar" "tar"
-    pkg_install "git" "git" "git" "git"
+    pkg_install "curl" "curl" "curl"
+    pkg_install "unzip" "unzip" "unzip"
+    pkg_install "tar" "tar" "tar"
+    pkg_install "git" "git" "git"
 
     # Install plugins
     install_plugins
 
     # Install core tools via package manager
     print_status "Installing core tools..."
-    pkg_install "eza" "eza" "eza" "eza"
-    pkg_install "bat" "bat" "bat" "bat"
-    pkg_install "fzf" "fzf" "fzf" "fzf"
-    pkg_install "ripgrep" "ripgrep" "ripgrep" "ripgrep"
-    pkg_install "fd" "fd" "fd-find" "fd-find"
-    pkg_install "btop" "btop" "btop" "btop"
-    pkg_install "micro" "micro" "micro" "micro"
-    pkg_install "gh" "github-cli" "gh" "gh"
+    pkg_install "eza" "eza" "eza"
+    pkg_install "bat" "bat" "bat"
+    pkg_install "fzf" "fzf" "fzf"
+    pkg_install "ripgrep" "ripgrep" "ripgrep"
+    pkg_install "fd" "fd" "fd-find"
+    pkg_install "btop" "btop" "btop"
+    pkg_install "micro" "micro" "micro"
+    pkg_install "gh" "github-cli" "gh"
 
     # Create Debian symlinks + install all GitHub tools
     create_debian_symlinks
@@ -179,6 +181,16 @@ main() {
 
     if [[ "$needs_clean_zshrc" == "true" ]]; then
         print_warning "Existing .zshrc has conflicting configs (oh-my-zsh/p10k/distro)"
+        print_warning "LiteZsh needs a clean .zshrc — your current one will be backed up to ~/.zshrc.pre-litezsh"
+        read -rp "Overwrite ~/.zshrc? [y/N] " _confirm
+        if [[ ! "$_confirm" =~ ^[Yy]$ ]]; then
+            print_warning "Skipping .zshrc replacement — manual setup may be required"
+            needs_clean_zshrc=false
+        fi
+        unset _confirm
+    fi
+
+    if [[ "$needs_clean_zshrc" == "true" ]]; then
         print_status "Backing up to ~/.zshrc.pre-litezsh"
         cp "$HOME/.zshrc" "$HOME/.zshrc.pre-litezsh"
 

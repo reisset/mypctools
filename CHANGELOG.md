@@ -4,6 +4,35 @@ All notable changes to mypctools.
 
 ---
 
+## [Unreleased]
+
+### Removed
+- **Fedora/RHEL support**: Dropped entirely — project now targets CachyOS and Debian/Ubuntu only. Removed all `dnf` code paths from `lib/distro-detect.sh`, `lib/tools-install.sh`, `tui/internal/cmd/distro.go`, `tui/internal/system/update.go`, `tui/internal/system/cleanup.go`, and all script installers. The `DnfPkg` field mentioned in CLAUDE.md was already absent from the Go codebase; docs updated accordingly.
+
+### Fixed
+- **gnome-ubuntu**: Added paru install instructions on missing paru, D-Bus session guard (prevents silent gsettings no-ops over SSH/TTY), per-package AUR install loop with failure reporting, python3 guard in enable_extension fallback, idempotency short-circuit (`--force` to re-run), GNOME version detection for GNOME 47+ keys.
+- **lib/distro-detect.sh**: No longer sources `/etc/os-release` (env pollution). Parses needed fields via grep. Fixed `ID_LIKE` matching to use word-boundary tokenization. Added hard-error on unsupported distro instead of silent empty `PKG_INSTALL`.
+- **lib/symlink.sh**: `safe_symlink` now accepts directories (was using `! -f` instead of `! -e`). Auto-creates parent directories before symlinking.
+- **lib/tools-install.sh**: Fixed GitHub rate-limit detection string (`"API rate limit exceeded"` vs the never-matching `"rate limit"`). Added `mkdir -p "$LOCAL_BIN"` before raw-binary install. Added 3-attempt retry with backoff via `_curl_github_api` helper.
+- **lib/terminal-install.sh**: `update-alternatives` now correctly gated on Debian only (was running on Arch+GNOME). `xdg-terminals.list` rewrite is now atomic (mktemp + mv).
+- **lib/print.sh**: `print_error` now routes to stderr. Added `NO_COLOR`/TTY gate for ANSI. `init_sudo` now installs an EXIT trap to kill the keepalive loop.
+- **tui/selfupdate**: Added 60s HTTP timeout. `fetchExpectedChecksum` now handles `sha256sum -b` format (3-field `*filename` suffix).
+- **tui/state/detect**: `git rev-list` now uses `CommandContext` (same timeout as fetch).
+- **tui/system/cleanup**: `ClearUserCaches` now returns `errors.Join` instead of only the first error.
+- **tui/system/service**: `ServiceExists` now checks stdout for the unit name (systemd ≥ 245 exits 0 even for missing units).
+- **tui/bundle/detect**: `IsInstalled` switched from `os.Stat` to `os.Lstat` — broken symlink markers no longer report "not installed".
+- **tui/bundle/registry**: Spicetify marker changed from `.spicetify/spicetify` to `.config/spicetify/config-xpui.ini` (stable across upstream updates).
+- **tui/screen/exec**: Success path no longer sets `m.done = true` (removes ghost View frame). Dead success branch removed from View.
+- **tui/screen/themepicker**: Theme save failure now surfaces as a toast instead of silently swallowing the error.
+- **tui/screen/mainmenu**: Separator-skip loop bounded by `len(items)` to guard against all-separator edge case.
+- **tui/system/service**: `ListAllServices` now uses native Go parsing instead of `bash | awk | sed | sort`.
+- **litebash/litebash.sh**: Fixed fzf init fallback — was never firing because `fzf --bash` exits 0 even with no output.
+- **litezsh/install.sh**: Clean-zshrc replacement now prompts `[y/N]` before overwriting. Added INT/TERM trap and network preflight.
+- **litebash/install.sh**: Added INT/TERM trap and network preflight.
+- **screensaver/install.sh**: Tightened `exec-once = hypridle` grep to regex to avoid matching commented-out lines.
+
+---
+
 ## [0.34.0] - 2026-05-07
 
 ### Changed

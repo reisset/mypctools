@@ -10,7 +10,7 @@ if ! command -v ptyxis &>/dev/null; then
     init_sudo
 fi
 
-# Install ptyxis (Arch and Fedora only)
+# Install ptyxis (Arch only)
 install_ptyxis() {
     if command -v ptyxis &>/dev/null; then
         print_success "ptyxis already installed"
@@ -20,10 +20,9 @@ install_ptyxis() {
     print_status "Installing ptyxis..."
     case "$PKG_MGR" in
         pacman) $PKG_INSTALL ptyxis ;;
-        dnf) $PKG_INSTALL ptyxis ;;
         apt)
             print_error "ptyxis is not available in Debian/Ubuntu apt repos."
-            print_error "Install Arch or Fedora, or install ptyxis manually via Flatpak:"
+            print_error "Install Arch, or install ptyxis manually via Flatpak:"
             echo "  flatpak install flathub org.gnome.Ptyxis"
             exit 1
             ;;

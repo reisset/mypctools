@@ -2,6 +2,7 @@ package system
 
 import (
 	"os/exec"
+	"sort"
 	"strings"
 )
 
@@ -31,8 +32,8 @@ type ServiceStatus struct {
 func GetServiceStatus(name string) ServiceStatus {
 	status := ServiceStatus{Name: name, Active: "unknown", Enabled: "unknown"}
 
-	// Check if service exists
-	if err := exec.Command("systemctl", "list-unit-files", name+".service").Run(); err != nil {
+	// Check if service exists (systemd >= 245 exits 0 even for missing units, so check stdout)
+	if !ServiceExists(name) {
 		return status
 	}
 
@@ -64,9 +65,13 @@ func GetServiceStatus(name string) ServiceStatus {
 }
 
 // ServiceExists checks if a service unit file exists.
+// We check stdout because systemd >= 245 exits 0 even when the unit is not found.
 func ServiceExists(name string) bool {
-	err := exec.Command("systemctl", "list-unit-files", name+".service", "--no-legend").Run()
-	return err == nil
+	out, err := exec.Command("systemctl", "list-unit-files", name+".service", "--no-legend").Output()
+	if err != nil {
+		return false
+	}
+	return strings.Contains(string(out), name+".service")
 }
 
 // GetKnownServices returns the status of all known services that exist on the system.
@@ -89,17 +94,21 @@ func ServiceActionCmd(name, action string) *exec.Cmd {
 
 // ListAllServices returns all service names on the system.
 func ListAllServices() ([]string, error) {
-	out, err := exec.Command("bash", "-c",
-		"systemctl list-unit-files --type=service --no-pager --no-legend | awk '{print $1}' | sed 's/\\.service$//' | sort").Output()
+	out, err := exec.Command("systemctl", "list-unit-files", "--type=service", "--no-pager", "--no-legend").Output()
 	if err != nil {
 		return nil, err
 	}
 
 	var services []string
 	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
-		if line != "" {
-			services = append(services, line)
+		fields := strings.Fields(line)
+		if len(fields) > 0 {
+			name := strings.TrimSuffix(fields[0], ".service")
+			if name != "" {
+				services = append(services, name)
+			}
 		}
 	}
+	sort.Strings(services)
 	return services, nil
 }

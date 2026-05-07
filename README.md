@@ -54,7 +54,7 @@ Script bundles you can install or uninstall:
 - **LiteZsh** — Zsh with syntax highlighting, autosuggestions, and arrow-key completion. Sets zsh as default shell.
 - **Terminal — alacritty** — X11/Wayland terminal config. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
 - **Terminal — kitty** — X11/Wayland terminal config. Same themes.
-- **Terminal — ptyxis** — GNOME terminal config via palettes. Same themes. Arch/Fedora only.
+- **Terminal — ptyxis** — GNOME terminal config via palettes. Same themes. Arch only.
 - **Fastfetch** — Tree-style layout with nerd font icons and compact distro logo.
 - **Screensaver** — Terminal screensaver via hypridle and Terminal Text Effects. Hyprland only.
 - **GNOME Ubuntu** — Ubuntu GNOME defaults (Yaru theme, dock, fonts) for Arch.
@@ -65,7 +65,7 @@ Script bundles you can install or uninstall:
 
 ## ⚙️ System Setup
 
-- **Full System Update** — Runs apt, pacman, or dnf upgrade.
+- **Full System Update** — Runs apt or pacman upgrade.
 - **System Cleanup** — Removes orphaned packages, clears caches, empties trash.
 - **Service Manager** — Browse or search systemd services.
 - **Theme** — Switch between DefaultCyan, CatppuccinMocha, and TokyoNight.
@@ -86,7 +86,7 @@ The app checks for updates at launch.
 
 ## 🖥️ Requirements
 
-- Linux (Debian/Ubuntu, Arch, or Fedora-based)
+- Linux (CachyOS or Debian/Ubuntu) — Fedora is intentionally not supported
 - x86_64 or arm64
 
 ---

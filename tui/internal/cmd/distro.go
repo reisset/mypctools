@@ -13,7 +13,6 @@ type DistroType string
 const (
 	DistroArch    DistroType = "arch"
 	DistroDebian  DistroType = "debian"
-	DistroFedora  DistroType = "fedora"
 	DistroUnknown DistroType = "unknown"
 )
 
@@ -40,11 +39,6 @@ var knownIDs = map[string]DistroType{
 	"linuxmint":   DistroDebian,
 	"elementary":  DistroDebian,
 	"zorin":       DistroDebian,
-	"fedora":      DistroFedora,
-	"rhel":        DistroFedora,
-	"centos":      DistroFedora,
-	"rocky":       DistroFedora,
-	"alma":        DistroFedora,
 }
 
 // DetectDistro parses /etc/os-release and returns distro info.
@@ -66,8 +60,6 @@ func DetectDistro() DistroInfo {
 		info.Type = DistroArch
 	} else if strings.Contains(idLike, "debian") || strings.Contains(idLike, "ubuntu") {
 		info.Type = DistroDebian
-	} else if strings.Contains(idLike, "fedora") || strings.Contains(idLike, "rhel") {
-		info.Type = DistroFedora
 	} else {
 		info.Type = detectByCommand()
 	}
@@ -81,10 +73,6 @@ func DetectDistro() DistroInfo {
 		info.PkgMgr = "apt"
 		info.PkgInstall = "sudo apt install -y"
 		info.PkgUpdate = "sudo apt update && sudo apt upgrade -y"
-	case DistroFedora:
-		info.PkgMgr = "dnf"
-		info.PkgInstall = "sudo dnf install -y"
-		info.PkgUpdate = "sudo dnf upgrade -y"
 	}
 
 	return info
@@ -120,8 +108,5 @@ func detectByCommand() DistroType {
 	if _, err := exec.LookPath("apt"); err == nil {
 		return DistroDebian
 	}
-	if _, err := exec.LookPath("dnf"); err == nil {
-		return DistroFedora
-	}
-	return DistroUnknown
+return DistroUnknown
 }

@@ -1,6 +1,7 @@
 package system
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -27,9 +28,7 @@ else
 fi
 `
 		return exec.Command("bash", "-c", script)
-	case cmd.DistroFedora:
-		return exec.Command("bash", "-c", "sudo dnf autoremove -y && sudo dnf clean all")
-	default:
+default:
 		return nil
 	}
 }
@@ -56,8 +55,5 @@ func ClearUserCaches() error {
 		errs = append(errs, err)
 	}
 
-	if len(errs) > 0 {
-		return errs[0] // Return first error for simplicity
-	}
-	return nil
+	return errors.Join(errs...)
 }

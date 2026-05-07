@@ -21,7 +21,6 @@ install_alacritty() {
     case "$PKG_MGR" in
         pacman) $PKG_INSTALL alacritty ;;
         apt) $PKG_INSTALL alacritty ;;
-        dnf) $PKG_INSTALL alacritty ;;
     esac
     print_success "Installed alacritty"
 }

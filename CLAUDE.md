@@ -36,7 +36,7 @@ mypctools/
 │   ├── litezsh/                # Speed-focused zsh (syntax highlighting, autosuggestions)
 │   ├── alacritty/              # alacritty terminal config (shell-agnostic, X11 + Wayland)
 │   ├── kitty/                  # kitty terminal config (shell-agnostic, X11 + Wayland)
-│   ├── ptyxis/                 # ptyxis terminal config via palettes (GNOME, Arch/Fedora only)
+│   ├── ptyxis/                 # ptyxis terminal config via palettes (GNOME, Arch only)
 │   ├── fastfetch/              # Custom fastfetch config with tree-style layout
 │   ├── screensaver/            # Terminal screensaver via hypridle + tte (Hyprland only)
 │   ├── gnome-ubuntu/             # Ubuntu GNOME defaults (Arch only, uses paru)
@@ -88,7 +88,7 @@ The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles
 - `scripts/litezsh/` - Zsh counterpart to litebash with native syntax highlighting, autosuggestions, and arrow-key completion. Auto-sets zsh as default shell.
 - `scripts/alacritty/` - alacritty terminal config (X11 + Wayland). Shell-agnostic. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
 - `scripts/kitty/` - kitty terminal config (X11 + Wayland). Shell-agnostic. Same themes.
-- `scripts/ptyxis/` - ptyxis terminal config via .palette keyfiles (GNOME, Arch/Fedora only). Same themes. Palettes installed to `~/.local/share/org.gnome.Ptyxis/palettes/`; applied via gsettings.
+- `scripts/ptyxis/` - ptyxis terminal config via .palette keyfiles (GNOME, Arch only). Same themes. Palettes installed to `~/.local/share/org.gnome.Ptyxis/palettes/`; applied via gsettings.
 - `scripts/fastfetch/` - Custom fastfetch config with tree-style layout, nerd font icons, color-coded sections, small distro logo.
 - `scripts/screensaver/` - Omarchy-style terminal screensaver using tte (Terminal Text Effects) with hypridle integration. Hyprland only.
 - `scripts/gnome-ubuntu/` - Ubuntu GNOME defaults (Yaru theme, dash-to-dock, Ubuntu fonts) for Arch. Uses paru.
@@ -97,8 +97,8 @@ The canonical `starship.toml` lives in `scripts/shared/prompt/` and both bundles
 
 ## Distro Support
 
-Tested on Arch-based and Debian/Ubuntu-based distros. Fedora support is partial (uses `DnfPkg` field only — no apt name fallback).
-`DISTRO_TYPE` is exported by `lib/distro-detect.sh` and used throughout.
+Targets **CachyOS** (primary Arch flavor) and **Debian/Ubuntu**. Fedora has been intentionally removed and will not be re-added.
+`DISTRO_TYPE` is exported by `lib/distro-detect.sh` (values: `arch`, `debian`) and used throughout.
 
 ## Code Style
 

@@ -21,8 +21,8 @@ safe_symlink() {
         return 1
     fi
 
-    if [[ ! -f "$resolved_source" ]]; then
-        print_warning "Source file not found: $source"
+    if [[ ! -e "$resolved_source" ]]; then
+        print_warning "Source not found: $source"
         return 1
     fi
 
@@ -43,7 +43,8 @@ safe_symlink() {
         print_status "Backed up existing $name to: $(basename "$backup")"
     fi
 
-    # Create symlink
+    # Create symlink (ensure parent dir exists)
+    mkdir -p "$(dirname "$target")"
     if ln -sf "$resolved_source" "$target"; then
         print_success "Linked $name"
         return 0

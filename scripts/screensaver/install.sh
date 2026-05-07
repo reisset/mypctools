@@ -51,7 +51,6 @@ if ! command_exists pipx; then
     case "$DISTRO_TYPE" in
         arch)   sudo pacman -S --noconfirm --needed python-pipx ;;
         debian) sudo apt install -y pipx ;;
-        fedora) sudo dnf install -y pipx ;;
         *)
             print_error "Cannot install pipx on this distro. Install it manually."
             exit 1
@@ -84,7 +83,6 @@ if ! command_exists hypridle; then
     case "$DISTRO_TYPE" in
         arch)   sudo pacman -S --noconfirm --needed hypridle ;;
         debian) sudo apt install -y hypridle ;;
-        fedora) sudo dnf install -y hypridle ;;
         *)      print_warning "Cannot auto-install hypridle. Install it manually." ;;
     esac
     if command_exists hypridle; then
@@ -195,7 +193,7 @@ fi
 
 # ---- Step 8: Ensure hypridle autostart ----
 
-if [[ -f "$HYPR_CONF" ]] && ! grep -q "exec-once = hypridle" "$HYPR_CONF"; then
+if [[ -f "$HYPR_CONF" ]] && ! grep -qE '^\s*exec-once\s*=\s*hypridle' "$HYPR_CONF"; then
     print_info "Adding hypridle to Hyprland autostart..."
     # Insert after the existing exec-once block
     last_exec_line=$(grep -n "exec-once" "$HYPR_CONF" | tail -1 | cut -d: -f1)

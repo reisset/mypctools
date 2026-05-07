@@ -11,7 +11,10 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
+
+var httpClient = &http.Client{Timeout: 60 * time.Second}
 
 const (
 	releaseBaseURL = "https://github.com/reisset/mypctools/releases/latest/download"
@@ -63,7 +66,7 @@ func downloadAndReplace(binaryURL, checksumsURL, binaryName, destPath string) er
 	defer os.Remove(tmpPath) // Clean up on any error path
 
 	// Download binary to temp file
-	resp, err := http.Get(binaryURL)
+	resp, err := httpClient.Get(binaryURL)
 	if err != nil {
 		tmpFile.Close()
 		return fmt.Errorf("download failed: %w", err)
@@ -112,7 +115,7 @@ func downloadAndReplace(binaryURL, checksumsURL, binaryName, destPath string) er
 
 // fetchExpectedChecksum downloads checksums.txt and extracts the hash for the given filename.
 func fetchExpectedChecksum(checksumsURL, filename string) (string, error) {
-	resp, err := http.Get(checksumsURL)
+	resp, err := httpClient.Get(checksumsURL)
 	if err != nil {
 		return "", fmt.Errorf("failed to download checksums: %w", err)
 	}
@@ -127,10 +130,11 @@ func fetchExpectedChecksum(checksumsURL, filename string) (string, error) {
 		return "", fmt.Errorf("failed to read checksums: %w", err)
 	}
 
-	// Parse checksums.txt format: "<hash>  <filename>" or "<hash> <filename>"
+	// Parse checksums.txt — supports "sha256sum" standard format:
+	// "<hash>  <filename>" (text mode) or "<hash> *<filename>" (binary mode)
 	for _, line := range strings.Split(string(body), "\n") {
 		fields := strings.Fields(line)
-		if len(fields) == 2 && fields[1] == filename {
+		if len(fields) >= 2 && strings.TrimPrefix(fields[len(fields)-1], "*") == filename {
 			return fields[0], nil
 		}
 	}

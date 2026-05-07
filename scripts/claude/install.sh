@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Check for jq (required for settings.json manipulation)
 if ! command -v jq &>/dev/null; then
     echo "Error: jq is required but not installed."
-    echo "Install it with: apt install jq / pacman -S jq / dnf install jq"
+    echo "Install it with: apt install jq / pacman -S jq"
     exit 1
 fi
 
