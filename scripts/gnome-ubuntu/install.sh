@@ -36,14 +36,6 @@ fi
 init_sudo
 
 # ---- Step 1: Install packages ----
-# Install official-repo deps for yaru first — paru can silently fail building
-# yaru-gtk-theme when these aren't present.
-print_status "Installing system dependencies..."
-sudo pacman -S --noconfirm --needed \
-    gtk-engine-murrine gnome-themes-extra sassc || {
-    print_warning "Some system deps may have failed. Continuing..."
-}
-
 print_status "Installing AUR packages via paru..."
 
 AUR_PACKAGES=(
@@ -56,7 +48,6 @@ AUR_PACKAGES=(
     yaru-icon-theme
     ttf-ubuntu-font-family
     gnome-tweaks
-    gnome-extensions-app
 )
 
 paru -S --noconfirm --needed "${AUR_PACKAGES[@]}" || {
