@@ -2,7 +2,7 @@
 # Black background, no decorations, no scrollback
 
 [font]
-normal = { family = "IosevkaTerm Nerd Font", style = "Regular" }
+normal = { family = "UbuntuMono Nerd Font Mono", style = "Regular" }
 size = 16.0
 
 [window]

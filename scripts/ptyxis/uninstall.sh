@@ -80,6 +80,12 @@ main() {
     reset_palette
     restore_default_terminal
 
+    # Reset font setting to system default
+    if command -v gsettings &>/dev/null; then
+        gsettings reset org.gnome.Ptyxis use-system-font 2>/dev/null || true
+        print_success "Reset ptyxis font to system default"
+    fi
+
     echo ""
     print_success "Uninstall complete!"
     echo ""
@@ -87,9 +93,6 @@ main() {
     echo "To remove it, run:"
     echo "  Arch:   sudo pacman -R ptyxis"
     echo "  Fedora: sudo dnf remove ptyxis"
-    echo ""
-    echo "Fonts were left in place. To remove manually:"
-    echo "  rm -rf ~/.local/share/fonts/Iosevka*"
 }
 
 main "$@"
