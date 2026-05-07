@@ -21,7 +21,6 @@ install_kitty() {
     case "$PKG_MGR" in
         pacman) $PKG_INSTALL kitty ;;
         apt) $PKG_INSTALL kitty ;;
-        dnf) $PKG_INSTALL kitty ;;
     esac
     print_success "Installed kitty"
 }

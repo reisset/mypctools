@@ -23,7 +23,14 @@ command -v zoxide &>/dev/null && eval "$(zoxide init bash)" && {
         \builtin cd -- "$@" && eza -lh --group-directories-first --icons=auto
     }
 }
-command -v fzf &>/dev/null && eval "$(fzf --bash 2>/dev/null)" || eval "$(fzf --completion --key-bindings 2>/dev/null)"
+if command -v fzf &>/dev/null; then
+    if _fzf_init=$(fzf --bash 2>/dev/null) && [[ -n "$_fzf_init" ]]; then
+        eval "$_fzf_init"
+    else
+        eval "$(fzf --completion --key-bindings 2>/dev/null)"
+    fi
+    unset _fzf_init
+fi
 command -v starship &>/dev/null && eval "$(starship init bash)"
 
 # Set default editor

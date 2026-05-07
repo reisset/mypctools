@@ -2,7 +2,6 @@ package exec
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -53,24 +52,18 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case execDoneMsg:
-		m.done = true
-		m.err = msg.err
 		if msg.err != nil {
-			if err := logging.LogAction(fmt.Sprintf("Script %s %s failed", m.bundle.Name, m.action)); err != nil {
-				fmt.Fprintf(os.Stderr, "logging failed: %v\n", err)
-			}
-		} else {
-			if err := logging.LogAction(fmt.Sprintf("Script %s %s completed", m.bundle.Name, m.action)); err != nil {
-				fmt.Fprintf(os.Stderr, "logging failed: %v\n", err)
-			}
-			system.Notify("mypctools", fmt.Sprintf("%s %s completed", m.bundle.Name, m.action))
-			// Success: auto-dismiss with toast
-			return m, app.Toast(
-				fmt.Sprintf("%s %s %s completed", theme.Icons.Check, m.bundle.Name, m.action),
-				false,
-			)
+			m.done = true
+			m.err = msg.err
+			logging.LogAction(fmt.Sprintf("Script %s %s failed", m.bundle.Name, m.action)) //nolint:errcheck
+			return m, nil
 		}
-		return m, nil
+		logging.LogAction(fmt.Sprintf("Script %s %s completed", m.bundle.Name, m.action)) //nolint:errcheck
+		system.Notify("mypctools", fmt.Sprintf("%s %s completed", m.bundle.Name, m.action))
+		return m, app.Toast(
+			fmt.Sprintf("%s %s %s completed", theme.Icons.Check, m.bundle.Name, m.action),
+			false,
+		)
 
 	case tea.KeyMsg:
 		if m.done {
@@ -90,15 +83,9 @@ func (m Model) View() string {
 	var content string
 
 	if m.done {
-		var statusLine string
-		if m.err != nil {
-			statusLine = theme.ErrorStyle().Render(fmt.Sprintf("Failed: %v", m.err))
-		} else {
-			statusLine = theme.SuccessStyle().Render(fmt.Sprintf("%s completed successfully", m.action))
-		}
-
+		// Only reached on error (success pops via toast)
+		statusLine := theme.ErrorStyle().Render(fmt.Sprintf("Failed: %v", m.err))
 		prompt := theme.MutedStyle().Render("Press any key to continue...")
-
 		content = lipgloss.JoinVertical(lipgloss.Center,
 			"",
 			statusLine,

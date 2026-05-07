@@ -29,7 +29,22 @@ fi
 # ---- Guard: paru ----
 if ! command_exists paru; then
     print_error "paru is required but not installed."
+    print_error "On CachyOS paru ships by default; if missing, reinstall via:"
+    print_error "  sudo pacman -S --needed base-devel git && git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si"
     exit 1
+fi
+
+# ---- Guard: D-Bus session ----
+if [[ -z "$DBUS_SESSION_BUS_ADDRESS" ]]; then
+    print_error "No D-Bus session found — run from a graphical login, not SSH/TTY."
+    print_error "gsettings and gnome-extensions require an active GNOME session."
+    exit 1
+fi
+
+# ---- Guard: already installed ----
+if [[ -f "$MARKER_DIR/installed" && "$1" != "--force" ]]; then
+    print_info "gnome-ubuntu already installed. Use '--force' to re-run."
+    exit 0
 fi
 
 # Pre-cache sudo so paru doesn't prompt inside the TUI
@@ -57,9 +72,14 @@ AUR_PACKAGES=(
     gnome-tweaks
 )
 
-paru -S --noconfirm --needed "${AUR_PACKAGES[@]}" || {
-    print_warning "Some AUR packages may have failed. Continuing..."
-}
+failed_pkgs=()
+for pkg in "${AUR_PACKAGES[@]}"; do
+    print_status "Installing $pkg..."
+    paru -S --noconfirm --needed "$pkg" || failed_pkgs+=("$pkg")
+done
+if [[ ${#failed_pkgs[@]} -gt 0 ]]; then
+    print_warning "Failed to install: ${failed_pkgs[*]}"
+fi
 
 # Report which Yaru packages actually landed
 for pkg in yaru-gtk-theme yaru-gnome-shell-theme yaru-icon-theme; do
@@ -90,6 +110,10 @@ EXTENSION_UUIDS=(
 enable_extension() {
     local uuid="$1"
     gnome-extensions enable "$uuid" 2>/dev/null && return 0
+    if ! command_exists python3; then
+        print_warning "python3 not found — cannot apply gsettings fallback for $uuid"
+        return 1
+    fi
     python3 - "$uuid" << 'PYEOF' 2>/dev/null
 import sys, subprocess, re
 uuid = sys.argv[1]
@@ -118,20 +142,23 @@ for uuid in "${EXTENSION_UUIDS[@]}"; do
         print_success "Verified: $uuid is enabled"
         ((VALIDATED++))
     else
-        print_warning "$uuid not active yet (will activate after log out/in)"
+        print_warning "$uuid not active in live session (will activate after log out/in)"
     fi
 done
 print_status "Validated $VALIDATED/${#EXTENSION_UUIDS[@]} extensions"
 
 # ---- Step 3: Apply gsettings (Ubuntu defaults) ----
-print_status "Applying Ubuntu GNOME defaults..."
+GNOME_MAJOR=$(gnome-shell --version 2>/dev/null | awk '{print $3}' | cut -d. -f1)
+print_status "Applying Ubuntu GNOME defaults (GNOME ${GNOME_MAJOR:-unknown})..."
 
 # GTK theme and icons
 gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
 gsettings set org.gnome.desktop.interface icon-theme 'Yaru'
 gsettings set org.gnome.desktop.interface cursor-theme 'Yaru'
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
-gsettings set org.gnome.desktop.interface accent-color 'orange' 2>/dev/null
+if [[ "${GNOME_MAJOR:-0}" -ge 47 ]]; then
+    gsettings set org.gnome.desktop.interface accent-color 'orange' 2>/dev/null
+fi
 
 # Fonts
 gsettings set org.gnome.desktop.interface font-name 'Ubuntu 11'

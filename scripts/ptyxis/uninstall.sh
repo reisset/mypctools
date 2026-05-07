@@ -92,7 +92,6 @@ main() {
     echo "Note: The ptyxis package was not removed."
     echo "To remove it, run:"
     echo "  Arch:   sudo pacman -R ptyxis"
-    echo "  Fedora: sudo dnf remove ptyxis"
 }
 
 main "$@"

@@ -41,7 +41,7 @@ func All() []Bundle {
 		{
 			ID:          "ptyxis",
 			Name:        "ptyxis",
-			Description: "Ptyxis terminal config (Arch/Fedora)",
+			Description: "Ptyxis terminal config (Arch only)",
 			MarkerPath:  ".local/share/org.gnome.Ptyxis/palettes/mypctools-catppuccin-mocha.palette",
 			AutoSync:    true,
 		},
@@ -75,7 +75,7 @@ func All() []Bundle {
 			ID:          "spicetify",
 			Name:        "spicetify",
 			Description: "Spotify theming with StarryNight",
-			MarkerPath:  ".spicetify/spicetify",
+			MarkerPath:  ".config/spicetify/config-xpui.ini",
 		},
 	}
 }

@@ -73,7 +73,6 @@ main() {
     echo "To remove it, run:"
     echo "  Arch:   sudo pacman -R alacritty"
     echo "  Debian: sudo apt remove alacritty"
-    echo "  Fedora: sudo dnf remove alacritty"
     echo ""
     echo "Fonts were left in place. To remove manually:"
     echo "  Arch:     sudo pacman -R ttf-ubuntu-mono-nerd"

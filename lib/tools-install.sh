@@ -6,7 +6,7 @@
 # Required variables from caller:
 #   LOCAL_BIN - path to ~/.local/bin
 #   ARCH - uname -m output
-#   PKG_MGR - pacman/apt/dnf
+#   PKG_MGR - pacman/apt
 #   PKG_INSTALL - install command string
 # Required functions from caller:
 #   print_status, print_success, print_warning, pkg_install
@@ -15,6 +15,20 @@ _TOOLS_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SHARED_STARSHIP_TOML="$(readlink -f "$_TOOLS_LIB_DIR/../scripts/shared/prompt/starship.toml")"
 
 source "$_TOOLS_LIB_DIR/symlink.sh"
+
+# Fetch a GitHub API URL with up to 3 retries and exponential backoff.
+_curl_github_api() {
+    local url="$1"
+    local auth_header=()
+    [ -n "${GITHUB_TOKEN:-}" ] && auth_header=(-H "Authorization: token $GITHUB_TOKEN")
+    local response i
+    for i in 1 2 3; do
+        response=$(curl -fsSL "${auth_header[@]}" "$url" 2>/dev/null)
+        [[ -n "$response" ]] && { echo "$response"; return 0; }
+        [[ $i -lt 3 ]] && sleep $((2 ** i))
+    done
+    return 1
+}
 
 # All tools installed to ~/.local/bin from GitHub releases
 LOCAL_TOOLS=(zoxide lazygit tldr glow dysk dust yazi starship)
@@ -34,13 +48,16 @@ _tools_install_from_github() {
     print_status "Installing $binary from GitHub ($repo)..."
 
     local api_url="https://api.github.com/repos/$repo/releases/latest"
-    local auth_header=()
-    [ -n "${GITHUB_TOKEN:-}" ] && auth_header=(-H "Authorization: token $GITHUB_TOKEN")
     local api_response
-    api_response=$(curl -fsSL "${auth_header[@]}" "$api_url" 2>/dev/null)
+    api_response=$(_curl_github_api "$api_url")
+
+    if [ -z "$api_response" ]; then
+        print_warning "GitHub API unreachable for $binary — check network or set GITHUB_TOKEN"
+        return 1
+    fi
 
     # Check for GitHub API rate limiting
-    if echo "$api_response" | grep -q '"rate limit"' 2>/dev/null || [ -z "$api_response" ]; then
+    if echo "$api_response" | grep -q '"API rate limit exceeded"' 2>/dev/null; then
         print_warning "GitHub API rate limit hit — try again later or set GITHUB_TOKEN"
         return 1
     fi
@@ -79,6 +96,7 @@ _tools_install_from_github() {
         *)
             # Assume raw binary
             chmod +x "$filename"
+            mkdir -p "$LOCAL_BIN"
             mv "$filename" "$LOCAL_BIN/$binary"
             exit 0
             ;;
@@ -338,9 +356,6 @@ print_pkg_removal_instructions() {
     elif command -v apt &>/dev/null; then
         print_status "To remove system packages, run:"
         echo "  sudo apt remove eza bat fzf ripgrep fd-find btop micro gh${extra_pkgs:+ $extra_pkgs}"
-    elif command -v dnf &>/dev/null; then
-        print_status "To remove system packages, run:"
-        echo "  sudo dnf remove eza bat fzf ripgrep fd-find btop micro gh${extra_pkgs:+ $extra_pkgs}"
     fi
 }
 

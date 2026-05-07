@@ -5,16 +5,20 @@
 [[ -n "$_PRINT_SH_LOADED" ]] && return 0
 _PRINT_SH_LOADED=1
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    NC='\033[0m'
+else
+    RED='' GREEN='' YELLOW='' BLUE='' NC=''
+fi
 
 print_status() { echo -e "${BLUE}[*]${NC} $1"; }
 print_success() { echo -e "${GREEN}[✓]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[!]${NC} $1"; }
-print_error() { echo -e "${RED}[✗]${NC} $1"; }
+print_error() { echo -e "${RED}[✗]${NC} $1" >&2; }
 
 # Header - simple ANSI version
 print_header() { echo -e "\n${BLUE}━━━ $1 ━━━${NC}\n"; }
@@ -24,6 +28,14 @@ print_info() { print_status "$1"; }
 
 # Check if command exists
 command_exists() { command -v "$1" &>/dev/null; }
+
+# Check network connectivity (GitHub reachable)
+check_network() {
+    if ! curl -fsI https://github.com >/dev/null 2>&1; then
+        print_error "No network access to GitHub — check your connection and retry."
+        exit 1
+    fi
+}
 
 # Prompt for sudo (wrapper)
 ensure_sudo() {
@@ -68,4 +80,5 @@ init_sudo() {
     sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
     _INIT_SUDO_PID=$!
+    trap 'kill "$_INIT_SUDO_PID" 2>/dev/null' EXIT
 }

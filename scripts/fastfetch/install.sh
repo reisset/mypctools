@@ -17,7 +17,6 @@ install_fastfetch() {
     print_status "Installing fastfetch..."
     case "$PKG_MGR" in
         pacman) $PKG_INSTALL fastfetch ;;
-        dnf) $PKG_INSTALL fastfetch ;;
         apt)
             $PKG_INSTALL fastfetch 2>/dev/null || install_fastfetch_deb
             ;;

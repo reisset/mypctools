@@ -5,36 +5,30 @@
 
 detect_distro() {
     if [[ -f /etc/os-release ]]; then
-        # Save LOGO before sourcing (Arch's os-release sets LOGO=archlinux-logo)
-        local _saved_logo="${LOGO:-}"
-        source /etc/os-release
-        [[ -n "$_saved_logo" ]] && LOGO="$_saved_logo"
+        local os_id os_name os_id_like
+        os_id=$(grep -m1 '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"' | tr '[:upper:]' '[:lower:]')
+        os_name=$(grep -m1 '^NAME=' /etc/os-release | cut -d= -f2- | tr -d '"')
+        os_id_like=$(grep -m1 '^ID_LIKE=' /etc/os-release | cut -d= -f2 | tr -d '"' | tr '[:upper:]' '[:lower:]')
 
-        case "$ID" in
+        case "$os_id" in
             arch|manjaro|endeavouros|garuda|artix|cachyos)
                 DISTRO_TYPE="arch"
-                DISTRO_NAME="$NAME"
+                DISTRO_NAME="$os_name"
                 ;;
             ubuntu|pop|debian|linuxmint|elementary|zorin)
                 DISTRO_TYPE="debian"
-                DISTRO_NAME="$NAME"
-                ;;
-            fedora|rhel|centos|rocky|alma)
-                DISTRO_TYPE="fedora"
-                DISTRO_NAME="$NAME"
+                DISTRO_NAME="$os_name"
                 ;;
             *)
-                # Check ID_LIKE for derivatives
-                if [[ "$ID_LIKE" == *"arch"* ]]; then
+                # Check ID_LIKE for derivatives (space-tokenized to avoid substring false-positives)
+                if [[ " $os_id_like " == *" arch "* ]]; then
                     DISTRO_TYPE="arch"
-                elif [[ "$ID_LIKE" == *"debian"* ]] || [[ "$ID_LIKE" == *"ubuntu"* ]]; then
+                elif [[ " $os_id_like " == *" debian "* ]] || [[ " $os_id_like " == *" ubuntu "* ]]; then
                     DISTRO_TYPE="debian"
-                elif [[ "$ID_LIKE" == *"fedora"* ]] || [[ "$ID_LIKE" == *"rhel"* ]]; then
-                    DISTRO_TYPE="fedora"
                 else
                     DISTRO_TYPE="unknown"
                 fi
-                DISTRO_NAME="$NAME"
+                DISTRO_NAME="$os_name"
                 ;;
         esac
     else
@@ -57,11 +51,6 @@ detect_distro() {
             PKG_INSTALL="sudo apt install -y"
             PKG_UPDATE="sudo apt update"
             ;;
-        fedora)
-            PKG_MGR="dnf"
-            PKG_INSTALL="sudo dnf install -y"
-            PKG_UPDATE="sudo dnf check-update || true"
-            ;;
         *)
             # Fallback: detect by available commands
             if command -v pacman &>/dev/null; then
@@ -72,18 +61,15 @@ detect_distro() {
                 PKG_MGR="apt"
                 PKG_INSTALL="sudo apt install -y"
                 PKG_UPDATE="sudo apt update"
-            elif command -v dnf &>/dev/null; then
-                PKG_MGR="dnf"
-                PKG_INSTALL="sudo dnf install -y"
-                PKG_UPDATE="sudo dnf check-update || true"
             fi
             ;;
     esac
 
     export PKG_MGR PKG_INSTALL PKG_UPDATE
 
-    if [[ "$DISTRO_TYPE" == "unknown" ]]; then
-        echo -e "\033[33mWarning: Unrecognized distro '$DISTRO_NAME'. Package installation may not work.\033[0m" >&2
+    if [[ -z "${PKG_INSTALL:-}" ]]; then
+        echo -e "\033[0;31m[✗]\033[0m Unsupported distro '$DISTRO_NAME' — neither pacman nor apt found. Aborting." >&2
+        exit 1
     fi
 }
 

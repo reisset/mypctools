@@ -118,25 +118,23 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "down", "j":
-			m.cursor++
-			if m.cursor >= len(m.items) {
-				m.cursor = 0
-			}
-			if m.items[m.cursor].separator {
+			for range len(m.items) {
 				m.cursor++
 				if m.cursor >= len(m.items) {
 					m.cursor = 0
 				}
+				if !m.items[m.cursor].separator {
+					break
+				}
 			}
 		case "up", "k":
-			m.cursor--
-			if m.cursor < 0 {
-				m.cursor = len(m.items) - 1
-			}
-			if m.items[m.cursor].separator {
+			for range len(m.items) {
 				m.cursor--
 				if m.cursor < 0 {
 					m.cursor = len(m.items) - 1
+				}
+				if !m.items[m.cursor].separator {
+					break
 				}
 			}
 		case "enter", " ":

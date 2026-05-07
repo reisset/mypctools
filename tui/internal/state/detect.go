@@ -26,7 +26,7 @@ func CheckForUpdates(rootDir string) tea.Cmd {
 			return UpdateCountMsg{Count: 0}
 		}
 
-		out, err := exec.Command("git", "-C", rootDir, "rev-list", "HEAD..origin/main", "--count").Output()
+		out, err := exec.CommandContext(ctx, "git", "-C", rootDir, "rev-list", "HEAD..origin/main", "--count").Output()
 		if err != nil {
 			return UpdateCountMsg{Count: 0}
 		}

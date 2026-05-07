@@ -135,9 +135,9 @@ set_default_terminal() {
     local desktop_lower="${desktop,,}"
     print_status "Detected desktop: $desktop"
 
-    # GNOME (Ubuntu) - uses update-alternatives
-    if [[ "$desktop_lower" == *"gnome"* ]] && [[ "$desktop_lower" != *"cosmic"* ]]; then
-        print_status "GNOME detected - using update-alternatives"
+    # GNOME on Debian/Ubuntu - uses update-alternatives (not available on Arch)
+    if [[ "$desktop_lower" == *"gnome"* ]] && [[ "$desktop_lower" != *"cosmic"* ]] && [[ "${DISTRO_TYPE:-}" == "debian" ]]; then
+        print_status "GNOME/Debian detected - using update-alternatives"
         if command -v update-alternatives &>/dev/null; then
             local terminal_path
             terminal_path=$(command -v "$terminal_name")
@@ -181,10 +181,10 @@ EOF
     fi
 
     if [ -f "$xdg_terminals" ]; then
-        grep -v "^${desktop_file}$" "$xdg_terminals" > "$xdg_terminals.tmp" 2>/dev/null || true
-        echo "$desktop_file" > "$xdg_terminals"
-        cat "$xdg_terminals.tmp" >> "$xdg_terminals" 2>/dev/null || true
-        rm -f "$xdg_terminals.tmp"
+        local tmp_file
+        tmp_file=$(mktemp)
+        { echo "$desktop_file"; grep -v "^${desktop_file}$" "$xdg_terminals" 2>/dev/null || true; } > "$tmp_file"
+        mv "$tmp_file" "$xdg_terminals"
     else
         echo "$desktop_file" > "$xdg_terminals"
     fi
