@@ -25,24 +25,10 @@ func All() []Bundle {
 			MarkerPath:  ".local/share/litezsh/litezsh.zsh",
 		},
 		{
-			ID:          "terminal",
-			Name:        "foot terminal",
-			Description: "foot terminal config (Wayland only)",
-			MarkerPath:  ".config/foot/foot.ini",
-			AutoSync:    true,
-		},
-		{
 			ID:          "alacritty",
 			Name:        "alacritty",
 			Description: "Alacritty terminal config",
 			MarkerPath:  ".config/alacritty/alacritty.toml",
-			AutoSync:    true,
-		},
-		{
-			ID:          "ghostty",
-			Name:        "ghostty",
-			Description: "Ghostty terminal config",
-			MarkerPath:  ".config/ghostty/config",
 			AutoSync:    true,
 		},
 		{
