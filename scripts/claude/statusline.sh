@@ -88,23 +88,16 @@ RESET='\033[0m'
 if [ -n "$used_pct" ]; then
     used_int=$(awk "BEGIN {printf \"%.0f\", $used_pct}")
     if [ "$used_int" -ge 70 ]; then
-        CTX_COLOR="$RED"      # High usage: >=70%
+        CTX_COLOR="$RED"
     elif [ "$used_int" -ge 50 ]; then
-        CTX_COLOR="$YELLOW"   # Moderate: >=50%
+        CTX_COLOR="$YELLOW"
     else
-        CTX_COLOR="$GREEN"    # Low: <50%
+        CTX_COLOR="$GREEN"
     fi
-    filled=$(( used_int / 10 ))
-    [ "$filled" -gt 10 ] && filled=10
-    empty=$(( 10 - filled ))
-    bar_filled=""
-    bar_empty=""
-    [ "$filled" -gt 0 ] && bar_filled=$(printf '▓%.0s' $(seq 1 $filled))
-    [ "$empty" -gt 0 ] && bar_empty=$(printf '░%.0s' $(seq 1 $empty))
+    ctx_display="${used_int}%"
 else
     CTX_COLOR="$GRAY"
-    bar_filled=""
-    bar_empty="░░░░░░░░░░"
+    ctx_display="--"
 fi
 
 # Build output
@@ -115,11 +108,18 @@ output+="${PURPLE}◆ ${model}${RESET}"
 output+=" ${GRAY}│${RESET} "
 
 # Context usage
-output+="${CTX_COLOR}CTX: ${bar_filled}${GRAY}${bar_empty}${RESET}"
+output+="${CTX_COLOR}CTX ${ctx_display}${RESET}"
 output+=" ${GRAY}│${RESET} "
 
 # Session duration
 output+="${CYAN}⏱ ${duration}${RESET}"
+
+# Effort level (only show if available)
+effort=$(echo "$input" | jq -r '.effort.level // empty')
+if [ -n "$effort" ]; then
+    output+=" ${GRAY}│${RESET} "
+    output+="${YELLOW}⚡ ${effort}${RESET}"
+fi
 
 # Git status
 if [ -n "$git_branch" ]; then
