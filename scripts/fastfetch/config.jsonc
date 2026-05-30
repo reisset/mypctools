@@ -13,7 +13,7 @@
     "modules": [
         {
             "type": "custom",
-            "format": "{#yellow}╭─ System ─────────────────────────{#}"
+            "format": "{#yellow}╭─ System ──────────────────────{#}"
         },
         {
             "type": "os",
@@ -21,8 +21,14 @@
             "keyColor": "yellow"
         },
         {
+            "type": "command",
+            "key": "├ 󰃭  Installed",
+            "keyColor": "yellow",
+            "text": "ts=$(sed -n '1s/^\\[\\([0-9-]*\\)T.*/\\1/p' /var/log/pacman.log 2>/dev/null); ts=$(date -d \"$ts\" +%s 2>/dev/null); [ -z \"$ts\" ] && ts=$(stat -c %W / 2>/dev/null); if [ -n \"$ts\" ] && [ \"$ts\" -gt 0 ] 2>/dev/null; then printf '%d days (%s)' $(( ($(date +%s) - ts) / 86400 )) \"$(date -d @\"$ts\" '+%b %d %Y')\"; else printf 'unknown'; fi"
+        },
+        {
             "type": "kernel",
-            "key": "├   Kernel",
+            "key": "├ 󰌽  Kernel",
             "keyColor": "yellow"
         },
         {
@@ -32,7 +38,7 @@
         },
         {
             "type": "shell",
-            "key": "├   Shell",
+            "key": "├ 󰞷  Shell",
             "keyColor": "yellow"
         },
         {
@@ -42,16 +48,16 @@
         },
         {
             "type": "custom",
-            "format": "{#blue}├─ Desktop ────────────────────────{#}"
+            "format": "{#blue}├─ Desktop ─────────────────────{#}"
         },
         {
             "type": "wm",
-            "key": "├   WM",
+            "key": "├ 󰕣  WM",
             "keyColor": "blue"
         },
         {
             "type": "terminal",
-            "key": "├   Terminal",
+            "key": "├ 󰆍  Terminal",
             "keyColor": "blue"
         },
         {
@@ -61,7 +67,7 @@
         },
         {
             "type": "custom",
-            "format": "{#green}├─ Hardware ───────────────────────{#}"
+            "format": "{#green}├─ Hardware ────────────────────{#}"
         },
         {
             "type": "host",
@@ -85,7 +91,7 @@
         },
         {
             "type": "disk",
-            "key": "╰   Disk (/)",
+            "key": "╰ 󰋊  Disk (/)",
             "keyColor": "green",
             "folders": "/"
         },
