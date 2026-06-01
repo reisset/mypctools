@@ -248,6 +248,8 @@ func (m Model) View() string {
 
 func (m Model) Title() string { return "System Cleanup" }
 
+func (m Model) HandlesBack() bool { return false }
+
 func (m Model) ShortHelp() []string {
 	if m.phase == phaseAskUserCache {
 		return []string{"y yes", "n no"}

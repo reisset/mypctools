@@ -171,6 +171,8 @@ func (m Model) Title() string {
 	return m.bundle.Name
 }
 
+func (m Model) HandlesBack() bool { return m.confirming }
+
 func (m Model) ShortHelp() []string {
 	if m.confirming {
 		return []string{"y confirm", "n cancel"}

@@ -214,6 +214,8 @@ func (m Model) Title() string {
 	return "Main Menu"
 }
 
+func (m Model) HandlesBack() bool { return false }
+
 func (m Model) ShortHelp() []string {
 	return []string{"↑↓ navigate", "enter select", "q quit"}
 }

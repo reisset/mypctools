@@ -88,10 +88,11 @@ SPOTIFY_PATH=$(get_spotify_path)
 print_success "Found Spotify at $SPOTIFY_PATH"
 
 # Fix Spotify permissions FIRST (before spicetify install, since installer runs auto-backup)
+# Grant group-write rather than world-write; owner/group retain full read-write access.
 print_info "Fixing Spotify permissions (requires sudo)..."
 ensure_sudo || exit 1
-sudo chmod a+wr "$SPOTIFY_PATH"
-sudo chmod a+wr "$SPOTIFY_PATH/Apps" -R
+sudo chmod g+w "$SPOTIFY_PATH"
+sudo chmod -R g+w "$SPOTIFY_PATH/Apps"
 print_success "Permissions fixed"
 
 # Check required commands

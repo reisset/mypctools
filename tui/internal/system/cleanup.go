@@ -28,7 +28,7 @@ else
 fi
 `
 		return exec.Command("bash", "-c", script)
-default:
+	default:
 		return nil
 	}
 }

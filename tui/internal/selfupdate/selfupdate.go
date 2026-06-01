@@ -20,7 +20,9 @@ const (
 	releaseBaseURL = "https://github.com/reisset/mypctools/releases/latest/download"
 )
 
-// Update downloads the latest binary and pulls the latest scripts.
+// Update pulls the latest scripts then downloads and replaces the binary.
+// Scripts are updated first so that a binary-download failure leaves the repo
+// in a clean state (old binary, new scripts) rather than a partially-updated one.
 func Update(scriptsDir string) error {
 	// Get current executable path
 	exePath, err := os.Executable()
@@ -32,6 +34,13 @@ func Update(scriptsDir string) error {
 		return fmt.Errorf("failed to resolve executable path: %w", err)
 	}
 
+	// Pull latest scripts first — if this fails nothing has been modified.
+	fmt.Println("Pulling latest scripts...")
+	if err := gitPull(scriptsDir); err != nil {
+		return fmt.Errorf("failed to pull scripts: %w", err)
+	}
+	fmt.Println("Scripts updated.")
+
 	// Download and replace binary
 	arch := runtime.GOARCH
 	binaryName := fmt.Sprintf("mypctools-linux-%s", arch)
@@ -40,16 +49,9 @@ func Update(scriptsDir string) error {
 
 	fmt.Printf("Downloading latest binary (%s)...\n", arch)
 	if err := downloadAndReplace(binaryURL, checksumsURL, binaryName, exePath); err != nil {
-		return fmt.Errorf("failed to update binary: %w", err)
+		return fmt.Errorf("scripts updated; binary update failed: %w", err)
 	}
 	fmt.Println("Binary updated.")
-
-	// Git pull scripts
-	fmt.Println("Pulling latest scripts...")
-	if err := gitPull(scriptsDir); err != nil {
-		return fmt.Errorf("failed to pull scripts: %w", err)
-	}
-	fmt.Println("Scripts updated.")
 
 	return nil
 }
@@ -90,15 +92,15 @@ func downloadAndReplace(binaryURL, checksumsURL, binaryName, destPath string) er
 
 	actualHash := hex.EncodeToString(hasher.Sum(nil))
 
-	// Verify checksum if checksums.txt is available
+	// Verify checksum — fail closed: abort if we can't confirm integrity.
 	expectedHash, err := fetchExpectedChecksum(checksumsURL, binaryName)
 	if err != nil {
-		fmt.Printf("Warning: checksum verification skipped (%v)\n", err)
-	} else if actualHash != expectedHash {
-		return fmt.Errorf("checksum mismatch: expected %s, got %s", expectedHash, actualHash)
-	} else {
-		fmt.Println("Checksum verified.")
+		return fmt.Errorf("checksum verification failed: %w", err)
 	}
+	if actualHash != expectedHash {
+		return fmt.Errorf("checksum mismatch: expected %s, got %s", expectedHash, actualHash)
+	}
+	fmt.Println("Checksum verified.")
 
 	// Set executable permission
 	if err := os.Chmod(tmpPath, 0755); err != nil {

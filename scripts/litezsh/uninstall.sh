@@ -47,9 +47,16 @@ restore_default_shell() {
 
 # Remove .zshrc entry
 print_status "Removing LiteZsh from ~/.zshrc..."
-if [[ -f "$HOME/.zshrc" ]]; then
+if [[ -f "$HOME/.zshrc.pre-litezsh" ]]; then
+    # Restore the original .zshrc that the installer backed up
+    cp "$HOME/.zshrc.pre-litezsh" "$HOME/.zshrc"
+    rm "$HOME/.zshrc.pre-litezsh"
+    print_success "Restored ~/.zshrc from pre-litezsh backup"
+elif [[ -f "$HOME/.zshrc" ]]; then
     sed -i '/# LiteZsh/d' "$HOME/.zshrc"
     sed -i '/litezsh\/litezsh.zsh/d' "$HOME/.zshrc"
+    # Remove the PATH export line written by the clean-rewrite installer
+    sed -i '/^export PATH="\$HOME\/.local\/bin:\$PATH"$/d' "$HOME/.zshrc"
     print_success "Removed from ~/.zshrc"
 fi
 

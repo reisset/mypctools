@@ -106,6 +106,8 @@ func (m Model) Title() string {
 	return fmt.Sprintf("%s %s", m.action, m.bundle.Name)
 }
 
+func (m Model) HandlesBack() bool { return false }
+
 func (m Model) ShortHelp() []string {
 	if m.done {
 		return []string{"any key continue"}

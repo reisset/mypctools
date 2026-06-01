@@ -28,7 +28,7 @@ Uninstall: `curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/
 
 - **LiteBash** — Bash with modern CLI tools (eza, bat, ripgrep, fd, zoxide, dust, dysk, lazygit, yazi).
 - **LiteZsh** — Zsh with syntax highlighting, autosuggestions, arrow-key completion. Sets zsh as default.
-- **Alacritty / Kitty / Ptyxis** — Terminal configs. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu. Ptyxis is Arch only.
+- **Alacritty / Kitty** — Terminal configs. Themes: Catppuccin Mocha, Tokyo Night, HackTheBox, Ubuntu.
 - **Fastfetch** — Tree-style layout, nerd font icons.
 - **Screensaver** — hypridle + Terminal Text Effects. Hyprland only.
 - **GNOME Ubuntu** — Ubuntu GNOME defaults (Yaru, dock, fonts) for Arch.

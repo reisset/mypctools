@@ -108,5 +108,5 @@ func detectByCommand() DistroType {
 	if _, err := exec.LookPath("apt"); err == nil {
 		return DistroDebian
 	}
-return DistroUnknown
+	return DistroUnknown
 }

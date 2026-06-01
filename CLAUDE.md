@@ -28,7 +28,6 @@ mypctools/
 │   ├── litezsh/                # Speed-focused zsh (syntax highlighting, autosuggestions)
 │   ├── alacritty/              # alacritty terminal config (X11 + Wayland)
 │   ├── kitty/                  # kitty terminal config (X11 + Wayland)
-│   ├── ptyxis/                 # ptyxis terminal config via palettes (GNOME, Arch only)
 │   ├── fastfetch/              # Custom fastfetch config
 │   ├── screensaver/            # hypridle + tte screensaver (Hyprland only)
 │   ├── gnome-ubuntu/           # Ubuntu GNOME defaults for Arch (uses paru)

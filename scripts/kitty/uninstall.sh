@@ -21,6 +21,12 @@ remove_config() {
         print_status "No kitty.conf found"
     fi
 
+    # Remove theme sentinel written by select_theme (blocks rmdir if left behind)
+    if [ -f "$CONFIG_DIR/.theme" ]; then
+        rm "$CONFIG_DIR/.theme"
+        print_success "Removed .theme sentinel"
+    fi
+
     # Remove config dir if empty
     if [ -d "$CONFIG_DIR" ] && [ -z "$(ls -A "$CONFIG_DIR")" ]; then
         rmdir "$CONFIG_DIR"

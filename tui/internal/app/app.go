@@ -99,7 +99,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "esc":
-			return m, PopScreen()
+			// Let the active screen handle esc when it has an internal state
+			// (e.g. a confirmation prompt). Otherwise pop the screen.
+			if len(m.stack) == 0 || !m.stack[len(m.stack)-1].HandlesBack() {
+				return m, PopScreen()
+			}
 		}
 	}
 

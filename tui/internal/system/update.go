@@ -13,7 +13,7 @@ func UpdateCommand(distroType cmd.DistroType) *exec.Cmd {
 		return exec.Command("bash", "-c", "sudo apt update && sudo apt upgrade -y")
 	case cmd.DistroArch:
 		return exec.Command("sudo", "pacman", "-Syu", "--noconfirm")
-default:
+	default:
 		return nil
 	}
 }

@@ -104,6 +104,8 @@ func (m Model) Title() string {
 	return "Full System Update"
 }
 
+func (m Model) HandlesBack() bool { return false }
+
 func (m Model) ShortHelp() []string {
 	if m.done {
 		return []string{"any key continue"}

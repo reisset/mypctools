@@ -40,14 +40,6 @@ func All() []Bundle {
 			AutoSync:    true,
 		},
 		{
-			ID:             "ptyxis",
-			Name:           "Ptyxis",
-			Description:    "GNOME terminal config via palettes",
-			PlatformSuffix: "arch",
-			MarkerPath:     ".local/share/org.gnome.Ptyxis/palettes/mypctools-catppuccin-mocha.palette",
-			AutoSync:       true,
-		},
-		{
 			ID:          "fastfetch",
 			Name:        "Fastfetch",
 			Description: "tree-style layout with nerd font icons",

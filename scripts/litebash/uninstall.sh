@@ -18,9 +18,16 @@ sudo -v || { print_error "Sudo access required. Aborting."; exit 1; }
 
 # Remove bashrc entry
 print_status "Removing LiteBash from ~/.bashrc..."
-if [ -f "$HOME/.bashrc" ]; then
+if [ -f "$HOME/.bashrc.pre-litebash" ]; then
+    # Restore the original .bashrc that the installer backed up
+    cp "$HOME/.bashrc.pre-litebash" "$HOME/.bashrc"
+    rm "$HOME/.bashrc.pre-litebash"
+    print_success "Restored ~/.bashrc from pre-litebash backup"
+elif [ -f "$HOME/.bashrc" ]; then
     sed -i '/# LiteBash/d' "$HOME/.bashrc"
     sed -i '/litebash\/litebash.sh/d' "$HOME/.bashrc"
+    # Remove the PATH export line written by the clean-rewrite installer
+    sed -i '/^export PATH="\$HOME\/.local\/bin:\$PATH"$/d' "$HOME/.bashrc"
     print_success "Removed from ~/.bashrc"
 fi
 

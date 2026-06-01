@@ -130,6 +130,8 @@ func (m Model) Title() string {
 	return "System Setup"
 }
 
+func (m Model) HandlesBack() bool { return false }
+
 func (m Model) ShortHelp() []string {
 	return []string{"↑↓ navigate", "enter select"}
 }

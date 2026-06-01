@@ -101,7 +101,8 @@ func (m Model) View() string {
 		Render(menu)
 }
 
-func (m Model) Title() string { return "Service Manager" }
+func (m Model) Title() string      { return "Service Manager" }
+func (m Model) HandlesBack() bool  { return false }
 func (m Model) ShortHelp() []string {
 	return []string{"enter select"}
 }

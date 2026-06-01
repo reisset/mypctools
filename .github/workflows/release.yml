@@ -42,8 +42,8 @@ jobs:
 
       - name: Generate checksums
         run: |
-          sha256sum mypctools-linux-amd64/mypctools-linux-amd64 \
-                    mypctools-linux-arm64/mypctools-linux-arm64 > checksums.txt
+          (cd mypctools-linux-amd64 && sha256sum mypctools-linux-amd64) >  checksums.txt
+          (cd mypctools-linux-arm64 && sha256sum mypctools-linux-arm64) >> checksums.txt
 
       - name: Create Release
         uses: softprops/action-gh-release@v1

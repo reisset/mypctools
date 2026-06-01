@@ -52,12 +52,14 @@ detect_distro() {
             PKG_UPDATE="sudo apt update"
             ;;
         *)
-            # Fallback: detect by available commands
+            # Fallback: detect by available commands; keep DISTRO_TYPE consistent.
             if command -v pacman &>/dev/null; then
+                DISTRO_TYPE="arch"
                 PKG_MGR="pacman"
                 PKG_INSTALL="sudo pacman -S --noconfirm --needed"
                 PKG_UPDATE="sudo pacman -Sy"
             elif command -v apt &>/dev/null; then
+                DISTRO_TYPE="debian"
                 PKG_MGR="apt"
                 PKG_INSTALL="sudo apt install -y"
                 PKG_UPDATE="sudo apt update"

@@ -13,6 +13,10 @@ type Screen interface {
 	View() string
 	Title() string
 	ShortHelp() []string // Context-specific hints only (e.g. ["y yes", "n no"])
+	// HandlesBack returns true when the screen wants to intercept the esc/back key
+	// itself (e.g. while showing a confirmation prompt). When true the root will
+	// forward the key to the screen instead of immediately popping the stack.
+	HandlesBack() bool
 }
 
 // NavigateMsg pushes a new screen onto the stack.

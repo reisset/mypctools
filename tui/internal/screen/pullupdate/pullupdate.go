@@ -153,6 +153,8 @@ func (m Model) View() string {
 
 func (m Model) Title() string { return "Pull Updates" }
 
+func (m Model) HandlesBack() bool { return false }
+
 func (m Model) ShortHelp() []string {
 	if m.done {
 		return []string{"any key continue"}

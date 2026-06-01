@@ -31,13 +31,12 @@ Manual:
 
 ## Terminal Config
 
-Terminal theming is shell-agnostic. Install alacritty, kitty, or ptyxis separately:
+Terminal theming is shell-agnostic. Install alacritty or kitty separately:
 
 ```bash
 # Via mypctools
 mypctools → Scripts → Terminal - alacritty
 mypctools → Scripts → Terminal - kitty
-mypctools → Scripts → Terminal - ptyxis
 ```
 
 ## What's Different from LiteBash

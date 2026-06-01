@@ -23,6 +23,22 @@ print_info "Restoring vanilla Spotify..."
 if spicetify restore; then
     print_success "Spotify restored to vanilla"
     echo ""
+
+    # Restore Spotify directory permissions narrowed by the installer
+    get_spotify_path() {
+        if [[ -d "/opt/spotify" ]]; then echo "/opt/spotify"
+        elif [[ -d "/usr/share/spotify" ]]; then echo "/usr/share/spotify"
+        elif [[ -d "/usr/lib/spotify" ]]; then echo "/usr/lib/spotify"
+        fi
+    }
+    SPOTIFY_PATH=$(get_spotify_path)
+    if [[ -n "$SPOTIFY_PATH" ]]; then
+        ensure_sudo && \
+        sudo chmod g-w "$SPOTIFY_PATH" && \
+        sudo chmod -R g-w "$SPOTIFY_PATH/Apps" && \
+        print_success "Spotify permissions restored"
+    fi
+
     print_info "Restart Spotify to see the changes."
     print_info "Note: Spicetify CLI is still installed at $SPICETIFY_DIR"
     print_info "To fully remove: rm -rf $SPICETIFY_DIR ~/.config/spicetify"
