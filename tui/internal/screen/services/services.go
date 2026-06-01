@@ -297,6 +297,8 @@ func (m ServiceListModel) View() string {
 	)
 }
 
+func (m ServiceListModel) HandlesBack() bool { return false }
+
 func (m ServiceListModel) Title() string {
 	label := "Common Services"
 	if m.showAll {
