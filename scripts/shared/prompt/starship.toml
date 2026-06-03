@@ -44,7 +44,7 @@ read_only = " 󰌾"
 
 [git_branch]
 format = ' on [\[$branch\]]($style)'
-style = "bold orange"
+style = "bold #ff8700"
 
 [git_status]
 disabled = true
