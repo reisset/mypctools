@@ -43,7 +43,7 @@ style = "bold blue"
 read_only = " 󰌾"
 
 [git_branch]
-format = ' on \[$branch\]($style)'
+format = ' on [\[$branch\]]($style)'
 style = "bold orange"
 
 [git_status]
