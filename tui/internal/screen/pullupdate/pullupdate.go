@@ -14,7 +14,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/ui"
 )
 
-type execDoneMsg struct{ err error }
 type syncDoneMsg struct{ synced []string }
 
 // Model handles pulling updates from the remote repository.
@@ -36,9 +35,9 @@ func New(shared *state.Shared) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	cmd := exec.Command("git", "-C", m.shared.RootDir, "pull", "origin", "main")
+	cmd := exec.Command("git", "-C", m.shared.RootDir, "pull", "--ff-only")
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return execDoneMsg{err: err}
+		return app.ExecDoneMsg{Err: err}
 	})
 }
 
@@ -65,10 +64,10 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	}
 
 	switch msg := msg.(type) {
-	case execDoneMsg:
-		if msg.err != nil {
+	case app.ExecDoneMsg:
+		if msg.Err != nil {
 			m.done = true
-			m.err = msg.err
+			m.err = msg.Err
 			return m, nil
 		}
 		m.syncing = true

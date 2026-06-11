@@ -39,6 +39,12 @@ type fadeToastMsg struct{}
 // clearToastMsg is sent when the toast should be dismissed.
 type clearToastMsg struct{}
 
+// ExecDoneMsg is sent when a tea.ExecProcess completes.
+// Screens use it to detect when an external command (script, system update, etc.) finishes.
+type ExecDoneMsg struct {
+	Err error
+}
+
 // Navigate returns a tea.Cmd that pushes a screen.
 func Navigate(s Screen) tea.Cmd {
 	return func() tea.Msg { return NavigateMsg{Screen: s} }

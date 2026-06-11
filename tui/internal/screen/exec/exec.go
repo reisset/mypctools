@@ -15,10 +15,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
-// execDoneMsg is sent when the script finishes.
-type execDoneMsg struct {
-	err error
-}
 
 // Model handles script execution with full terminal control.
 type Model struct {
@@ -45,16 +41,16 @@ func (m Model) Init() tea.Cmd {
 	// Use tea.ExecProcess to give the script full terminal control
 	cmd := exec.Command("bash", scriptPath)
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return execDoneMsg{err: err}
+		return app.ExecDoneMsg{Err: err}
 	})
 }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
-	case execDoneMsg:
-		if msg.err != nil {
+	case app.ExecDoneMsg:
+		if msg.Err != nil {
 			m.done = true
-			m.err = msg.err
+			m.err = msg.Err
 			logging.LogAction(fmt.Sprintf("Script %s %s failed", m.bundle.Name, m.action)) //nolint:errcheck
 			return m, nil
 		}

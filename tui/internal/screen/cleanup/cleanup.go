@@ -23,7 +23,6 @@ const (
 	phaseDone
 )
 
-type execDoneMsg struct{ err error }
 type cacheClearDoneMsg struct{ err error }
 
 type action int
@@ -58,11 +57,11 @@ func (m Model) Init() tea.Cmd {
 	cmd := system.CleanupCommand(m.shared.Distro.Type)
 	if cmd == nil {
 		return func() tea.Msg {
-			return execDoneMsg{err: fmt.Errorf("unsupported distro: %s", m.shared.Distro.Type)}
+			return app.ExecDoneMsg{Err: fmt.Errorf("unsupported distro: %s", m.shared.Distro.Type)}
 		}
 	}
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return execDoneMsg{err: err}
+		return app.ExecDoneMsg{Err: err}
 	})
 }
 
@@ -89,8 +88,8 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	}
 
 	switch msg := msg.(type) {
-	case execDoneMsg:
-		m.pkgErr = msg.err
+	case app.ExecDoneMsg:
+		m.pkgErr = msg.Err
 		m.phase = phaseAskUserCache
 		return m, nil
 

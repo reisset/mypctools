@@ -12,10 +12,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
-// execDoneMsg is sent when the update finishes.
-type execDoneMsg struct {
-	err error
-}
 
 // Model handles the full system update screen.
 type Model struct {
@@ -35,21 +31,21 @@ func (m Model) Init() tea.Cmd {
 	cmd := system.UpdateCommand(m.shared.Distro.Type)
 	if cmd == nil {
 		return func() tea.Msg {
-			return execDoneMsg{err: fmt.Errorf("unsupported distro: %s", m.shared.Distro.Type)}
+			return app.ExecDoneMsg{Err: fmt.Errorf("unsupported distro: %s", m.shared.Distro.Type)}
 		}
 	}
 
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return execDoneMsg{err: err}
+		return app.ExecDoneMsg{Err: err}
 	})
 }
 
 func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
-	case execDoneMsg:
+	case app.ExecDoneMsg:
 		m.done = true
-		m.err = msg.err
-		if msg.err != nil {
+		m.err = msg.Err
+		if msg.Err != nil {
 			logging.LogAction("System update failed")
 		} else {
 			logging.LogAction("System update completed")

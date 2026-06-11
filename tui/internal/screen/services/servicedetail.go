@@ -31,9 +31,6 @@ type actionItem struct {
 	action detailAction
 }
 
-type execDoneMsg struct {
-	err error
-}
 
 // ServiceDetailModel shows stats and actions for a single service.
 type ServiceDetailModel struct {
@@ -79,9 +76,9 @@ func (m ServiceDetailModel) Init() tea.Cmd { return nil }
 
 func (m ServiceDetailModel) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
-	case execDoneMsg:
+	case app.ExecDoneMsg:
 		m.actionDone = true
-		m.actionErr = msg.err
+		m.actionErr = msg.Err
 		m.logServiceAction()
 		m.status = system.GetServiceStatus(m.serviceName)
 		m.items = buildMenuItems(m.status)
@@ -121,19 +118,19 @@ func (m ServiceDetailModel) handleAction(action detailAction) tea.Cmd {
 		return app.PopScreen()
 	case actionStart:
 		cmd := system.ServiceActionCmd(m.serviceName, "start")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return app.ExecDoneMsg{Err: err} })
 	case actionStop:
 		cmd := system.ServiceActionCmd(m.serviceName, "stop")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return app.ExecDoneMsg{Err: err} })
 	case actionRestart:
 		cmd := system.ServiceActionCmd(m.serviceName, "restart")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return app.ExecDoneMsg{Err: err} })
 	case actionEnable:
 		cmd := system.ServiceActionCmd(m.serviceName, "enable")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return app.ExecDoneMsg{Err: err} })
 	case actionDisable:
 		cmd := system.ServiceActionCmd(m.serviceName, "disable")
-		return tea.ExecProcess(cmd, func(err error) tea.Msg { return execDoneMsg{err: err} })
+		return tea.ExecProcess(cmd, func(err error) tea.Msg { return app.ExecDoneMsg{Err: err} })
 	}
 	return nil
 }

@@ -14,6 +14,8 @@ All notable changes to mypctools.
 
 ### Removed
 - **Dead code**: Removed unused config constants (`LogPath`, `ConfigDir`), unused cached style fields (`primary`, `secondary`, `statusActive`, `statusInactive`, `statusError`), three unused status-style accessors (`StatusActiveStyle`, `StatusInactiveStyle`, `StatusErrorStyle`), unexported `RebuildStyles` (only ever called from `init()`), dead `commands/` directory loops in claude install/uninstall scripts, and scaffolding `reasonix.toml`.
+- **Consolidated `ExecDoneMsg`**: Extracted 5 identical `execDoneMsg struct{ err error }` definitions from individual screen packages into a single shared `app.ExecDoneMsg`.
+- **Standardized git pull**: `pullupdate` screen now uses `git pull --ff-only` (matching `selfupdate`), replacing the explicit `pull origin main` invocation.
 
 ---
 
