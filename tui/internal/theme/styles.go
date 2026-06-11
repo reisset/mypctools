@@ -9,9 +9,6 @@ type cachedStyles struct {
 	success   lipgloss.Style
 	warning   lipgloss.Style
 	err       lipgloss.Style
-	accent    lipgloss.Style
-
-	subheader lipgloss.Style
 
 	helpKey     lipgloss.Style
 	helpDesc    lipgloss.Style
@@ -37,11 +34,6 @@ func RebuildStyles() {
 	styles.success = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Success))
 	styles.warning = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Warning))
 	styles.err = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Error))
-	styles.accent = lipgloss.NewStyle().Foreground(lipgloss.Color(Current.Accent))
-
-	styles.subheader = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(Current.Primary)).
-		Bold(true)
 
 	styles.helpKey = lipgloss.NewStyle().
 		Foreground(lipgloss.Color(Current.Secondary)).
@@ -67,8 +59,6 @@ func MutedStyle() lipgloss.Style     { return styles.muted }
 func SuccessStyle() lipgloss.Style   { return styles.success }
 func WarningStyle() lipgloss.Style   { return styles.warning }
 func ErrorStyle() lipgloss.Style     { return styles.err }
-func AccentStyle() lipgloss.Style    { return styles.accent }
-func SubheaderStyle() lipgloss.Style { return styles.subheader }
 
 func HelpKeyStyle() lipgloss.Style     { return styles.helpKey }
 func HelpDescStyle() lipgloss.Style    { return styles.helpDesc }

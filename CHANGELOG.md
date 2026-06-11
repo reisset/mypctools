@@ -4,6 +4,16 @@ All notable changes to mypctools.
 
 ---
 
+## [0.38.1] - 2026-06-11
+
+### Chore
+- **Dead code cleanup**: Removed unused files (`ui/box.go`, `theme/spacing.go`, `screen/themepicker/`), unused exported symbols (`ClampBoxWidth`, `StatusBadge`, `EnabledBadge`, `AccentStyle`, `SubheaderStyle`, `Palette.Accent`), and 14 unused layout constants.
+- **Hardened awk call**: `statusline.sh` now passes `$used_pct` via `awk -v` instead of string interpolation.
+- **Panic visibility**: Background update-check goroutine now logs panics to stderr instead of silently swallowing them.
+- **Symlink-aware detection**: Bundle install detection uses `os.Stat` instead of `os.Lstat` so broken symlink markers report correctly.
+
+---
+
 ## [0.38.0] - 2026-06-01
 
 ### Security

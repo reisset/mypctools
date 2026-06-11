@@ -81,8 +81,7 @@ func main() {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				// Silently ignore panics in background goroutine
-				// (program may have exited before Send completes)
+				fmt.Fprintf(os.Stderr, "Background update check panicked: %v\n", r)
 			}
 		}()
 		result := state.CheckForUpdates(rootDir)()

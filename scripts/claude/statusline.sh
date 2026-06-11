@@ -86,7 +86,7 @@ RESET='\033[0m'
 # Context color based on used percentage
 # Green <50%, yellow <70%, red >=70%
 if [ -n "$used_pct" ]; then
-    used_int=$(awk "BEGIN {printf \"%.0f\", $used_pct}")
+    used_int=$(awk -v pct="$used_pct" 'BEGIN {printf "%.0f", pct}')
     if [ "$used_int" -ge 70 ]; then
         CTX_COLOR="$RED"
     elif [ "$used_int" -ge 50 ]; then

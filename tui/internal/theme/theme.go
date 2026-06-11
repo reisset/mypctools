@@ -9,7 +9,6 @@ type Palette struct {
 	Success   string
 	Warning   string
 	Error     string
-	Accent    string
 	// UI colors
 	Highlight string // Selection highlight background
 	Surface   string // Subtle surface background
@@ -25,7 +24,6 @@ var DefaultCyan = Palette{
 	Success:   "#5fff00",
 	Warning:   "#ffaf00",
 	Error:     "#ff0000",
-	Accent:    "#af87ff",
 	Highlight: "#0a1e1e",
 	Surface:   "#0a1a1a",
 	Border:    "#00ffff",

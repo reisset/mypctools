@@ -12,6 +12,6 @@ func IsInstalled(b *Bundle) bool {
 		return false
 	}
 	markerPath := filepath.Join(home, b.MarkerPath)
-	_, err = os.Lstat(markerPath)
+	_, err = os.Stat(markerPath)
 	return err == nil
 }
