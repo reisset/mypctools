@@ -12,6 +12,9 @@ All notable changes to mypctools.
 - **Panic visibility**: Background update-check goroutine now logs panics to stderr instead of silently swallowing them.
 - **Symlink-aware detection**: Bundle install detection uses `os.Stat` instead of `os.Lstat` so broken symlink markers report correctly.
 
+### Removed
+- **Dead code**: Removed unused config constants (`LogPath`, `ConfigDir`), unused cached style fields (`primary`, `secondary`, `statusActive`, `statusInactive`, `statusError`), three unused status-style accessors (`StatusActiveStyle`, `StatusInactiveStyle`, `StatusErrorStyle`), unexported `RebuildStyles` (only ever called from `init()`), dead `commands/` directory loops in claude install/uninstall scripts, and scaffolding `reasonix.toml`.
+
 ---
 
 ## [0.38.0] - 2026-06-01

@@ -34,18 +34,6 @@ if [ -d "$HOME/.claude/skills" ]; then
     done
 fi
 
-# Remove commands
-if [ -d "$HOME/.claude/commands" ] && [ -d "$SCRIPT_DIR/commands" ]; then
-    for cmd in "$SCRIPT_DIR/commands"/*; do
-        [ -e "$cmd" ] || continue
-        cmd_name=$(basename "$cmd")
-        [[ "$cmd_name" == .* ]] && continue
-        if [ -f "$HOME/.claude/commands/$cmd_name" ]; then
-            rm "$HOME/.claude/commands/$cmd_name"
-            log_info "Removed command: $cmd_name"
-        fi
-    done
-fi
 
 # Remove statusline.sh
 if [ -f "$HOME/.claude/statusline.sh" ]; then

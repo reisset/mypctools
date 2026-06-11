@@ -13,8 +13,7 @@ fi
 
 echo "Installing Claude Code config..."
 
-# Create directories
-mkdir -p ~/.claude/skills ~/.claude/commands
+mkdir -p ~/.claude/skills
 
 # Copy skills (directories containing SKILL.md)
 if [ -d "$SCRIPT_DIR/skills" ]; then
@@ -28,16 +27,6 @@ if [ -d "$SCRIPT_DIR/skills" ]; then
     done
 fi
 
-# Copy commands (skip hidden files like .gitkeep)
-if [ -d "$SCRIPT_DIR/commands" ]; then
-    for cmd in "$SCRIPT_DIR/commands"/*; do
-        [ -e "$cmd" ] || continue
-        cmd_name=$(basename "$cmd")
-        [[ "$cmd_name" == .* ]] && continue
-        cp "$cmd" ~/.claude/commands/"$cmd_name"
-        echo "  Installed command: $cmd_name"
-    done
-fi
 
 # Copy statusline script
 if [ -f "$SCRIPT_DIR/statusline.sh" ]; then
