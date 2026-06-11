@@ -1,23 +1,19 @@
 package theme
 
-// Palette holds the theme colors as hex strings.
-type Palette struct {
-	Name      string
+// Current holds the active theme colors.
+// Single palette — the multi-theme picker was removed in v0.36.0.
+var Current = struct {
 	Primary   string
 	Secondary string
 	Muted     string
 	Success   string
 	Warning   string
 	Error     string
-	// UI colors
 	Highlight string // Selection highlight background
 	Surface   string // Subtle surface background
 	Border    string // Active border color
 	BorderDim string // Separator / inactive border color
-}
-
-var DefaultCyan = Palette{
-	Name:      "default",
+}{
 	Primary:   "#00ffff",
 	Secondary: "#0087ff",
 	Muted:     "#6c6c6c",
@@ -29,6 +25,3 @@ var DefaultCyan = Palette{
 	Border:    "#00ffff",
 	BorderDim: "#222222",
 }
-
-// Current is the active palette (always DefaultCyan).
-var Current = DefaultCyan

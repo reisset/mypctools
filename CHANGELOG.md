@@ -17,6 +17,10 @@ All notable changes to mypctools.
 - **Consolidated `ExecDoneMsg`**: Extracted 5 identical `execDoneMsg struct{ err error }` definitions from individual screen packages into a single shared `app.ExecDoneMsg`.
 - **Standardized git pull**: `pullupdate` screen now uses `git pull --ff-only` (matching `selfupdate`), replacing the explicit `pull origin main` invocation.
 
+### Changed
+- **Nerd Font toggle**: Replaced slow `fc-list` system-wide font scan on startup with a persistent toggle in System Setup. Preference saved to `~/.config/mypctools/nerd-font`. Instantly switches icon set with an on-screen toast.
+- **Simplified palette**: Replaced `Palette` struct and `DefaultCyan` var with an anonymous struct — no multi-theme support needed since the theme picker was removed in v0.36.0.
+
 ---
 
 ## [0.38.0] - 2026-06-01

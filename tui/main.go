@@ -12,6 +12,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/screen/mainmenu"
 	"github.com/reisset/mypctools/tui/internal/selfupdate"
 	"github.com/reisset/mypctools/tui/internal/state"
+	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
 func main() {
@@ -55,6 +56,9 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Do not run as root. Use your normal user.")
 		os.Exit(1)
 	}
+
+	// Init icon set from saved preference (no fc-list scan)
+	theme.InitIcons()
 
 	// Find the mypctools root directory (parent of tui/)
 	rootDir := findRootDir()

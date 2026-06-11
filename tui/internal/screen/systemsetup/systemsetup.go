@@ -27,20 +27,28 @@ type Model struct {
 	cursor int
 }
 
-func New(shared *state.Shared) Model {
-	items := []menuItem{
+func New(shared *state.Shared) *Model {
+	return &Model{shared: shared, items: buildItems(theme.UseNerdIcons()), cursor: 0}
+}
+
+func buildItems(nerdIcons bool) []menuItem {
+	iconDesc := "using ASCII fallback icons"
+	if nerdIcons {
+		iconDesc = "using Nerd Font icons"
+	}
+	return []menuItem{
 		{icon: "⟳", label: "Full System Update", desc: "runs pacman / apt upgrade", id: "update"},
 		{icon: "✕", label: "System Cleanup", desc: "orphans, caches, trash", id: "cleanup"},
 		{icon: "◎", label: "Service Manager", desc: "browse systemd services", id: "services"},
+		{icon: "▣", label: "Toggle Nerd Font Icons", desc: iconDesc, id: "icons"},
 		{separator: true},
 		{icon: "←", label: "Back", id: "back"},
 	}
-	return Model{shared: shared, items: items, cursor: 0}
 }
 
 func (m Model) Init() tea.Cmd { return nil }
 
-func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -73,7 +81,7 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) handleSelection(id string) tea.Cmd {
+func (m *Model) handleSelection(id string) tea.Cmd {
 	switch id {
 	case "update":
 		return app.Navigate(update.New(m.shared))
@@ -81,6 +89,13 @@ func (m Model) handleSelection(id string) tea.Cmd {
 		return app.Navigate(cleanup.New(m.shared))
 	case "services":
 		return app.Navigate(services.New(m.shared))
+	case "icons":
+		theme.ToggleIconSet()
+		m.items = buildItems(theme.UseNerdIcons())
+		if theme.UseNerdIcons() {
+			return app.Toast("Nerd Font icons enabled", false)
+		}
+		return app.Toast("ASCII icons enabled", false)
 	case "back":
 		return app.PopScreen()
 	}

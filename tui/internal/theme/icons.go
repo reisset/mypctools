@@ -1,9 +1,6 @@
 package theme
 
-import (
-	"os/exec"
-	"strings"
-)
+import "os"
 
 // Icon pairs: nerd font glyph + ASCII fallback.
 type IconSet struct {
@@ -69,21 +66,45 @@ var ASCIIIcons = IconSet{
 	Shell:     "$",
 }
 
-// Icons is the active icon set, chosen at init.
+// Icons is the active icon set.
 var Icons IconSet
 
-func init() {
-	if hasNerdFont() {
+const nerdFontFlagPath = ".config/mypctools/nerd-font"
+
+// InitIcons reads the Nerd Font preference flag and sets Icons.
+// Call once at startup.
+func InitIcons() {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		Icons = ASCIIIcons
+		return
+	}
+	if _, err := os.Stat(home + "/" + nerdFontFlagPath); err == nil {
 		Icons = NerdIcons
 	} else {
 		Icons = ASCIIIcons
 	}
 }
 
-func hasNerdFont() bool {
-	out, err := exec.Command("fc-list", ":", "family").Output()
+// UseNerdIcons reports whether Nerd Font icons are active.
+func UseNerdIcons() bool {
+	return Icons == NerdIcons
+}
+
+// ToggleIconSet flips between Nerd Font and ASCII icons and persists the choice.
+func ToggleIconSet() {
+	home, err := os.UserHomeDir()
 	if err != nil {
-		return false
+		return
 	}
-	return strings.Contains(strings.ToLower(string(out)), "nerd")
+	flagPath := home + "/" + nerdFontFlagPath
+
+	if Icons == NerdIcons {
+		Icons = ASCIIIcons
+		os.Remove(flagPath)
+	} else {
+		Icons = NerdIcons
+		os.MkdirAll(home+"/.config/mypctools", 0755)
+		os.WriteFile(flagPath, nil, 0644)
+	}
 }
