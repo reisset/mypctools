@@ -12,7 +12,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
-
 // Model handles the full system update screen.
 type Model struct {
 	shared *state.Shared
@@ -50,7 +49,8 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		} else {
 			logging.LogAction("System update completed")
 			system.Notify("mypctools", "System update completed")
-			return m, app.Toast(theme.Icons.Check+" System update completed", false)
+			icons := theme.GetIcons()
+			return m, app.Toast(icons.Check+" System update completed", false)
 		}
 		return m, nil
 
@@ -75,7 +75,8 @@ func (m Model) View() string {
 		if m.err != nil {
 			statusLine = theme.ErrorStyle().Render(fmt.Sprintf("Update failed: %v", m.err))
 		} else {
-			statusLine = theme.SuccessStyle().Render(theme.Icons.Check + " System update completed successfully")
+			icons := theme.GetIcons()
+			statusLine = theme.SuccessStyle().Render(icons.Check + " System update completed successfully")
 		}
 
 		prompt := theme.MutedStyle().Render("Press any key to continue...")

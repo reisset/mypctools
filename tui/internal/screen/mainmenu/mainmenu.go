@@ -271,12 +271,13 @@ func buildSysLine(shared *state.Shared) string {
 		}
 	}
 
-	sep := "  " + theme.Icons.Dot + "  "
-	parts := []string{theme.Icons.Distro + " " + shared.Distro.Name}
+	icons := theme.GetIcons()
+	sep := "  " + icons.Dot + "  "
+	parts := []string{icons.Distro + " " + shared.Distro.Name}
 	if kernel != "" {
-		parts = append(parts, theme.Icons.Kernel+" "+kernel)
+		parts = append(parts, icons.Kernel+" "+kernel)
 	}
-	parts = append(parts, theme.Icons.Shell+" "+shell)
+	parts = append(parts, icons.Shell+" "+shell)
 
 	return strings.Join(parts, sep)
 }

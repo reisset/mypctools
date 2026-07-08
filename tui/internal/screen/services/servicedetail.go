@@ -31,7 +31,6 @@ type actionItem struct {
 	action detailAction
 }
 
-
 // ServiceDetailModel shows stats and actions for a single service.
 type ServiceDetailModel struct {
 	shared      *state.Shared
@@ -243,8 +242,8 @@ func (m ServiceDetailModel) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left, parts...)
 }
 
-func (m ServiceDetailModel) Title() string      { return m.serviceName }
-func (m ServiceDetailModel) HandlesBack() bool  { return false }
+func (m ServiceDetailModel) Title() string     { return m.serviceName }
+func (m ServiceDetailModel) HandlesBack() bool { return false }
 
 func (m ServiceDetailModel) ShortHelp() []string {
 	if m.actionDone {

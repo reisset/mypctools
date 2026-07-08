@@ -100,7 +100,6 @@ func ServiceActionCmd(name, action string) *exec.Cmd {
 	return exec.Command("sudo", "systemctl", action, name)
 }
 
-
 // ListAllServices returns all service names on the system.
 func ListAllServices() ([]string, error) {
 	out, err := exec.Command("systemctl", "list-unit-files", "--type=service", "--no-pager", "--no-legend").Output()

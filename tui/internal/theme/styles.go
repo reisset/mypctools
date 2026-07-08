@@ -3,10 +3,10 @@ package theme
 import "github.com/charmbracelet/lipgloss"
 
 type cachedStyles struct {
-	muted     lipgloss.Style
-	success   lipgloss.Style
-	warning   lipgloss.Style
-	err       lipgloss.Style
+	muted   lipgloss.Style
+	success lipgloss.Style
+	warning lipgloss.Style
+	err     lipgloss.Style
 
 	helpKey     lipgloss.Style
 	helpDesc    lipgloss.Style
@@ -37,12 +37,11 @@ func rebuildStyles() {
 		Foreground(lipgloss.Color(Current.BorderDim))
 }
 
-func MutedStyle() lipgloss.Style     { return styles.muted }
-func SuccessStyle() lipgloss.Style   { return styles.success }
-func WarningStyle() lipgloss.Style   { return styles.warning }
-func ErrorStyle() lipgloss.Style     { return styles.err }
+func MutedStyle() lipgloss.Style   { return styles.muted }
+func SuccessStyle() lipgloss.Style { return styles.success }
+func WarningStyle() lipgloss.Style { return styles.warning }
+func ErrorStyle() lipgloss.Style   { return styles.err }
 
 func HelpKeyStyle() lipgloss.Style     { return styles.helpKey }
 func HelpDescStyle() lipgloss.Style    { return styles.helpDesc }
 func HelpDividerStyle() lipgloss.Style { return styles.helpDivider }
-

@@ -101,8 +101,8 @@ func (m Model) View() string {
 		Render(menu)
 }
 
-func (m Model) Title() string      { return "Service Manager" }
-func (m Model) HandlesBack() bool  { return false }
+func (m Model) Title() string     { return "Service Manager" }
+func (m Model) HandlesBack() bool { return false }
 func (m Model) ShortHelp() []string {
 	return []string{"enter select"}
 }
@@ -315,6 +315,9 @@ func (m ServiceListModel) ShortHelp() []string {
 }
 
 func truncate(s string, max int) string {
+	if max < 2 {
+		return ""
+	}
 	if utf8.RuneCountInString(s) <= max {
 		return s
 	}

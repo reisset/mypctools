@@ -46,7 +46,7 @@ func buildItems(nerdIcons bool) []menuItem {
 	}
 }
 
-func (m Model) Init() tea.Cmd { return nil }
+func (m *Model) Init() tea.Cmd { return nil }
 
 func (m *Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -102,7 +102,7 @@ func (m *Model) handleSelection(id string) tea.Cmd {
 	return nil
 }
 
-func (m Model) View() string {
+func (m *Model) View() string {
 	width := m.shared.TerminalWidth
 	if width == 0 {
 		width = 80
@@ -141,12 +141,12 @@ func (m Model) View() string {
 	)
 }
 
-func (m Model) Title() string {
+func (m *Model) Title() string {
 	return "System Setup"
 }
 
-func (m Model) HandlesBack() bool { return false }
+func (m *Model) HandlesBack() bool { return false }
 
-func (m Model) ShortHelp() []string {
+func (m *Model) ShortHelp() []string {
 	return []string{"↑↓ navigate", "enter select"}
 }

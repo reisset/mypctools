@@ -56,9 +56,9 @@ func DetectDistro() DistroInfo {
 
 	if dt, ok := knownIDs[id]; ok {
 		info.Type = dt
-	} else if strings.Contains(idLike, "arch") {
+	} else if isIDLikeMatch(idLike, "arch") {
 		info.Type = DistroArch
-	} else if strings.Contains(idLike, "debian") || strings.Contains(idLike, "ubuntu") {
+	} else if isIDLikeMatch(idLike, "debian") || isIDLikeMatch(idLike, "ubuntu") {
 		info.Type = DistroDebian
 	} else {
 		info.Type = detectByCommand()
@@ -99,6 +99,17 @@ func parseOSRelease() map[string]string {
 		return fields
 	}
 	return fields
+}
+
+// isIDLikeMatch checks if token appears as a word-boundary-separated token in idLike.
+// This prevents substring false-positives (e.g., "debian" matching "debbian" in ID_LIKE).
+func isIDLikeMatch(idLike, token string) bool {
+	for _, t := range strings.Fields(idLike) {
+		if t == token {
+			return true
+		}
+	}
+	return false
 }
 
 func detectByCommand() DistroType {

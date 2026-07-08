@@ -2,7 +2,7 @@
 # Claude Code config installer
 # v1.7 - Removed set -e for reliability
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check for jq (required for settings.json manipulation)
 if ! command -v jq &>/dev/null; then

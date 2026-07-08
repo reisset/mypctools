@@ -18,15 +18,19 @@ type UpdateCountMsg struct {
 // CheckForUpdates runs git fetch + rev-list in the background.
 func CheckForUpdates(rootDir string) tea.Cmd {
 	return func() tea.Msg {
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
+		// Separate contexts — fetch gets 5s, rev-list gets 2s.
+		fetchCtx, fetchCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer fetchCancel()
 
-		cmd := exec.CommandContext(ctx, "git", "-C", rootDir, "fetch", "origin", "main")
+		cmd := exec.CommandContext(fetchCtx, "git", "-C", rootDir, "fetch", "origin", "main")
 		if err := cmd.Run(); err != nil {
 			return UpdateCountMsg{Count: 0}
 		}
 
-		out, err := exec.CommandContext(ctx, "git", "-C", rootDir, "rev-list", "HEAD..origin/main", "--count").Output()
+		revCtx, revCancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer revCancel()
+
+		out, err := exec.CommandContext(revCtx, "git", "-C", rootDir, "rev-list", "HEAD..origin/main", "--count").Output()
 		if err != nil {
 			return UpdateCountMsg{Count: 0}
 		}

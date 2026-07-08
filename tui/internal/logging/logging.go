@@ -10,19 +10,26 @@ import (
 
 var (
 	logMu      sync.Mutex
-	logDirOnce sync.Once
+	logDirInit sync.Mutex
 	logDirPath string
+	logDirDone bool
 )
 
 func ensureLogDir() string {
-	logDirOnce.Do(func() {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return
-		}
+	if logDirDone {
+		return logDirPath
+	}
+	logDirInit.Lock()
+	defer logDirInit.Unlock()
+	if logDirDone {
+		return logDirPath
+	}
+	home, err := os.UserHomeDir()
+	if err == nil {
 		logDirPath = filepath.Join(home, ".local", "share", "mypctools")
 		os.MkdirAll(logDirPath, 0755)
-	})
+	}
+	logDirDone = true
 	return logDirPath
 }
 

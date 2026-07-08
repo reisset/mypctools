@@ -24,6 +24,7 @@ if [ -f "$HOME/.bashrc.pre-litebash" ]; then
     rm "$HOME/.bashrc.pre-litebash"
     print_success "Restored ~/.bashrc from pre-litebash backup"
 elif [ -f "$HOME/.bashrc" ]; then
+    cp "$HOME/.bashrc" "$HOME/.bashrc.litebash-backup-$(date +%Y%m%d-%H%M%S)"
     sed -i '/# LiteBash/d' "$HOME/.bashrc"
     sed -i '/litebash\/litebash.sh/d' "$HOME/.bashrc"
     # Remove the PATH export line written by the clean-rewrite installer

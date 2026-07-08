@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -15,14 +16,13 @@ import (
 	"github.com/reisset/mypctools/tui/internal/theme"
 )
 
-
 // Model handles script execution with full terminal control.
 type Model struct {
-	shared  *state.Shared
-	bundle  bundle.Bundle
-	action  string // "install" or "uninstall"
-	done bool
-	err  error
+	shared *state.Shared
+	bundle bundle.Bundle
+	action string // "install" or "uninstall"
+	done   bool
+	err    error
 }
 
 // New creates an exec screen for the given bundle and action.
@@ -35,7 +35,17 @@ func New(shared *state.Shared, b bundle.Bundle, action string) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	// Build script path
+	// Build script path — validate inputs to prevent path traversal.
+	if strings.Contains(m.bundle.ID, "/") || strings.Contains(m.bundle.ID, "\\") {
+		return func() tea.Msg {
+			return app.ExecDoneMsg{Err: fmt.Errorf("invalid bundle ID: %s", m.bundle.ID)}
+		}
+	}
+	if m.action != "install" && m.action != "uninstall" {
+		return func() tea.Msg {
+			return app.ExecDoneMsg{Err: fmt.Errorf("invalid action: %s", m.action)}
+		}
+	}
 	scriptPath := filepath.Join(m.shared.RootDir, "scripts", m.bundle.ID, m.action+".sh")
 
 	// Use tea.ExecProcess to give the script full terminal control
@@ -56,8 +66,9 @@ func (m Model) Update(msg tea.Msg) (app.Screen, tea.Cmd) {
 		}
 		logging.LogAction(fmt.Sprintf("Script %s %s completed", m.bundle.Name, m.action)) //nolint:errcheck
 		system.Notify("mypctools", fmt.Sprintf("%s %s completed", m.bundle.Name, m.action))
+		icons := theme.GetIcons()
 		return m, app.Toast(
-			fmt.Sprintf("%s %s %s completed", theme.Icons.Check, m.bundle.Name, m.action),
+			fmt.Sprintf("%s %s %s completed", icons.Check, m.bundle.Name, m.action),
 			false,
 		)
 

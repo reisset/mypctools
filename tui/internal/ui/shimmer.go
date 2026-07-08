@@ -21,7 +21,11 @@ type Shimmer struct {
 }
 
 // Tick returns a command that fires the next shimmer frame.
+// Returns nil if Text is empty (no animation needed).
 func (s Shimmer) Tick() tea.Cmd {
+	if len(s.Text) == 0 {
+		return nil
+	}
 	return tea.Tick(shimmerInterval, func(t time.Time) tea.Msg {
 		return ShimmerTickMsg{}
 	})

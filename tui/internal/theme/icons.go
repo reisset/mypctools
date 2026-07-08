@@ -1,6 +1,11 @@
 package theme
 
-import "os"
+import (
+	"os"
+	"sync"
+)
+
+var iconsMu sync.RWMutex
 
 // Icon pairs: nerd font glyph + ASCII fallback.
 type IconSet struct {
@@ -74,6 +79,8 @@ const nerdFontFlagPath = ".config/mypctools/nerd-font"
 // InitIcons reads the Nerd Font preference flag and sets Icons.
 // Call once at startup.
 func InitIcons() {
+	iconsMu.Lock()
+	defer iconsMu.Unlock()
 	home, err := os.UserHomeDir()
 	if err != nil {
 		Icons = ASCIIIcons
@@ -88,11 +95,22 @@ func InitIcons() {
 
 // UseNerdIcons reports whether Nerd Font icons are active.
 func UseNerdIcons() bool {
+	iconsMu.RLock()
+	defer iconsMu.RUnlock()
 	return Icons == NerdIcons
+}
+
+// GetIcons returns a copy of the current icon set (thread-safe).
+func GetIcons() IconSet {
+	iconsMu.RLock()
+	defer iconsMu.RUnlock()
+	return Icons
 }
 
 // ToggleIconSet flips between Nerd Font and ASCII icons and persists the choice.
 func ToggleIconSet() {
+	iconsMu.Lock()
+	defer iconsMu.Unlock()
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return

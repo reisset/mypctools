@@ -53,6 +53,7 @@ if [[ -f "$HOME/.zshrc.pre-litezsh" ]]; then
     rm "$HOME/.zshrc.pre-litezsh"
     print_success "Restored ~/.zshrc from pre-litezsh backup"
 elif [[ -f "$HOME/.zshrc" ]]; then
+    cp "$HOME/.zshrc" "$HOME/.zshrc.litezsh-backup-$(date +%Y%m%d-%H%M%S)"
     sed -i '/# LiteZsh/d' "$HOME/.zshrc"
     sed -i '/litezsh\/litezsh.zsh/d' "$HOME/.zshrc"
     # Remove the PATH export line written by the clean-rewrite installer
