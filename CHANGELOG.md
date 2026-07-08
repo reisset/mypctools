@@ -4,6 +4,22 @@ All notable changes to mypctools.
 
 ---
 
+## [0.39.1] - 2026-07-08
+
+### Fixed
+- **Empty shimmer guard**: `Shimmer.Tick()` returns nil when text is empty, preventing useless animation ticks.
+- **Logging resilience**: Replaced `sync.Once` with retry-safe double-checked init so a transient `UserHomeDir()` failure doesn't permanently disable logging.
+- **Receiver consistency**: Unified `systemsetup` screen to pointer receivers (`*Model`) across all `Screen` interface methods.
+- **ID_LIKE word-boundary matching**: `distro.go` now tokenizes `ID_LIKE` to prevent substring false-positives (e.g., "debian" matching "debbian").
+- **Truncate guard**: `truncate()` in service list defends against `max < 2` to prevent slice-bounds panic.
+- **Icon thread safety**: Added `sync.RWMutex` and `GetIcons()` getter to protect the package-level `Icons` variable from data races.
+- **Path traversal prevention**: `exec.go` validates `bundle.ID` contains no path separators and action is `install` or `uninstall`.
+- **Git update resilience**: `CheckForUpdates` split into separate 5s fetch + 2s rev-list contexts (was shared 3s).
+- **Claude installer robustness**: `install.sh` uses `${BASH_SOURCE[0]}` instead of `$0` for correct behavior under `source` or symlinks.
+- **Uninstaller safety**: `litebash` and `litezsh` uninstallers now back up `.bashrc`/`.zshrc` before `sed -i`.
+
+---
+
 ## [0.38.1] - 2026-06-11
 
 ### Chore
