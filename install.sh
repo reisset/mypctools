@@ -37,6 +37,7 @@ info "Detected architecture: $ARCH"
 # Check dependencies
 command -v git &>/dev/null || error "git is required but not installed"
 command -v curl &>/dev/null || error "curl is required but not installed"
+command -v sha256sum &>/dev/null || error "sha256sum is required but not installed"
 
 # Create directories
 mkdir -p "$BIN_DIR"
@@ -60,14 +61,32 @@ else
 fi
 success "Repository ready at $INSTALL_DIR"
 
-# Download binary from latest release
+# Download binary from latest release and verify it the same way the in-app
+# self-updater does — fail closed rather than install an unverified binary.
+# Staged inside BIN_DIR so the final move is an atomic same-filesystem rename.
 info "Downloading mypctools binary..."
-RELEASE_URL="https://github.com/$REPO/releases/latest/download/mypctools-linux-$ARCH"
-if ! curl -fsSL "$RELEASE_URL" -o "$BIN_DIR/mypctools"; then
-    error "Failed to download binary. Check that a release exists at: $RELEASE_URL"
+BASE_URL="https://github.com/$REPO/releases/latest/download"
+BIN_NAME="mypctools-linux-$ARCH"
+TMP_DIR=$(mktemp -d "$BIN_DIR/.mypctools-install.XXXXXX")
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+if ! curl -fsSL "$BASE_URL/$BIN_NAME" -o "$TMP_DIR/$BIN_NAME"; then
+    error "Failed to download binary. Check that a release exists at: $BASE_URL/$BIN_NAME"
 fi
-chmod +x "$BIN_DIR/mypctools"
-success "Binary installed to $BIN_DIR/mypctools"
+
+if ! curl -fsSL "$BASE_URL/checksums.txt" -o "$TMP_DIR/checksums.txt"; then
+    error "Failed to download checksums.txt — refusing to install an unverified binary"
+fi
+
+EXPECTED=$(awk -v f="$BIN_NAME" '$NF == f || $NF == "*" f { print $1 }' "$TMP_DIR/checksums.txt")
+[[ -n "$EXPECTED" ]] || error "No checksum published for $BIN_NAME — refusing to install"
+
+ACTUAL=$(sha256sum "$TMP_DIR/$BIN_NAME" | awk '{print $1}')
+[[ "$ACTUAL" == "$EXPECTED" ]] || error "Checksum mismatch for $BIN_NAME (expected $EXPECTED, got $ACTUAL)"
+
+chmod +x "$TMP_DIR/$BIN_NAME"
+mv "$TMP_DIR/$BIN_NAME" "$BIN_DIR/mypctools"
+success "Binary installed and verified (sha256 ${ACTUAL:0:12}...)"
 
 # Ensure ~/.local/bin is in PATH
 if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then

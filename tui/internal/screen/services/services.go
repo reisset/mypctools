@@ -148,13 +148,9 @@ func (m ServiceListModel) Init() tea.Cmd {
 func (m ServiceListModel) loadServices() tea.Cmd {
 	return func() tea.Msg {
 		if m.showAll {
-			names, err := system.ListAllServices()
+			svcs, err := system.GetAllServices()
 			if err != nil {
 				return servicesLoadedMsg{services: nil}
-			}
-			var svcs []system.ServiceStatus
-			for _, name := range names {
-				svcs = append(svcs, system.GetServiceStatus(name))
 			}
 			return servicesLoadedMsg{services: svcs}
 		}

@@ -10,26 +10,21 @@ import (
 
 var (
 	logMu      sync.Mutex
-	logDirInit sync.Mutex
 	logDirPath string
-	logDirDone bool
 )
 
+// ensureLogDir is only ever called with logMu held, so it needs no locking of
+// its own. A failed lookup leaves the path empty so the next call retries.
 func ensureLogDir() string {
-	if logDirDone {
-		return logDirPath
-	}
-	logDirInit.Lock()
-	defer logDirInit.Unlock()
-	if logDirDone {
+	if logDirPath != "" {
 		return logDirPath
 	}
 	home, err := os.UserHomeDir()
-	if err == nil {
-		logDirPath = filepath.Join(home, ".local", "share", "mypctools")
-		os.MkdirAll(logDirPath, 0755)
+	if err != nil {
+		return ""
 	}
-	logDirDone = true
+	logDirPath = filepath.Join(home, ".local", "share", "mypctools")
+	os.MkdirAll(logDirPath, 0755)
 	return logDirPath
 }
 

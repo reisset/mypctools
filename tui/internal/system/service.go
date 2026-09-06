@@ -83,12 +83,61 @@ func ServiceExists(name string) bool {
 	return strings.Contains(string(out), name+".service")
 }
 
-// GetKnownServices returns the status of all known services that exist on the system.
+// unitFileStates maps every installed service unit to its enable state.
+func unitFileStates() (map[string]string, error) {
+	out, err := exec.Command("systemctl", "list-unit-files", "--type=service", "--no-pager", "--no-legend").Output()
+	if err != nil {
+		return nil, err
+	}
+	states := make(map[string]string)
+	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+		states[strings.TrimSuffix(fields[0], ".service")] = fields[1]
+	}
+	return states, nil
+}
+
+// activeStates maps every loaded service unit to its active state.
+// Units missing from the result are installed but not loaded.
+func activeStates() map[string]string {
+	out, err := exec.Command("systemctl", "list-units", "--type=service", "--all", "--plain", "--no-pager", "--no-legend").Output()
+	if err != nil {
+		return nil
+	}
+	states := make(map[string]string)
+	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 3 {
+			continue
+		}
+		states[strings.TrimSuffix(fields[0], ".service")] = fields[2]
+	}
+	return states
+}
+
+func listedStatus(name, enabled string, active map[string]string) ServiceStatus {
+	state := active[name]
+	if state == "" {
+		state = "inactive"
+	}
+	return ServiceStatus{Name: name, Active: state, Enabled: enabled}
+}
+
+// GetKnownServices returns the status of all known services installed on the system.
 func GetKnownServices() []ServiceStatus {
+	enabled, err := unitFileStates()
+	if err != nil {
+		return nil
+	}
+	active := activeStates()
+
 	var services []ServiceStatus
 	for _, name := range KnownServices {
-		if ServiceExists(name) {
-			services = append(services, GetServiceStatus(name))
+		if state, ok := enabled[name]; ok {
+			services = append(services, listedStatus(name, state, active))
 		}
 	}
 	return services
@@ -100,23 +149,18 @@ func ServiceActionCmd(name, action string) *exec.Cmd {
 	return exec.Command("sudo", "systemctl", action, name)
 }
 
-// ListAllServices returns all service names on the system.
-func ListAllServices() ([]string, error) {
-	out, err := exec.Command("systemctl", "list-unit-files", "--type=service", "--no-pager", "--no-legend").Output()
+// GetAllServices returns the status of every installed service, sorted by name.
+func GetAllServices() ([]ServiceStatus, error) {
+	enabled, err := unitFileStates()
 	if err != nil {
 		return nil, err
 	}
+	active := activeStates()
 
-	var services []string
-	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
-		fields := strings.Fields(line)
-		if len(fields) > 0 {
-			name := strings.TrimSuffix(fields[0], ".service")
-			if name != "" {
-				services = append(services, name)
-			}
-		}
+	services := make([]ServiceStatus, 0, len(enabled))
+	for name, state := range enabled {
+		services = append(services, listedStatus(name, state, active))
 	}
-	sort.Strings(services)
+	sort.Slice(services, func(i, j int) bool { return services[i].Name < services[j].Name })
 	return services, nil
 }

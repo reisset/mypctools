@@ -4,6 +4,21 @@ All notable changes to mypctools.
 
 ---
 
+## [0.41.0] - 2026-09-05
+
+### Security
+- **`install.sh` installed the binary unverified**: the in-app self-updater has verified SHA256 fail-closed since 0.38.0, but the initial install — which runs via `curl | bash` — downloaded the binary with no verification at all, straight to its final path, then made it executable. A truncated or interrupted download left a corrupt executable installed. The download is now staged inside `~/.local/bin` (same filesystem, so the final `mv` is an atomic rename), checked against the published `checksums.txt`, and aborts if the checksum is missing, unreadable, or mismatched.
+
+### Fixed
+- **`pacman -Syu --noconfirm` was two bugs in one line**: `--noconfirm` auto-answers prompts to replace or remove packages during a full upgrade, which is the documented way to break an Arch install unattended; and plain `pacman` never updates AUR packages, so anything installed by the `gnome-ubuntu` bundle silently went stale forever. System update now prefers `paru -Syu`, falls back to `pacman -Syu`, and no longer passes `--noconfirm` — a full upgrade will ask for confirmation.
+- **Logging double-checked locking was inert**: `ensureLogDir` is only ever reached with `logMu` already held, so the second mutex and the double-check did nothing while technically racing on a plain `bool`. Removed; a failed home-directory lookup still retries on the next call.
+
+### Changed
+- **Service listing is ~10x faster**: the list view renders only name and active state, but fetched four subprocesses per service (`list-unit-files`, `is-active`, `is-enabled`, `show`). Across 370 units that was ~1,480 process spawns and roughly 2s of lag. Both states are available in bulk, so listings now parse one `list-unit-files` plus one `list-units` call — 2 subprocesses, ~198ms, verified to produce identical results to the per-service path. `ListAllServices` is replaced by `GetAllServices`; `GetServiceStatus` is unchanged and still backs the detail view, which needs the main PID.
+- **CLAUDE.md corrected**: it claimed `go build` hangs and must never be run — it completes in about 0.16s, and the instruction cost every session a needless round-trip. The Design Decisions section also documented curl|bash installers for Ollama, OpenCode, and Mistral Vibe, none of which exist in the repo; it now describes the two that do (starship, spicetify) plus three previously undocumented decisions: the runtime clone is a force-synced mirror, system update prefers paru, and systemctl is batched rather than looped.
+
+---
+
 ## [0.40.0] - 2026-09-05
 
 ### Fixed

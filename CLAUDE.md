@@ -64,17 +64,23 @@ Targets **CachyOS** (primary Arch flavor) and **Debian/Ubuntu**. Fedora is inten
 
 ## Design Decisions
 
-**curl|bash fallback installers**: Fallbacks for Ollama, OpenCode, Claude Code, and Mistral Vibe pipe directly from official vendor URLs (`curl ... | bash`). Intentional — official trusted installers, simplifies code, acceptable for a personal tool.
+**curl|bash vendor installers**: starship (`starship.rs/install.sh`) and spicetify (`spicetify/cli`) pipe directly from official vendor URLs. Intentional — official trusted installers, simplifies code, acceptable for a personal tool.
+
+**Runtime clone is a mirror, never merged**: the TUI reads scripts from `~/.local/share/mypctools`, a *separate* clone from your dev checkout — `findRootDir()` checks that path first, unconditionally. It is force-synced (`system.RepoSyncCmd`: fetch, unshallow if needed, `reset --hard origin/main`), never `git pull --ff-only`. A plain ff-pull cannot recover if remote history is ever rewritten, which strands the install permanently and also blocks the self-updater, since it pulls scripts before replacing the binary.
+
+**System update prefers `paru`**: it covers AUR packages, which bundles like gnome-ubuntu install. Deliberately no `--noconfirm` on a full upgrade — auto-answering package replacement prompts is how an Arch box breaks.
+
+**Batch systemctl, don't loop it**: service listings parse one `list-unit-files` plus one `list-units` call. Calling `systemctl` per service was 4 subprocesses × ~370 units ≈ 2s of lag.
 
 ## Go TUI (tui/)
 
-**Building locally** (testing only): Claude must NOT run `go build` directly — it hangs in sandboxed environments. Provide the command and ask the user to run it.
+**Building locally** (testing only):
 
 ```bash
 cd ~/mypctools/tui && go build -o ~/.local/bin/mypctools ./main.go
 ```
 
-**Releasing**: Any change under `tui/` requires a new semver tag. GitHub Actions builds and publishes the binary. The in-app self-updater downloads the new binary + runs `git pull`.
+**Releasing**: Any change under `tui/` requires a new semver tag. GitHub Actions builds and publishes the binary. The in-app self-updater downloads the new binary + runs a force-sync of the scripts.
 
 ```bash
 git tag v0.X.Y && git push origin v0.X.Y
