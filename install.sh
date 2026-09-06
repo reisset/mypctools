@@ -98,7 +98,21 @@ success "Repository ready at $INSTALL_DIR"
 # self-updater does — fail closed rather than install an unverified binary.
 # Staged inside BIN_DIR so the final move is an atomic same-filesystem rename.
 info "Downloading mypctools binary..."
+
+# Resolve the newest tag and download from its explicit URL. The
+# releases/latest/download alias can keep serving the PREVIOUS release's assets
+# for a while after a new one publishes, and since checksums.txt goes stale
+# alongside the binary, the two still match and verification cannot catch it.
 BASE_URL="https://github.com/$REPO/releases/latest/download"
+TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" 2>/dev/null \
+    | grep -m1 '"tag_name"' | sed 's/.*: *"\(.*\)",*/\1/')
+if [[ -n "$TAG" ]]; then
+    BASE_URL="https://github.com/$REPO/releases/download/$TAG"
+    info "Latest release: $TAG"
+else
+    info "Could not query the release API — falling back to latest/download"
+fi
+
 BIN_NAME="mypctools-linux-$ARCH"
 TMP_DIR=$(mktemp -d "$BIN_DIR/.mypctools-install.XXXXXX")
 trap 'rm -rf "$TMP_DIR"' EXIT

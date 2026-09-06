@@ -3,6 +3,7 @@ package selfupdate
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,8 +19,35 @@ import (
 var httpClient = &http.Client{Timeout: 60 * time.Second}
 
 const (
-	releaseBaseURL = "https://github.com/reisset/mypctools/releases/latest/download"
+	fallbackBaseURL  = "https://github.com/reisset/mypctools/releases/latest/download"
+	latestReleaseAPI = "https://api.github.com/repos/reisset/mypctools/releases/latest"
 )
+
+// releaseBaseURL resolves the newest tag and returns its explicit download URL.
+// The releases/latest/download alias can keep serving the PREVIOUS release's
+// assets after a new one publishes; because checksums.txt goes stale alongside
+// the binary, the pair still verifies and the staleness passes silently.
+func releaseBaseURL() string {
+	resp, err := httpClient.Get(latestReleaseAPI)
+	if err != nil {
+		return fallbackBaseURL
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fallbackBaseURL
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return fallbackBaseURL
+	}
+	var release struct {
+		TagName string `json:"tag_name"`
+	}
+	if err := json.Unmarshal(body, &release); err != nil || release.TagName == "" {
+		return fallbackBaseURL
+	}
+	return "https://github.com/reisset/mypctools/releases/download/" + release.TagName
+}
 
 // Update pulls the latest scripts then downloads and replaces the binary.
 // Scripts are updated first so that a binary-download failure leaves the repo
@@ -45,8 +73,9 @@ func Update(scriptsDir string) error {
 	// Download and replace binary
 	arch := runtime.GOARCH
 	binaryName := fmt.Sprintf("mypctools-linux-%s", arch)
-	binaryURL := fmt.Sprintf("%s/%s", releaseBaseURL, binaryName)
-	checksumsURL := fmt.Sprintf("%s/checksums.txt", releaseBaseURL)
+	baseURL := releaseBaseURL()
+	binaryURL := fmt.Sprintf("%s/%s", baseURL, binaryName)
+	checksumsURL := fmt.Sprintf("%s/checksums.txt", baseURL)
 
 	fmt.Printf("Downloading latest binary (%s)...\n", arch)
 	if err := downloadAndReplace(binaryURL, checksumsURL, binaryName, exePath); err != nil {

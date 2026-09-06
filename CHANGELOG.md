@@ -4,6 +4,13 @@ All notable changes to mypctools.
 
 ---
 
+## [0.42.1] - 2026-09-05
+
+### Fixed
+- **Installs and self-updates could silently fetch the previous release.** Both `install.sh` and the self-updater downloaded from `releases/latest/download`, an alias that can keep serving the *previous* release's assets for some time after a new one publishes. Observed immediately after v0.42.0 shipped: the release API reported `v0.42.0` while `latest/download` still returned the v0.41.0 binary, so a fresh `install.sh` run produced a v0.41.0 install that looked successful. **SHA256 verification cannot catch this** — `checksums.txt` goes stale alongside the binary, so the pair still matches. Both paths now resolve the newest tag via the releases API and download from its explicit `releases/download/<tag>/` URL, falling back to the old alias only if the API is unreachable.
+
+---
+
 ## [0.42.0] - 2026-09-05
 
 ### Removed
