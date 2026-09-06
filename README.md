@@ -7,7 +7,7 @@
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0a0a0c)](LICENSE)
-[![Go](https://img.shields.io/badge/go-1.22%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0a0a0c)](https://go.dev)
+[![Go](https://img.shields.io/badge/go-1.26%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0a0a0c)](https://go.dev)
 
 </div>
 

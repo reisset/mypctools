@@ -4,6 +4,21 @@ All notable changes to mypctools.
 
 ---
 
+## [0.40.0] - 2026-09-05
+
+### Fixed
+- **Pull updates could brick permanently**: `pullupdate` and the self-updater both ran `git pull --ff-only` against the runtime clone at `~/.local/share/mypctools`. Once the remote history was rewritten the two shared no common ancestor, so every pull failed with `Not possible to fast-forward` and no recovery path existed. Both now use `system.RepoSyncCmd`, which fetches (unshallowing when needed) and hard-resets to `origin/main` — the runtime clone is a read-only mirror, so local divergence is always discarded. Stale tags are force-updated.
+- **Self-update was blocked by the same failure**: `Update()` pulls scripts before replacing the binary and aborts on error, so a stranded clone also prevented the binary from ever updating. Existing broken installs must be repaired by re-running `install.sh`.
+- **`install.sh` inherited both flaws**: re-runs now force-sync instead of `git pull`, and the initial clone is full-depth rather than `--depth=1`.
+- **ARM64 tool installs were silently broken**: three release-asset patterns never matched on `aarch64`. lazygit and glow are goreleaser projects that label ARM assets `arm64`, not `aarch64`; fastfetch is the inverse — `dpkg --print-architecture` reports `arm64` while the published `.deb` is `aarch64`. All patterns verified against live releases on both architectures.
+
+### Changed
+- **Go 1.22 → 1.26**: 1.22 had been end-of-life since early 2025. `go.mod`, the CI toolchain pin, and the README badge now agree.
+- **Dependencies**: `bubbles` 0.20.0 → 1.0.0, `bubbletea` 1.3.4 → 1.3.10, plus transitive updates (`x/text` 0.3.8 → 0.41.0, `x/sys` 0.30.0 → 0.47.0). `govulncheck` reports zero vulnerabilities, down from one dormant advisory.
+- **Release workflow**: all five actions were years behind. `checkout` v4 → v7, `setup-go` v5 → v7, `upload-artifact` v4 → v7, `download-artifact` v4 → v8, and `action-gh-release` **v1 → v3** (v1 ran on the long-retired Node 16 runtime). The download step now uses `merge-multiple: true`, which replaces the per-directory `sha256sum` subshells with a single command while preserving the bare filenames the self-updater matches verbatim.
+
+---
+
 ## [0.39.1] - 2026-07-08
 
 ### Fixed

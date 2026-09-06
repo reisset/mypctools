@@ -93,7 +93,7 @@ Script-only changes (`scripts/`, `lib/`) are safe to push to main without a tag.
 - `tui/internal/cmd/` — CLI argument handling
 - `tui/internal/logging/` — Operation logging to `~/.local/share/mypctools/mypctools.log`
 - `tui/internal/selfupdate/` — Binary self-update with SHA256 verification
-- `tui/internal/system/` — System operations (update, cleanup, services, notifications)
+- `tui/internal/system/` — System operations (update, cleanup, services, notifications, repo sync)
 
 **Patterns**:
 - Screens implement `app.Screen`: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`

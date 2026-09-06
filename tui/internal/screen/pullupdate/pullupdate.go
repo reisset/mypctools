@@ -2,7 +2,6 @@ package pullupdate
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -10,6 +9,7 @@ import (
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/bundle"
 	"github.com/reisset/mypctools/tui/internal/state"
+	"github.com/reisset/mypctools/tui/internal/system"
 	"github.com/reisset/mypctools/tui/internal/theme"
 	"github.com/reisset/mypctools/tui/internal/ui"
 )
@@ -35,7 +35,7 @@ func New(shared *state.Shared) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	cmd := exec.Command("git", "-C", m.shared.RootDir, "pull", "--ff-only")
+	cmd := system.RepoSyncCmd(m.shared.RootDir)
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
 		return app.ExecDoneMsg{Err: err}
 	})

@@ -43,13 +43,20 @@ mkdir -p "$BIN_DIR"
 mkdir -p "$INSTALL_DIR"
 
 # Clone or update repo (for scripts/)
+# This checkout is a read-only mirror, so it is force-synced rather than merged —
+# a plain pull cannot recover if the remote history has been rewritten.
 if [[ -d "$INSTALL_DIR/.git" ]]; then
     info "Updating mypctools..."
-    git -C "$INSTALL_DIR" pull --quiet
+    if [[ "$(git -C "$INSTALL_DIR" rev-parse --is-shallow-repository)" == "true" ]]; then
+        git -C "$INSTALL_DIR" fetch --unshallow --tags --force --prune --quiet origin
+    else
+        git -C "$INSTALL_DIR" fetch --tags --force --prune --quiet origin
+    fi
+    git -C "$INSTALL_DIR" reset --hard --quiet origin/main
 else
     info "Cloning mypctools..."
     rm -rf "$INSTALL_DIR"
-    git clone --depth=1 --quiet "https://github.com/$REPO.git" "$INSTALL_DIR"
+    git clone --quiet "https://github.com/$REPO.git" "$INSTALL_DIR"
 fi
 success "Repository ready at $INSTALL_DIR"
 

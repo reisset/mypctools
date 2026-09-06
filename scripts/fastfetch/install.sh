@@ -35,6 +35,8 @@ install_fastfetch_deb() {
     print_status "Package not in repos, downloading from GitHub..."
     local arch
     arch=$(dpkg --print-architecture 2>/dev/null || echo "amd64")
+    # fastfetch publishes aarch64 .debs; dpkg reports that arch as arm64
+    [ "$arch" = "arm64" ] && arch="aarch64"
     local api_url="https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest"
     local deb_url
     deb_url=$(curl -fsSL "$api_url" 2>/dev/null | grep -oP '"browser_download_url":\s*"\K[^"]*linux-'"$arch"'\.deb' | head -1)

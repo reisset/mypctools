@@ -289,17 +289,21 @@ install_all_tools() {
     local _step=0 _total=8
     _show_step() { ((_step++)); print_status "[$_step/$_total] $1"; }
 
+    # goreleaser projects (lazygit, glow) label arm64 assets "arm64", not "aarch64"
+    local goarch="$ARCH"
+    [ "$ARCH" = "aarch64" ] && goarch="arm64"
+
     _show_step "Installing zoxide..."
     _tools_install_from_github "ajeetdsouza/zoxide" "zoxide" "${ARCH}.*linux.*musl"
 
     _show_step "Installing lazygit..."
-    _tools_install_from_github "jesseduffield/lazygit" "lazygit" "linux_${ARCH}\.tar\.gz"
+    _tools_install_from_github "jesseduffield/lazygit" "lazygit" "linux_${goarch}\.tar\.gz"
 
     _show_step "Installing tldr..."
     _tools_install_tldr
 
     _show_step "Installing glow..."
-    _tools_install_from_github "charmbracelet/glow" "glow" "Linux_${ARCH}\.tar\.gz"
+    _tools_install_from_github "charmbracelet/glow" "glow" "Linux_${goarch}\.tar\.gz"
 
     _show_step "Installing dysk..."
     _tools_install_dysk

@@ -7,11 +7,12 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/reisset/mypctools/tui/internal/system"
 )
 
 var httpClient = &http.Client{Timeout: 60 * time.Second}
@@ -144,10 +145,9 @@ func fetchExpectedChecksum(checksumsURL, filename string) (string, error) {
 	return "", fmt.Errorf("checksum not found for %s", filename)
 }
 
-// gitPull runs git pull in the specified directory.
+// gitPull force-syncs the script checkout in dir to origin/main.
 func gitPull(dir string) error {
-	cmd := exec.Command("git", "pull", "--ff-only")
-	cmd.Dir = dir
+	cmd := system.RepoSyncCmd(dir)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
