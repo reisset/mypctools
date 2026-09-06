@@ -3,12 +3,14 @@
 # v1.7 - Removed set -e for reliability
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../lib/print.sh"
+source "$SCRIPT_DIR/../../lib/distro-detect.sh"
 
-# Check for jq (required for settings.json manipulation)
+# jq drives the settings.json merge below and statusline.sh at runtime.
 if ! command -v jq &>/dev/null; then
-    echo "Error: jq is required but not installed."
-    echo "Install it with: apt install jq / pacman -S jq"
-    exit 1
+    print_status "Installing jq..."
+    $PKG_INSTALL jq
+    command -v jq &>/dev/null || { print_error "jq is required but could not be installed"; exit 1; }
 fi
 
 echo "Installing Claude Code config..."

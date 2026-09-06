@@ -11,7 +11,6 @@ import (
 	"github.com/reisset/mypctools/tui/internal/app"
 	"github.com/reisset/mypctools/tui/internal/screen/pullupdate"
 	"github.com/reisset/mypctools/tui/internal/screen/scripts"
-	"github.com/reisset/mypctools/tui/internal/screen/systemsetup"
 	"github.com/reisset/mypctools/tui/internal/state"
 	"github.com/reisset/mypctools/tui/internal/theme"
 	"github.com/reisset/mypctools/tui/internal/ui"
@@ -67,7 +66,6 @@ func (m *Model) rebuildItemsIfNeeded() {
 	m.lastUpdateCount = m.shared.UpdateCount
 	m.items = []menuItem{
 		{icon: "◆", label: "My Scripts", id: "scripts"},
-		{icon: "⚙", label: "System Setup", id: "system"},
 	}
 	if m.shared.UpdateCount > 0 {
 		m.items = append(m.items, menuItem{
@@ -149,8 +147,6 @@ func (m Model) handleSelection(id string) tea.Cmd {
 		return tea.Quit
 	case "scripts":
 		return app.Navigate(scripts.New(m.shared))
-	case "system":
-		return app.Navigate(systemsetup.New(m.shared))
 	case "update":
 		return app.Navigate(pullupdate.New(m.shared))
 	}

@@ -117,6 +117,7 @@ main() {
     pkg_install "unzip" "unzip" "unzip"
     pkg_install "tar" "tar" "tar"
     pkg_install "git" "git" "git"
+    pkg_install "jq" "jq" "jq"
 
     # Install plugins
     install_plugins
@@ -134,7 +135,8 @@ main() {
 
     # Create Debian symlinks + install all GitHub tools
     create_debian_symlinks
-    install_all_tools
+    local tools_failed=0
+    install_all_tools || tools_failed=1
 
     # Symlink config files (source of truth in repo, aliases and TOOLS.md are shared)
     print_status "Installing LiteZsh config..."
@@ -182,12 +184,13 @@ main() {
     if [[ "$needs_clean_zshrc" == "true" ]]; then
         print_warning "Existing .zshrc has conflicting configs (oh-my-zsh/p10k/distro)"
         print_warning "LiteZsh needs a clean .zshrc — your current one will be backed up to ~/.zshrc.pre-litezsh"
-        read -rp "Overwrite ~/.zshrc? [y/N] " _confirm
-        if [[ ! "$_confirm" =~ ^[Yy]$ ]]; then
+        # Defaults to yes: declining appends the LiteZsh source line to the
+        # conflicting rc and still switches the login shell, leaving the two
+        # configs fighting. The original is backed up either way.
+        if ! confirm "Overwrite ~/.zshrc?" y; then
             print_warning "Skipping .zshrc replacement — manual setup may be required"
             needs_clean_zshrc=false
         fi
-        unset _confirm
     fi
 
     if [[ "$needs_clean_zshrc" == "true" ]]; then
@@ -217,7 +220,11 @@ ZSHRC
     set_default_shell "$(command -v zsh)"
 
     echo ""
-    print_success "Installation complete!"
+    if [[ $tools_failed -eq 1 ]]; then
+        print_warning "Installed with errors — some CLI tools are missing (see above)."
+    else
+        print_success "Installation complete!"
+    fi
     echo ""
     echo -e "${YELLOW}╔════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}║  LOG OUT AND BACK IN to start using zsh!   ║${NC}"
@@ -225,6 +232,8 @@ ZSHRC
     echo ""
     echo "Or run 'zsh' to try it now without logging out."
     echo "Type 'tools' to see the quick reference."
+
+    return $tools_failed
 }
 
 main "$@"

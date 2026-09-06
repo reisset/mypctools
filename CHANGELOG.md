@@ -4,6 +4,33 @@ All notable changes to mypctools.
 
 ---
 
+## [0.42.0] - 2026-09-05
+
+### Removed
+- **System Setup is gone** — full system update, system cleanup, the service manager, and the Nerd Font toggle. That was **1,345 lines, 36% of the Go codebase**, for a feature set that was never used, and it was the riskiest code here: `pacman -Syu`, orphan removal, cache deletion and systemd control. Typing `paru -Syu` beats launching a TUI to run it. Dropping it also removes `bubbles` as a dependency (its only use in the repo was one viewport) and cuts `IconSet` from 18 fields to 5, since 13 were already dead.
+
+### Added
+- **Non-interactive CLI** — `mypctools install <bundle>...`, `uninstall`, and `list`, so a fresh machine can be set up in one pasteable line instead of ~19 keypresses and 6 prompts. Bundle names are validated up front, so a typo cannot half-configure a machine; every bundle is attempted even if an earlier one fails, and the exit code is non-zero if any did.
+- **`is_noninteractive()` / `confirm()`** in `lib/print.sh`. Headless mode is signalled explicitly via `MYPCTOOLS_NONINTERACTIVE=1` rather than inferred from the tty, because the CLI has a real terminal (so `sudo` can prompt) but must not ask questions.
+
+### Fixed
+- **`dysk` installed the wrong architecture.** Its release is a single zip containing every target (`build/<triple>/dysk`, including macOS and armv7), and the installer took the first match — on x86_64 that selected `aarch64-unknown-linux-musl`, installing an ARM64 binary. Now selects the triple matching `uname -m`.
+- **`simple_choose` span forever on EOF** — a `while true` loop whose `read` failure was never checked, measured at 552,046 iterations in 5 seconds at 100% CPU. It now takes the first option on EOF, and returns early when non-interactive.
+- **`install.sh` failed on machines without `git`.** It hard-required `git`/`curl`/`sha256sum` and installed none of them, so it fell over on stock Ubuntu Server and Raspberry Pi OS images. Missing dependencies are now installed via inline package-manager detection (this runs before the repo clone, so `lib/distro-detect.sh` isn't available yet).
+- **`~/.local/bin` was never actually added to PATH** — the installer only printed advice, so `mypctools` was routinely "command not found" immediately after the documented install command. It now appends to `.bashrc`/`.zshrc`/`config.fish` idempotently.
+- **`jq` was an uninstalled hard dependency** — the claude bundle exited 1 without it and `statusline.sh` degraded at runtime, yet nothing installed it. Added to the litebash/litezsh base packages, and the claude bundle now installs it.
+- **Installers reported success having installed nothing.** With `set -e` deliberately absent, a run where all 8 CLI tools failed still printed "Installation complete!". Failures are now collected and reported, and the script exits non-zero.
+- **LiteZsh's `.zshrc` prompt defaulted to No**, which appended its source line to the conflicting rc and still switched the login shell, leaving two configs fighting. It now defaults to Yes; the original is backed up either way.
+- **`set_default_terminal` and three uninstall prompts had no EOF guard** and silently answered whatever a failed `read` left behind. All prompts now route through `confirm` with an explicit default.
+- **`raspbian` was missing** from the known distro IDs in both `lib/distro-detect.sh` and `tui/internal/cmd/distro.go`; Raspberry Pi OS resolved only via the `ID_LIKE` fallback.
+
+### Changed
+- **CLI tools install from the distro package manager first**, falling back to GitHub releases only when no package provides them. All 8 are in the CachyOS repos, so the primary target no longer scrapes release assets at all — removing both the silent-rot failure mode that broke three arm64 patterns for months, and the 7-API-calls-per-run pressure on GitHub's 60/hr unauthenticated limit.
+- **Nerd Font icons are auto-detected** (~76µs directory scan) instead of toggled and persisted to a flag file. `MYPCTOOLS_ICONS=nerd|ascii` overrides detection.
+- Path validation for bundle scripts is consolidated in `bundle.ScriptPath`, used by the TUI, AutoSync and the CLI alike.
+
+---
+
 ## [0.41.0] - 2026-09-05
 
 ### Security

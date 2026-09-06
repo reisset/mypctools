@@ -21,21 +21,33 @@ func main() {
 		switch os.Args[1] {
 		case "--help", "-h":
 			fmt.Printf("mypctools v%s\n", config.Version)
-			fmt.Println("A personal TUI for managing scripts and system setup")
+			fmt.Println("A personal TUI for setting up Linux machines")
 			fmt.Println("Built with Bubble Tea by Charm")
 			fmt.Println()
-			fmt.Println("Usage: mypctools [command] [option]")
+			fmt.Println("Usage: mypctools [command] [args]")
 			fmt.Println()
 			fmt.Println("Commands:")
-			fmt.Println("  update           Update binary and scripts to latest version")
+			fmt.Println("  install <bundle>...     Install bundles without the TUI")
+			fmt.Println("  uninstall <bundle>...   Uninstall bundles without the TUI")
+			fmt.Println("  list                    List bundles and installed status")
+			fmt.Println("  update                  Update binary and scripts to latest version")
 			fmt.Println()
 			fmt.Println("Options:")
-			fmt.Println("  --help, -h       Show this help message")
-			fmt.Println("  --version, -v    Show version number")
+			fmt.Println("  --help, -h              Show this help message")
+			fmt.Println("  --version, -v           Show version number")
+			fmt.Println()
+			fmt.Println("Run with no arguments to start the TUI.")
+			fmt.Println()
+			fmt.Println("Example:")
+			fmt.Println("  mypctools install litezsh kitty fastfetch claude")
 			os.Exit(0)
 		case "--version", "-v":
 			fmt.Printf("mypctools v%s\n", config.Version)
 			os.Exit(0)
+		case "install", "uninstall":
+			os.Exit(cmd.RunBundles(findRootDir(), os.Args[1], os.Args[2:]))
+		case "list":
+			os.Exit(cmd.ListBundles())
 		case "update":
 			scriptsDir := findRootDir()
 			fmt.Println("Updating mypctools...")

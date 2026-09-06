@@ -35,9 +35,42 @@ esac
 info "Detected architecture: $ARCH"
 
 # Check dependencies
-command -v git &>/dev/null || error "git is required but not installed"
-command -v curl &>/dev/null || error "curl is required but not installed"
-command -v sha256sum &>/dev/null || error "sha256sum is required but not installed"
+# Install anything missing rather than failing — stock Ubuntu Server and
+# Raspberry Pi OS images frequently ship without git.
+#
+# This runs before the repo clone, so lib/distro-detect.sh isn't available yet
+# and the package manager is detected inline. The script is executed as
+# `curl | bash`, so stdin is the pipe: never prompt here. sudo is fine, it
+# reads the password from /dev/tty.
+ensure_deps() {
+    local missing=() pkgs=() c
+    for c in git curl sha256sum; do
+        command -v "$c" &>/dev/null || missing+=("$c")
+    done
+    [[ ${#missing[@]} -eq 0 ]] && return 0
+
+    info "Installing missing dependencies: ${missing[*]}"
+    for c in "${missing[@]}"; do
+        case "$c" in
+            sha256sum) pkgs+=("coreutils") ;;
+            *)         pkgs+=("$c") ;;
+        esac
+    done
+
+    if command -v pacman &>/dev/null; then
+        sudo pacman -S --noconfirm --needed "${pkgs[@]}" || error "Failed to install: ${pkgs[*]}"
+    elif command -v apt-get &>/dev/null; then
+        sudo apt-get update -qq
+        sudo apt-get install -y "${pkgs[@]}" || error "Failed to install: ${pkgs[*]}"
+    else
+        error "Missing ${missing[*]}, and neither pacman nor apt was found. Install them and re-run."
+    fi
+
+    for c in "${missing[@]}"; do
+        command -v "$c" &>/dev/null || error "$c is still unavailable after installing ${pkgs[*]}"
+    done
+}
+ensure_deps
 
 # Create directories
 mkdir -p "$BIN_DIR"
@@ -88,10 +121,22 @@ chmod +x "$TMP_DIR/$BIN_NAME"
 mv "$TMP_DIR/$BIN_NAME" "$BIN_DIR/mypctools"
 success "Binary installed and verified (sha256 ${ACTUAL:0:12}...)"
 
-# Ensure ~/.local/bin is in PATH
+# Ensure ~/.local/bin is on PATH — write it rather than only advising, or
+# mypctools is "command not found" immediately after this installer runs.
+add_path_line() {
+    local rc="$1" line="$2"
+    [[ -f "$rc" ]] || return 0
+    grep -q '\.local/bin' "$rc" 2>/dev/null && return 0
+    printf '\n# Added by mypctools\n%s\n' "$line" >> "$rc"
+    info "Added ~/.local/bin to PATH in $rc"
+}
+
 if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+    add_path_line "$HOME/.bashrc" 'export PATH="$HOME/.local/bin:$PATH"'
+    add_path_line "$HOME/.zshrc" 'export PATH="$HOME/.local/bin:$PATH"'
+    add_path_line "$HOME/.config/fish/config.fish" 'fish_add_path "$HOME/.local/bin"'
     echo ""
-    info "Add to your shell config:"
+    info "Not on PATH in this shell yet. Either restart it, or run:"
     echo '  export PATH="$HOME/.local/bin:$PATH"'
 fi
 

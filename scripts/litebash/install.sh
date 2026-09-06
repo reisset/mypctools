@@ -63,6 +63,7 @@ main() {
     pkg_install "unzip" "unzip" "unzip"
     pkg_install "tar" "tar" "tar"
     pkg_install "git" "git" "git"
+    pkg_install "jq" "jq" "jq"
 
     # Install core tools via package manager
     print_status "Installing core tools..."
@@ -77,7 +78,8 @@ main() {
 
     # Create Debian symlinks + install all GitHub tools
     create_debian_symlinks
-    install_all_tools
+    local tools_failed=0
+    install_all_tools || tools_failed=1
 
     # Symlink config files (source of truth in repo, aliases and TOOLS.md are shared)
     print_status "Installing LiteBash config..."
@@ -147,10 +149,16 @@ BASHRC
     set_default_shell "$(command -v bash)"
 
     echo ""
-    print_success "Installation complete!"
+    if [[ $tools_failed -eq 1 ]]; then
+        print_warning "Installed with errors — some CLI tools are missing (see above)."
+    else
+        print_success "Installation complete!"
+    fi
     echo ""
     echo "Restart your shell or run: source ~/.bashrc"
     echo "Type 'tools' to see the quick reference."
+
+    return $tools_failed
 }
 
 main "$@"

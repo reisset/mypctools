@@ -15,7 +15,7 @@ detect_distro() {
                 DISTRO_TYPE="arch"
                 DISTRO_NAME="$os_name"
                 ;;
-            ubuntu|pop|debian|linuxmint|elementary|zorin)
+            ubuntu|pop|debian|raspbian|linuxmint|elementary|zorin)
                 DISTRO_TYPE="debian"
                 DISTRO_NAME="$os_name"
                 ;;

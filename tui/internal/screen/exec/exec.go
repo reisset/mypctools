@@ -3,8 +3,6 @@ package exec
 import (
 	"fmt"
 	"os/exec"
-	"path/filepath"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -35,18 +33,10 @@ func New(shared *state.Shared, b bundle.Bundle, action string) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	// Build script path — validate inputs to prevent path traversal.
-	if strings.Contains(m.bundle.ID, "/") || strings.Contains(m.bundle.ID, "\\") {
-		return func() tea.Msg {
-			return app.ExecDoneMsg{Err: fmt.Errorf("invalid bundle ID: %s", m.bundle.ID)}
-		}
+	scriptPath, err := bundle.ScriptPath(m.shared.RootDir, m.bundle.ID, m.action)
+	if err != nil {
+		return func() tea.Msg { return app.ExecDoneMsg{Err: err} }
 	}
-	if m.action != "install" && m.action != "uninstall" {
-		return func() tea.Msg {
-			return app.ExecDoneMsg{Err: fmt.Errorf("invalid action: %s", m.action)}
-		}
-	}
-	scriptPath := filepath.Join(m.shared.RootDir, "scripts", m.bundle.ID, m.action+".sh")
 
 	// Use tea.ExecProcess to give the script full terminal control
 	cmd := exec.Command("bash", scriptPath)

@@ -30,8 +30,35 @@ _curl_github_api() {
     return 1
 }
 
-# All tools installed to ~/.local/bin from GitHub releases
+# Tools that may end up in ~/.local/bin when no distro package provides them
 LOCAL_TOOLS=(zoxide lazygit tldr glow dysk dust yazi starship)
+
+# Try the distro package before scraping a GitHub release. Packages don't rot
+# when upstream renames a release asset, and don't burn the 60/hr unauthenticated
+# GitHub API quota. Returns non-zero if the binary still isn't available.
+# Usage: _tools_pkg_first <binary> <pacman-pkg> <apt-pkg>
+_tools_pkg_first() {
+    local binary="$1" arch_pkg="$2" deb_pkg="$3" pkg
+
+    if command -v "$binary" &>/dev/null; then
+        print_success "$binary already installed"
+        return 0
+    fi
+
+    case "$PKG_MGR" in
+        pacman) pkg="$arch_pkg" ;;
+        apt)    pkg="$deb_pkg" ;;
+        *)      return 1 ;;
+    esac
+    [ -n "$pkg" ] || return 1
+
+    $PKG_INSTALL "$pkg" &>/dev/null
+    if command -v "$binary" &>/dev/null; then
+        print_success "Installed $binary via $PKG_MGR"
+        return 0
+    fi
+    return 1
+}
 
 # Install from GitHub releases (generic)
 _tools_install_from_github() {
@@ -189,9 +216,17 @@ _tools_install_dysk() {
     curl -fsSL -o "dysk.zip" "$download_url" || exit 1
     unzip -q "dysk.zip"
 
+    # The zip ships every target (build/<triple>/dysk), including macOS and
+    # armv7. Picking the first match installs the wrong architecture.
+    local target
+    case "$ARCH" in
+        x86_64)  target="x86_64-unknown-linux-musl" ;;
+        aarch64) target="aarch64-unknown-linux-musl" ;;
+        *)       exit 1 ;;
+    esac
+
     local binary_path
-    binary_path=$(find . -name "dysk" -type f -executable 2>/dev/null | head -1)
-    [ -z "$binary_path" ] && binary_path=$(find . -name "dysk" -type f 2>/dev/null | head -1)
+    binary_path=$(find . -path "*/$target/dysk" -type f 2>/dev/null | head -1)
 
     if [ -n "$binary_path" ] && [ -f "$binary_path" ]; then
         chmod +x "$binary_path"
@@ -284,9 +319,11 @@ _tools_install_starship() {
     fi
 }
 
-# Install all GitHub-release tools + Debian symlinks
+# Install the CLI tools, preferring distro packages over GitHub releases.
+# Returns non-zero if any tool could not be installed.
 install_all_tools() {
     local _step=0 _total=8
+    local failed=()
     _show_step() { ((_step++)); print_status "[$_step/$_total] $1"; }
 
     # goreleaser projects (lazygit, glow) label arm64 assets "arm64", not "aarch64"
@@ -294,28 +331,42 @@ install_all_tools() {
     [ "$ARCH" = "aarch64" ] && goarch="arm64"
 
     _show_step "Installing zoxide..."
-    _tools_install_from_github "ajeetdsouza/zoxide" "zoxide" "${ARCH}.*linux.*musl"
+    _tools_pkg_first zoxide zoxide zoxide \
+        || _tools_install_from_github "ajeetdsouza/zoxide" "zoxide" "${ARCH}.*linux.*musl" \
+        || failed+=(zoxide)
 
     _show_step "Installing lazygit..."
-    _tools_install_from_github "jesseduffield/lazygit" "lazygit" "linux_${goarch}\.tar\.gz"
+    _tools_pkg_first lazygit lazygit lazygit \
+        || _tools_install_from_github "jesseduffield/lazygit" "lazygit" "linux_${goarch}\.tar\.gz" \
+        || failed+=(lazygit)
 
     _show_step "Installing tldr..."
-    _tools_install_tldr
+    _tools_pkg_first tldr tealdeer tealdeer || _tools_install_tldr || failed+=(tldr)
 
     _show_step "Installing glow..."
-    _tools_install_from_github "charmbracelet/glow" "glow" "Linux_${goarch}\.tar\.gz"
+    _tools_pkg_first glow glow glow \
+        || _tools_install_from_github "charmbracelet/glow" "glow" "Linux_${goarch}\.tar\.gz" \
+        || failed+=(glow)
 
     _show_step "Installing dysk..."
-    _tools_install_dysk
+    _tools_pkg_first dysk dysk dysk || _tools_install_dysk || failed+=(dysk)
 
     _show_step "Installing dust..."
-    _tools_install_dust
+    _tools_pkg_first dust dust du-dust || _tools_install_dust || failed+=(dust)
 
     _show_step "Installing yazi..."
-    _tools_install_from_github "sxyazi/yazi" "yazi" "${ARCH}-unknown-linux-musl\.zip"
+    _tools_pkg_first yazi yazi yazi \
+        || _tools_install_from_github "sxyazi/yazi" "yazi" "${ARCH}-unknown-linux-musl\.zip" \
+        || failed+=(yazi)
 
     _show_step "Installing starship..."
-    _tools_install_starship
+    _tools_pkg_first starship starship starship || _tools_install_starship || failed+=(starship)
+
+    if [ ${#failed[@]} -gt 0 ]; then
+        print_warning "Could not install: ${failed[*]}"
+        return 1
+    fi
+    return 0
 }
 
 # Create Debian/Ubuntu symlinks for bat/fd naming differences

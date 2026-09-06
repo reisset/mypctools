@@ -3,7 +3,6 @@ package bundle
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
 )
 
 // SyncInstalled re-runs install.sh for every installed AutoSync bundle.
@@ -14,9 +13,14 @@ func SyncInstalled(rootDir string) []string {
 		if !b.AutoSync || !IsInstalled(&b) {
 			continue
 		}
-		script := filepath.Join(rootDir, "scripts", b.ID, "install.sh")
+		script, err := ScriptPath(rootDir, b.ID, "install")
+		if err != nil {
+			continue
+		}
 		cmd := exec.Command("bash", script)
-		cmd.Env = os.Environ()
+		// Stdin is nil here, so scripts are already headless; say so explicitly
+		// rather than relying on that being noticed.
+		cmd.Env = append(os.Environ(), "MYPCTOOLS_NONINTERACTIVE=1")
 		if err := cmd.Run(); err == nil {
 			synced = append(synced, b.Name)
 		}

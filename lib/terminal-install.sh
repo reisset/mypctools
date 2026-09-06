@@ -16,8 +16,8 @@ source "$_TERMINAL_INSTALL_DIR/distro-detect.sh"
 select_theme() {
     local theme_file="${THEME_FILE:-}"
 
-    if [ ! -t 0 ]; then
-        # Non-interactive (AutoSync): restore persisted theme or use default
+    if is_noninteractive; then
+        # Headless (AutoSync or CLI): restore persisted theme or use default
         if [ -n "$theme_file" ] && [ -f "$theme_file" ]; then
             THEME=$(cat "$theme_file")
             print_status "Using persisted theme: $THEME"
@@ -123,9 +123,9 @@ set_default_terminal() {
     local backup_file="$HOME/.config/xdg-terminals.list.${terminal_name}-backup"
 
     echo ""
-    read -rp "Set $terminal_name as default terminal? [y/N]: " set_default
-
-    if [[ ! "$set_default" =~ ^[Yy]$ ]]; then
+    # Defaults to no: this is a system-wide change, and it is also reached on
+    # every AutoSync re-run of the terminal bundles.
+    if ! confirm "Set $terminal_name as default terminal?" n; then
         print_status "Skipping default terminal setup"
         return 0
     fi

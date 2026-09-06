@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Context
 
-mypctools is a personal Go TUI for managing scripts and system setup across Linux systems. Built with Bubble Tea / Lip Gloss. When researching UI inspiration, produce concrete implementation plans with specific styling values (colors, padding, borders) rather than vague suggestions.
+mypctools is a personal Go TUI for setting up fresh Linux machines. Built with Bubble Tea / Lip Gloss. It is used to bootstrap a new machine (CachyOS, Ubuntu, Raspberry Pi), install a few script bundles, and then largely not opened again — favour future-proofing and unattended operation over features. When researching UI inspiration, produce concrete implementation plans with specific styling values (colors, padding, borders) rather than vague suggestions.
 
 ## UI/UX Principles
 
@@ -68,9 +68,11 @@ Targets **CachyOS** (primary Arch flavor) and **Debian/Ubuntu**. Fedora is inten
 
 **Runtime clone is a mirror, never merged**: the TUI reads scripts from `~/.local/share/mypctools`, a *separate* clone from your dev checkout — `findRootDir()` checks that path first, unconditionally. It is force-synced (`system.RepoSyncCmd`: fetch, unshallow if needed, `reset --hard origin/main`), never `git pull --ff-only`. A plain ff-pull cannot recover if remote history is ever rewritten, which strands the install permanently and also blocks the self-updater, since it pulls scripts before replacing the binary.
 
-**System update prefers `paru`**: it covers AUR packages, which bundles like gnome-ubuntu install. Deliberately no `--noconfirm` on a full upgrade — auto-answering package replacement prompts is how an Arch box breaks.
+**No system maintenance**: system update, cleanup and the service manager were removed in v0.42.0 — they were 36% of the Go code, were never used, and were the riskiest thing here (`pacman -Syu`, orphan removal, systemd control). Typing `paru -Syu` beats launching a TUI to run it. Don't add them back.
 
-**Batch systemctl, don't loop it**: service listings parse one `list-unit-files` plus one `list-units` call. Calling `systemctl` per service was 4 subprocesses × ~370 units ≈ 2s of lag.
+**Package-first, GitHub second**: CLI tools install from the distro package manager and only scrape a GitHub release when no package provides them (`_tools_pkg_first` in `lib/tools-install.sh`). Release-asset regexes rot silently — three arm64 patterns were broken for months — and 7 unauthenticated API calls per run hit the 60/hr limit, after which the installer used to report success having installed nothing.
+
+**Headless is signalled explicitly, not inferred**: `is_noninteractive()` in `lib/print.sh` is true when `MYPCTOOLS_NONINTERACTIVE=1` **or** stdin is not a tty. Testing the tty alone is not enough — the CLI has a real terminal (so `sudo` can prompt) but must not ask questions. Every prompt goes through `confirm` or `simple_choose`, both of which take a default on EOF.
 
 ## Go TUI (tui/)
 
@@ -90,19 +92,19 @@ Script-only changes (`scripts/`, `lib/`) are safe to push to main without a tag.
 
 **Structure**:
 - `tui/internal/app/` — Root model, screen interface, navigation (Navigate/PopScreen)
-- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, update, cleanup, services, pullupdate, systemsetup)
-- `tui/internal/bundle/` — Script bundle registry and installation detection
+- `tui/internal/screen/` — Screen implementations (mainmenu, scripts, scriptmenu, exec, pullupdate)
+- `tui/internal/bundle/` — Script bundle registry, install detection, and script execution (`ScriptPath`/`Run`)
 - `tui/internal/theme/` — Single DefaultCyan palette, gradient logo, Lip Gloss styles
 - `tui/internal/ui/` — Shared components (list, badges, header, footer, shimmer, fadeup)
 - `tui/internal/state/` — Shared state (distro info, terminal size, update count)
 - `tui/internal/config/` — Version, log path, config dir constants
-- `tui/internal/cmd/` — CLI argument handling
+- `tui/internal/cmd/` — Distro detection and the non-TUI subcommands (`install`/`uninstall`/`list`)
 - `tui/internal/logging/` — Operation logging to `~/.local/share/mypctools/mypctools.log`
 - `tui/internal/selfupdate/` — Binary self-update with SHA256 verification
-- `tui/internal/system/` — System operations (update, cleanup, services, notifications, repo sync)
+- `tui/internal/system/` — Desktop notifications and repo sync
 
 **Patterns**:
-- Screens implement `app.Screen`: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`
+- Screens implement `app.Screen`: `Init()`, `Update()`, `View()`, `Title()`, `ShortHelp()`, `HandlesBack()`
 - Navigation: `app.Navigate(screen)` pushes, `app.PopScreen()` pops
 - Menu rendering: `ui.RenderList()` — cyan `│` bar highlight, separators, suffixes
 - List width: `ListConfig.MaxInnerWidth` controls max content width (default 50, scripts uses 80)

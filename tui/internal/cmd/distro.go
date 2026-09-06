@@ -36,6 +36,7 @@ var knownIDs = map[string]DistroType{
 	"ubuntu":      DistroDebian,
 	"pop":         DistroDebian,
 	"debian":      DistroDebian,
+	"raspbian":    DistroDebian,
 	"linuxmint":   DistroDebian,
 	"elementary":  DistroDebian,
 	"zorin":       DistroDebian,

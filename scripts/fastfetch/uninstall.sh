@@ -12,8 +12,7 @@ if [[ -L "$CONFIG_FILE" ]]; then
     print_success "Removed config symlink"
 elif [[ -f "$CONFIG_FILE" ]]; then
     print_warning "Config is not a symlink (may have been modified manually)"
-    read -rp "Remove anyway? [y/N]: " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    if confirm "Remove anyway?" n; then
         rm "$CONFIG_FILE"
         print_success "Removed config file"
     fi

@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared shell aliases (sourced by litebash and litezsh)
 # The 'tools' alias is defined separately by each shell bundle
 

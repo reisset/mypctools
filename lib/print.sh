@@ -42,6 +42,28 @@ ensure_sudo() {
     sudo -v || { print_error "Sudo access required."; return 1; }
 }
 
+# True when prompts must be skipped: an explicit flag from a headless caller
+# (the CLI, which has a tty but must not ask), or no terminal on stdin
+# (AutoSync, which runs scripts with stdin closed).
+is_noninteractive() {
+    [[ -n "${MYPCTOOLS_NONINTERACTIVE:-}" || ! -t 0 ]]
+}
+
+# confirm <question> <default: y|n> — returns 0 for yes, 1 for no.
+# Non-interactive, an empty answer, and EOF all take the default.
+confirm() {
+    local question="$1" default="${2:-n}" suffix reply
+    if [[ "$default" == "y" ]]; then suffix="[Y/n]"; else suffix="[y/N]"; fi
+
+    if is_noninteractive; then
+        [[ "$default" == "y" ]]
+        return
+    fi
+
+    read -rp "$question $suffix " reply || reply=""
+    [[ "${reply:-$default}" =~ ^[Yy]$ ]]
+}
+
 # Simple menu selection (replaces themed_choose)
 # Usage: result=$(simple_choose "Prompt:" "opt1" "opt2" "opt3")
 simple_choose() {
@@ -56,9 +78,18 @@ simple_choose() {
         ((i++))
     done
 
+    if is_noninteractive; then
+        echo "${options[0]}"
+        return 0
+    fi
+
     local choice
     while true; do
-        read -rp "Enter number: " choice
+        # A failed read means EOF — without this the loop spins forever.
+        if ! read -rp "Enter number: " choice; then
+            echo "${options[0]}"
+            return 0
+        fi
         if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#options[@]} )); then
             echo "${options[$((choice-1))]}"
             return 0

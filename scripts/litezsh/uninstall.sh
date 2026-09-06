@@ -80,8 +80,7 @@ uninstall_starship_config
 
 # Ask about removing tools
 echo ""
-read -rp "Remove installed CLI tools? [y/N]: " remove_tools
-if [[ "$remove_tools" =~ ^[Yy]$ ]]; then
+if confirm "Remove installed CLI tools?" n; then
     uninstall_local_tools
     print_pkg_removal_instructions "zsh"
 else

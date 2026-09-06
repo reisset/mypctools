@@ -2,7 +2,7 @@
 
 # mypctools
 
-**A TUI for managing scripts and system setup across Linux systems.**
+**A TUI for setting up fresh Linux machines.**
 
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) by Charm.
 
@@ -20,6 +20,13 @@ curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/install.sh |
 mypctools
 ```
 
+Or skip the TUI and install bundles directly:
+
+```bash
+mypctools install litezsh kitty fastfetch claude
+mypctools list
+```
+
 Uninstall: `curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/uninstall.sh | bash`
 
 ---
@@ -35,15 +42,11 @@ Uninstall: `curl -fsSL https://raw.githubusercontent.com/reisset/mypctools/main/
 - **Spicetify** — StarryNight theme for native Spotify.
 - **Claude Setup** — Claude Code skills and statusline.
 
-## System Setup
-
-Full system update, cleanup, and systemd service manager built in.
-
 ---
 
 ## Requirements
 
-Linux (CachyOS or Debian/Ubuntu), x86_64 or arm64.
+Linux (CachyOS or Debian/Ubuntu), x86_64 or arm64. 32-bit ARM is not supported.
 
 <details>
 <summary>Build from Source</summary>
